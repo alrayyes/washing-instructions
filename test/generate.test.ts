@@ -71,6 +71,6 @@ describe("bun run generate", () => {
 
   test("reports the piles that collapsed onto one card", () => {
     expect(stdout).toContain("sharing one card");
-    expect(stdout).toContain("Uniqlo Gym Clothes (AIRism) + Uniqlo HEATTECH");
+    expect(stdout).toContain("Merino Wool + Cashmere Blend");
   });
 });

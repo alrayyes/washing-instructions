@@ -81,31 +81,28 @@ export function loadGroups<T extends Instruction>(instructions: T[]): T[][] {
 }
 
 /**
- * Everything about a pile except what it is called. Two piles with the same
- * fingerprint have nothing left to tell you apart, so they share a card.
+ * Everything you physically set: the programme, what the display reads, which
+ * buttons are lit, whether softener goes in, and where the iron's ring points.
+ *
+ * Deliberately *not* the prose. Two piles can want the same six settings and
+ * still want different detergent or a different drying rack, and those the card
+ * lists per pile rather than splitting into two near-identical cards.
  */
 function fingerprint(item: Instruction): string {
   return JSON.stringify([
-    item.detergent,
-    item.fabricSoftener,
+    item.program,
     item.temperature,
     item.spin,
-    item.duration,
-    item.program,
     [...item.options].sort(),
-    item.ironing,
+    item.fabricSoftener,
     item.ironSetting,
-    item.drying,
-    item.colourGroup,
-    [...item.mixTags].sort(),
-    item.notes,
   ]);
 }
 
 /**
- * Piles whose instructions are identical in every attribute — programme, iron,
- * detergent, drying, the lot. Printing a card each would print the same card
- * twice, so they get one card listing both names.
+ * Piles you set the machine and the iron up for identically. Every dial
+ * drawing on their cards would be the same drawing, so they get one card
+ * listing all the names.
  */
 export function cardGroups<T extends Instruction>(instructions: T[]): T[][] {
   const groups = new Map<string, T[]>();

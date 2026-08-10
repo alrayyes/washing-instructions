@@ -31,7 +31,14 @@ export function ProgramDial({ program, size = 76 }: { program: string; size?: nu
   const step = 360 / washer.programs.length;
 
   return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    // An Svg carries no intrinsic height in the layout, so without the style
+    // it overflows whatever box it is centred in.
+    <Svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ width: size, height: size }}
+    >
       {/* The red arc printed on the fascia, running clockwise from Uit. */}
       <Path
         d={arc(centre, centre, outer, step * 0.6, 360 - step * 0.6)}
@@ -100,7 +107,14 @@ export function IronDial({ setting, size = 76 }: { setting: string; size?: numbe
   const pointer = polar(centre, centre, knob - 1.5, angleOf(index));
 
   return (
-    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    // An Svg carries no intrinsic height in the layout, so without the style
+    // it overflows whatever box it is centred in.
+    <Svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ width: size, height: size }}
+    >
       <Path
         d={arc(centre, centre, outer, angleOf(0), angleOf(0) + sweep)}
         stroke={off ? colour.hairline : colour.line}
@@ -279,7 +293,8 @@ export function ControlPanel({ item, dialSize = 76 }: { item: Instruction; dialS
 }
 
 /** The iron half of a card: dial plus what the setting means in words. */
-export function IronPanel({ item, dialSize = 62 }: { item: Instruction; dialSize?: number }) {
+export function IronPanel({ items, dialSize = 62 }: { items: Instruction[]; dialSize?: number }) {
+  const item = items[0] as Instruction;
   const setting = item.ironSetting === "none" ? undefined : ironSetting(item.ironSetting);
 
   return (
@@ -305,10 +320,82 @@ export function IronPanel({ item, dialSize = 62 }: { item: Instruction; dialSize
             {setting.steam ? "inside the steam zone" : "below the steam zone — dry iron only"}
           </Text>
         )}
-        <Text style={{ fontFamily: font.sans, fontSize: 7.2, color: colour.body, marginTop: 2.5 }}>
-          {item.ironing}
-        </Text>
+        <Prose items={items} pick={(entry) => entry.ironing} size={7.2} marginTop={2.5} />
       </View>
+    </View>
+  );
+}
+
+/**
+ * A line of prose for a card. Where the piles sharing the card agree it reads
+ * once; where they differ each pile is named, so a merged card never quietly
+ * asserts one pile's advice over another's.
+ */
+function Prose({
+  items,
+  pick,
+  size = 7.6,
+  marginTop = 0,
+  emphasis = false,
+}: {
+  items: Instruction[];
+  pick: (item: Instruction) => string;
+  size?: number;
+  marginTop?: number;
+  emphasis?: boolean;
+}) {
+  const values = items.map(pick);
+  const style = {
+    fontFamily: emphasis ? font.bold : font.sans,
+    fontSize: size,
+    lineHeight: 1.35,
+    color: emphasis ? colour.ink : colour.body,
+    marginTop,
+  } as const;
+
+  if (values.every((value) => value === values[0])) {
+    return <Text style={style}>{values[0]}</Text>;
+  }
+
+  return (
+    <View style={{ marginTop }}>
+      {items.map((item, index) => (
+        <Text key={item.clothingType} style={{ ...style, marginTop: index === 0 ? 0 : 1.5 }}>
+          <Text style={{ fontFamily: font.bold, color: colour.ink }}>{item.clothingType}: </Text>
+          {values[index]}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
+/** A labelled block of prose that may differ between the piles on a card. */
+export function SplitField({
+  label,
+  items,
+  pick,
+  emphasis = false,
+}: {
+  label: string;
+  items: Instruction[];
+  pick: (item: Instruction) => string;
+  emphasis?: boolean;
+}) {
+  if (items.every((item) => pick(item) === "")) return null;
+
+  return (
+    <View style={{ marginTop: 3.5 }}>
+      <Text
+        style={{
+          fontFamily: font.bold,
+          fontSize: 5.8,
+          letterSpacing: 0.6,
+          color: colour.muted,
+        }}
+      >
+        {label.toUpperCase()}
+      </Text>
+      <Prose items={items} pick={pick} emphasis={emphasis} />
     </View>
   );
 }

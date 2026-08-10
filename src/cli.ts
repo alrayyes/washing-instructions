@@ -75,7 +75,7 @@ async function main(argv: string[]): Promise<void> {
     }
   }
   if (merged.length > 0) {
-    console.log("\nIdentical in every attribute, so sharing one card:");
+    console.log("\nSet up identically on both appliances, so sharing one card:");
     for (const group of merged) {
       console.log(`  ${group.map((item) => item.clothingType).join(" + ")}`);
     }

@@ -1,10 +1,18 @@
 import { Document, Page, Text, View } from "@react-pdf/renderer";
-import { ControlPanel, Field, IronPanel, ProgramDial, SoftenerBadge } from "./components";
+import {
+  ControlPanel,
+  Field,
+  IronPanel,
+  ProgramDial,
+  SoftenerBadge,
+  SplitField,
+} from "./components";
 import { iron, ironSetting, washer } from "./machine";
 import {
   type Blocker,
   blockerCode,
   blockerLegend,
+  canMix,
   cardGroups,
   loadGroups,
   mixBlocker,
@@ -41,9 +49,9 @@ function SectionHeading({ children }: { children: string }) {
 /**
  * One card, top to bottom: what it is, how the machine goes, iron, dry.
  *
- * `group` is usually a single pile. Where two piles came out identical in
- * every attribute they share one card, because printing it twice would only
- * change the heading.
+ * `group` is usually a single pile. Where several piles are set up identically
+ * on both appliances they share one card, and any prose they disagree on is
+ * listed per pile rather than one pile's advice standing in for the rest.
  */
 function Card({
   group,
@@ -56,9 +64,15 @@ function Card({
 }) {
   const item = group[0] as ResolvedInstruction;
   const heading = group.map((member) => member.clothingType).join(" + ");
-  // Piles on this card wash together by definition; don't list them twice.
   const names = new Set(group.map((member) => member.clothingType));
-  const alsoWith = item.mixesWith.filter((name) => !names.has(name));
+  // Identical settings do not guarantee they may share a drum — the colour and
+  // lint rules are separate — so ask rather than assume.
+  const together = group.every((a) => group.every((b) => a === b || canMix(a, b)));
+  // Only piles that suit every member of the card, not just the first one.
+  const alsoWith = item.mixesWith.filter(
+    (name) => !names.has(name) && group.every((member) => member.mixesWith.includes(name)),
+  );
+  const durations = [...new Set(group.map((member) => member.duration))];
 
   return (
     <View
@@ -94,7 +108,7 @@ function Card({
           {index}. {heading}
         </Text>
         <Text style={{ fontFamily: font.sans, fontSize: 7, color: colour.muted }}>
-          {item.duration}
+          {durations.join(" / ")}
         </Text>
       </View>
 
@@ -108,26 +122,28 @@ function Card({
 
       <ControlPanel item={item} dialSize={compact ? 68 : 78} />
 
-      <Field label="Detergent" value={item.detergent} />
+      <SplitField label="Detergent" items={group} pick={(member) => member.detergent} />
 
       <View style={{ marginTop: 5 }}>
         <SectionHeading>Iron</SectionHeading>
-        <IronPanel item={item} dialSize={compact ? 54 : 62} />
+        <IronPanel items={group} dialSize={compact ? 54 : 62} />
       </View>
 
-      <Field label="Drying" value={item.drying} />
+      <SplitField label="Drying" items={group} pick={(member) => member.drying} />
       <Field
         label="Wash together with"
         value={
-          group.length > 1
+          group.length > 1 && together
             ? `each other${alsoWith.length > 0 ? `, and ${alsoWith.join(", ")}` : ""}`
-            : alsoWith.length > 0
-              ? alsoWith.join(", ")
-              : "nothing else — wash alone"
+            : group.length > 1
+              ? "same settings, but wash these separately — see the matrix"
+              : alsoWith.length > 0
+                ? alsoWith.join(", ")
+                : "nothing else — wash alone"
         }
         emphasis
       />
-      {item.notes !== "" && <Field label="Notes" value={item.notes} />}
+      <SplitField label="Notes" items={group} pick={(member) => member.notes} />
     </View>
   );
 }
@@ -219,16 +235,38 @@ function Legend() {
         gap: 10,
         backgroundColor: colour.panel,
         borderRadius: 3,
-        padding: 6,
+        padding: 8,
         marginBottom: 10,
       }}
     >
-      <View style={{ alignItems: "center", width: 54 }}>
+      {/*
+        The height is stated rather than inferred: an Svg contributes nothing
+        to the layout, so without it the grey panel shrinks to the caption and
+        the dial spills out of the top.
+      */}
+      <View style={{ width: 54, height: 66, alignItems: "center" }}>
         <ProgramDial program="Katoen" size={54} />
-        <Text style={{ fontFamily: font.sans, fontSize: 5.5, color: colour.muted }}>programme</Text>
+        <Text
+          style={{
+            fontFamily: font.sans,
+            fontSize: 5.5,
+            color: colour.muted,
+            marginTop: 2,
+          }}
+        >
+          programme
+        </Text>
       </View>
       <View style={{ flex: 1, justifyContent: "center" }}>
-        <Text style={{ fontFamily: font.sans, fontSize: 7, color: colour.body, lineHeight: 1.4 }}>
+        <Text
+          style={{
+            fontFamily: font.sans,
+            fontSize: 7,
+            color: colour.body,
+            lineHeight: 1.4,
+            paddingRight: 2,
+          }}
+        >
           The dials are drawn as they sit on the machine: twelve o'clock is Uit, and the red pointer
           is where to turn it. Chips show every value the display steps through, filled in on the
           one you want. On the iron, the blue band is the zone where it makes steam.

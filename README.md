@@ -54,8 +54,8 @@ bun run generate
 ```
 
 ```text
-Read 16 piles from /home/you/washing-instructions/data/washing-instructions.csv
-  out/washing-instructions-phone.pdf  one page, 6265 pt tall (10 layout passes)
+Read 15 piles from /home/you/washing-instructions/data/washing-instructions.csv
+  out/washing-instructions-phone.pdf  one page, 6053 pt tall (10 layout passes)
   out/washing-instructions-print.pdf
 
 Piles that can share a drum:
@@ -63,10 +63,9 @@ Piles that can share a drum:
   Coloured + Coloured Socks
   Dark + Black Socks + Denim
   Merino Wool + Cashmere Blend
-  Uniqlo Gym Clothes (AIRism) + Uniqlo HEATTECH
 
-Identical in every attribute, so sharing one card:
-  Uniqlo Gym Clothes (AIRism) + Uniqlo HEATTECH
+Set up identically on both appliances, so sharing one card:
+  Merino Wool + Cashmere Blend
 ```
 
 Point it at your own file, or somewhere else for the output:
@@ -123,16 +122,21 @@ Rule 4 is why White and White Socks share a load but White Towels do not: the
 towels want 1400 rpm and an extra rinse, which is a different wash even though
 the temperature agrees.
 
-### One card for two piles
+### One card for several piles
 
-Sharing a load still gets you a card each, because the ironing and drying
-usually differ — Dark, Black Socks and Denim wash identically but want a
-two-dot iron, no iron and a three-dot iron respectively.
+Sharing a load still gets you a card each. Dark, Black Socks and Denim wash
+identically but want a two-dot iron, no iron and a three-dot iron respectively,
+so the iron drawing alone justifies three cards.
 
-When two piles match on *every* attribute, though — detergent, softener,
-temperature, spin, programme, buttons, ironing, drying, tags, notes — a card
-each would be the same card twice. Those are merged into one card listing both
-names, as AIRism and HEATTECH are.
+Piles merge onto one card when everything you physically *set* agrees:
+programme, temperature, spin, option buttons, whether softener goes in, and
+where the iron's thermostat points. Every dial drawing would be the same
+drawing, so one card carries all the names — Merino Wool and Cashmere Blend, for
+instance.
+
+Prose is deliberately not part of that key. Those two want different detergent
+and different drying, and the card lists both lines against the pile they belong
+to rather than letting one stand in for the other.
 
 ### Retargeting it to different appliances
 

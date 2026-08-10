@@ -87,28 +87,38 @@ describe("cardGroups", () => {
     expect(groups[0]?.map((item) => item.clothingType)).toEqual(["AIRism", "HEATTECH"]);
   });
 
-  test("keeps piles apart when any single attribute differs", () => {
-    const attributes: Partial<Instruction>[] = [
-      { detergent: "Something else" },
-      { fabricSoftener: true },
+  test("splits on anything you physically set", () => {
+    const settings: Partial<Instruction>[] = [
+      { program: "Wol" },
       { temperature: "60" },
       { spin: "400" },
-      { duration: "~9:99" },
-      { program: "Wol" },
       { options: [] },
-      { ironing: "Carefully" },
+      { fabricSoftener: true },
       { ironSetting: "3" },
-      { drying: "On a line" },
-      { colourGroup: "dark" },
-      { mixTags: ["solo"] },
-      { notes: "Beware" },
     ];
-    for (const attribute of attributes) {
+    for (const setting of settings) {
       const groups = cardGroups([
         pile({ clothingType: "A" }),
-        pile({ clothingType: "B", ...attribute }),
+        pile({ clothingType: "B", ...setting }),
       ]);
-      expect(groups, `differing on ${Object.keys(attribute)[0]}`).toHaveLength(2);
+      expect(groups, `differing on ${Object.keys(setting)[0]}`).toHaveLength(2);
+    }
+  });
+
+  test("still merges when only the prose differs", () => {
+    const prose: Partial<Instruction>[] = [
+      { detergent: "Something else" },
+      { duration: "~9:99" },
+      { ironing: "Carefully" },
+      { drying: "On a line" },
+      { notes: "Beware" },
+    ];
+    for (const difference of prose) {
+      const groups = cardGroups([
+        pile({ clothingType: "A" }),
+        pile({ clothingType: "B", ...difference }),
+      ]);
+      expect(groups, `differing on ${Object.keys(difference)[0]}`).toHaveLength(1);
     }
   });
 
