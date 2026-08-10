@@ -1,0 +1,12 @@
+config:
+  # Prose wraps where it reads best; a hard column limit fights that.
+  MD013: false
+  # The README opens with a badge row, not a heading.
+  MD041: false
+
+globs:
+  - "**/*.md"
+
+ignores:
+  - "node_modules/**"
+  - "out/**"

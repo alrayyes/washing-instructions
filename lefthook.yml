@@ -1,0 +1,23 @@
+# Same commands CI runs, so the hook and the gate cannot drift.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      glob: "*.{js,jsx,ts,tsx,json,jsonc,css}"
+      run: bunx --bun biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    - name: markdownlint
+      glob: "*.md"
+      run: bunx --bun markdownlint-cli2 {staged_files}
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: bunx --bun commitlint --edit {1}
+
+pre-push:
+  jobs:
+    - name: typecheck
+      run: bun run typecheck
+    - name: test
+      run: bun test
