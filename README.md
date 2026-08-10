@@ -1,9 +1,10 @@
 <!--
-Maintainer note (not rendered): the badge row is deliberately absent. There is
-no pipeline, forge release or coverage report to point one at yet, and a badge
-reading "unknown" is worse than no badge. Add the row in the same commit that
-adds CI.
+Maintainer note (not rendered): only the pipeline badge is here because it is
+the only thing wired up. Add a release badge in the same commit that adds
+semantic-release, and a licence badge when a licence is chosen.
 -->
+[![pipeline status](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/badges/main/pipeline.svg)](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/commits/main)
+
 # Washing instructions
 
 Nobody remembers whether the towels go in at 40 or 60, which button stops the
