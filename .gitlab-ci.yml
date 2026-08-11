@@ -47,8 +47,15 @@ ltex:
 # Style. House voice, weasel words, wordiness, undefined jargon. Advice rather
 # than a verdict, so it reports at warning level and is allowed to fail: style
 # that blocks a merge only teaches people to skip the hooks.
+#
+# The Debian bun image rather than the musl one above, for the same reason the
+# job over there needs its own: Vale's Linux release is dynamically linked
+# against glibc and libstdc++, so on Alpine it installs perfectly and then fails
+# to start. The error is a bare ENOENT on a file that plainly exists, because
+# the thing exec cannot find is the ELF interpreter, not the binary.
 vale:
   stage: check
+  image: oven/bun:1.3.14-debian@sha256:9dba1a1b43ce28c9d7931bfc4eb00feb63b0114720a0277a8f939ae4dfc9db6f
   extends: .install
   script:
     - bun run prose:sync

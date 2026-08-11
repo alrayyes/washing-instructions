@@ -30,3 +30,23 @@ export function releaseUrl(asset: string): string {
 }
 
 export const CHECKSUMS_URL = releaseUrl(`vale_${VALE_VERSION}_checksums.txt`);
+
+/**
+ * What the binary at `path` says it is, or null if there isn't one that runs.
+ *
+ * Spawning is the probe rather than a file check, because a Vale built against
+ * the wrong libc installs perfectly and then cannot start — and exec reports
+ * that as ENOENT on a file that plainly exists, since the thing it cannot find
+ * is the ELF interpreter. Answering "not installed" turns that into the
+ * version-mismatch message the caller already knows how to explain.
+ */
+export async function installedVersion(path: string): Promise<string | null> {
+  if (!(await Bun.file(path).exists())) return null;
+  try {
+    const probe = Bun.spawnSync([path, "--version"]);
+    if (!probe.success) return null;
+    return probe.stdout.toString().trim().split(/\s+/).at(-1) ?? null;
+  } catch {
+    return null;
+  }
+}
