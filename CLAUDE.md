@@ -12,8 +12,9 @@ for the phone, and an A4 reference sheet plus detail cards for printing.
 ## Commands
 
 - `bun run generate` — write both PDFs to `out/`
-- `bun run check` — Biome, Prettier, markdownlint, `tsc --noEmit` and the tests, in that order
+- `bun run check` — every linter, `tsc --noEmit` and the tests, in that order
 - `bun run format:md` — Prettier over the Markdown; it owns `*.md` and nothing else
+- `bun run prose:sync` — fetch Vale's style packages; needed once before `check` works
 - `bun test test/csv.test.ts` — one file, when iterating
 
 ## Gotchas
