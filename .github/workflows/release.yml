@@ -33,8 +33,20 @@ jobs:
       issues: write
       pull-requests: write
     steps:
+      # Fails here rather than three minutes later inside semantic-release,
+      # where a missing token reads as an authentication error against GitHub
+      # rather than as a secret nobody has created yet.
+      - name: Check the release token exists
+        run: |
+          if [ -z "$RELEASE_TOKEN" ]; then
+            echo "::error::RELEASE_TOKEN is not set. See the release section of the README."
+            exit 1
+          fi
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          token: ${{ secrets.RELEASE_TOKEN }}
           # semantic-release reads every commit since the last tag to decide
           # what this one is, so a shallow clone would have it release the
           # wrong thing or nothing at all.
@@ -46,6 +58,10 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bunx --bun semantic-release
         env:
-          # The job token is enough: this repository publishes to no registry,
-          # so there is nothing here that a personal token would unlock.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Not the job token. main requires status checks, and a ruleset
+          # applies those to a direct push as well as to a pull request, so the
+          # changelog commit from github-actions[bot] is rejected. A token
+          # belonging to someone the ruleset lets bypass is what gets it in —
+          # the same "repo-write token in a masked variable" this needed on the
+          # old forge, wearing a different name.
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

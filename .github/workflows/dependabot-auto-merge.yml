@@ -23,8 +23,20 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      # Squashed with a subject commitlint accepts. Dependabot writes "Bump x
+      # from a to b" and config-conventional refuses the capital B, so the
+      # commit that reaches main is retitled here rather than the rule being
+      # relaxed for everyone else.
+      #
+      # --auto is the whole safety story: it holds the pull request until the
+      # required checks on main have passed. Without a ruleset naming those
+      # checks it merges the moment the branch is mergeable, red or not — which
+      # is exactly what happened to the first bump this repository ever saw.
       - name: Wave it through once the checks are green
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: |
+          subject=$(printf '%s' "$PR_TITLE" | sed -E 's/^([a-z]+(\([^)]*\))?: )([A-Z])/\1\l\3/')
+          gh pr merge --auto --squash --subject "$subject" "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
