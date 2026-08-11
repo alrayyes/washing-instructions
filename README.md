@@ -94,6 +94,31 @@ bun run generate my-laundry.csv --out ~/Documents
 The output filenames follow the input, so `my-laundry.csv` gives you
 `my-laundry-phone.pdf` and `my-laundry-print.pdf`.
 
+### Without installing anything
+
+There is a `Dockerfile`, so you can run it with nothing on the machine but
+Docker. Mount a directory on `/out` and the PDFs land there:
+
+```sh
+docker build -t washing-instructions .
+docker run --rm -v "$PWD/out:/out" washing-instructions
+```
+
+That uses the dummy chart baked into the image. To chart your own laundry,
+mount it over the top and name it — everything after the image name goes
+straight to the CLI:
+
+```sh
+docker run --rm \
+  -v "$PWD/out:/out" \
+  -v "$PWD/data/washing-instructions.csv:/app/data/mine.csv:ro" \
+  washing-instructions data/mine.csv
+```
+
+The container runs as an unprivileged user, so the PDFs come out owned by
+`1000:1000` rather than by root. If that is not your own ID, `--user "$(id
+-u):$(id -g)"` fixes the ownership on the way out.
+
 ## The CSV
 
 One row per pile. Adding a pile never needs a code change.
