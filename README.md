@@ -8,6 +8,7 @@ something real — do not add one that reads "unknown".
 [![release](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml)
 [![latest release](https://img.shields.io/github/v/release/alrayyes/washing-instructions?sort=semver)](https://github.com/alrayyes/washing-instructions/releases/latest)
 [![licence: GPL v3+](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](LICENSE)
+[![container image](https://img.shields.io/badge/ghcr.io-washing--instructions-blue?logo=docker&logoColor=white)](https://github.com/alrayyes/washing-instructions/pkgs/container/washing-instructions)
 
 # Washing instructions
 
@@ -114,8 +115,26 @@ The output filenames follow the input, so `my-laundry.csv` gives you
 
 ### Without installing anything
 
-There is a `Dockerfile`, so you can run it with nothing on the machine but
-Docker. Mount a directory on `/out` and the PDFs land there:
+You can run it with nothing on the machine but Docker. Every release publishes
+an image, so there is nothing to build — mount a directory on `/out` and the
+PDFs land there:
+
+```sh
+docker run --rm -v "$PWD/out:/out" ghcr.io/alrayyes/washing-instructions
+```
+
+`latest` follows the newest release, and every release also answers to its full
+version and to the loose ends of it — `:1.0.0`, `:1.0`, `:1` — so a compose file
+can say how much drift it is willing to take. Images are built for `amd64` and
+`arm64`, and each one carries a signed provenance attestation tying it to the
+workflow run and commit that produced it:
+
+```sh
+gh attestation verify oci://ghcr.io/alrayyes/washing-instructions:latest \
+  --repo alrayyes/washing-instructions
+```
+
+Building it yourself works the same way:
 
 ```sh
 docker build -t washing-instructions .
@@ -130,7 +149,18 @@ straight to the CLI:
 docker run --rm \
   -v "$PWD/out:/out" \
   -v "$PWD/data/washing-instructions.csv:/app/data/mine.csv:ro" \
-  washing-instructions data/mine.csv
+  ghcr.io/alrayyes/washing-instructions data/mine.csv
+```
+
+Your appliances go in the same way, since the image carries only the example
+pair:
+
+```sh
+docker run --rm \
+  -v "$PWD/out:/out" \
+  -v "$PWD/data/machine.json:/app/data/machine.json:ro" \
+  -v "$PWD/data/washing-instructions.csv:/app/data/washing-instructions.csv:ro" \
+  ghcr.io/alrayyes/washing-instructions
 ```
 
 The container runs as an unprivileged user, so the PDFs come out owned by

@@ -6,3 +6,4 @@
 !bun.lock
 !src
 !data/washing-instructions.csv.dist
+!data/machine.json.dist

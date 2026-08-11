@@ -20,10 +20,11 @@ WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
 COPY src ./src
-# The committed dummy chart, so `docker run` with nothing mounted still produces
-# something to look at. Your own chart is gitignored and never in the image;
-# mount it over the top.
-COPY data/washing-instructions.csv.dist ./data/
+# The committed dummy chart and the committed example appliances, so
+# `docker run` with nothing mounted still produces something to look at. Your
+# own versions of both are gitignored and never in the image; mount them over
+# the top.
+COPY data/washing-instructions.csv.dist data/machine.json.dist ./data/
 
 # /out is the mount point, and it is created here rather than by the first run
 # so that it belongs to the unprivileged user. The oven/bun images ship a `bun`
