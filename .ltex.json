@@ -33,6 +33,11 @@
     ]
   },
   "disabledRules": {
-    "en-GB": ["PASSIVE_VOICE", "UPPERCASE_SENTENCE_START", "THIS_NNS"]
+    "en-GB": [
+      "PASSIVE_VOICE",
+      "UPPERCASE_SENTENCE_START",
+      "THIS_NNS",
+      "LICENCE_LICENSE_NOUN_SINGULAR"
+    ]
   }
 }

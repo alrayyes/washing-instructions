@@ -4,6 +4,7 @@
   "description": "Turns a CSV of laundry piles into a phone PDF and a printable PDF, drawn for one specific washing machine and iron.",
   "type": "module",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "generate": "bun run src/cli.ts",
     "test": "bun test",

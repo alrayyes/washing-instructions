@@ -1,10 +1,11 @@
 <!--
-Maintainer note (not rendered): only the pipeline badge is here because it is
-the only thing wired up. Add a release badge in the same commit that adds
-semantic-release, and a licence badge when a licence is chosen.
+Maintainer note (not rendered): add a release badge in the same commit that
+adds semantic-release. The licence badge is static because there is no registry
+release to read the licence off yet.
 -->
 
 [![pipeline status](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/badges/main/pipeline.svg)](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/commits/main)
+[![licence: GPL v3+](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](LICENSE)
 
 # Washing instructions
 
@@ -328,4 +329,10 @@ on synthetic activewear.
 
 ## Licence
 
-Not yet chosen — add one before this goes anywhere public.
+[GNU General Public License v3.0 or later](LICENSE). Use it, change it, pass it
+on — but anything you distribute that is built on it comes with the same freedom
+attached, source included.
+
+The care advice in `data/washing-instructions.csv.dist` is assembled from the
+manufacturer and trade sources listed above, and is offered in the same spirit
+as the code: no warranty. Your care labels outrank it.
