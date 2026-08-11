@@ -33,10 +33,16 @@ to it. Tests and CI read the `.dist`; never point them at the other one.
 - **The phone page height is measured, not chosen.** `renderPhone` renders the
   document repeatedly and bisects until it fits on one page. Don't replace it
   with a constant — adding a sentence to the CSV would push a card onto page two.
-- **`src/machine.ts` is the authority on the appliances.** Every programme,
-  temperature, spin speed and button in the CSV is checked against it, and the
-  dial drawings derive their angles from the order of `washer.programs`.
-  Retargeting to a different machine means editing that file only.
+- **The appliances are data.** `data/machine.json.dist` is the committed example
+  and `data/machine.json` is yours, gitignored. Every programme, temperature,
+  spin speed and button in the CSV is checked against the loaded machine, and
+  the dial angles come from the order of `washer.programs`, so a reordered list
+  redraws every card. Fascia labels are never translated — `src/machine.ts` only
+  loads and validates.
+- **Anything that writes a file for the repo must load `DIST_MACHINE`, not
+  `DEFAULT_MACHINE`.** The latter prefers your own appliances, so the schema
+  generator and the tests would otherwise bake in whatever machine the person
+  running them happens to own.
 - **`src/mixing.ts` is the only place that decides what can share a drum.** The
   per-card "wash together with" line, the compatibility matrix and the CLI
   summary all read from it, so a rule change lands in all three at once.

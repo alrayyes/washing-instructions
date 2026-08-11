@@ -1,9 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { SCHEMA_PATH, tableSchema } from "../scripts/csv-schema";
-import { washer } from "../src/machine";
+import { DIST_MACHINE, loadMachine } from "../src/machine";
+
+const machine = await loadMachine(DIST_MACHINE);
+const { washer } = machine;
 
 function field(name: string) {
-  const found = tableSchema().fields.find((f) => f.name === name);
+  const found = tableSchema(machine).fields.find((f) => f.name === name);
   if (!found) throw new Error(`no field named ${name}`);
   return found;
 }
@@ -23,11 +26,11 @@ describe("tableSchema", () => {
     const pattern = new RegExp(field("options").constraints?.pattern ?? "$^");
 
     expect(pattern.test("")).toBe(true);
-    expect(pattern.test("Eco Perfect")).toBe(true);
-    expect(pattern.test("Eco Perfect|Extra spoelen")).toBe(true);
-    expect(pattern.test("Eco Perfect | Extra spoelen")).toBe(true);
+    expect(pattern.test("Eco")).toBe(true);
+    expect(pattern.test("Eco|Extra Rinse")).toBe(true);
+    expect(pattern.test("Eco | Extra Rinse")).toBe(true);
     expect(pattern.test("Turbo Wash")).toBe(false);
-    expect(pattern.test("Eco Perfect|Turbo Wash")).toBe(false);
+    expect(pattern.test("Eco|Turbo Wash")).toBe(false);
   });
 
   test("constrains the mixing tags the same way", () => {
@@ -47,6 +50,6 @@ describe("tableSchema", () => {
   // validator, and this is what stops the committed copy going stale.
   test("the committed copy is what the generator produces", async () => {
     const committed = await Bun.file(SCHEMA_PATH).json();
-    expect(committed).toEqual(tableSchema());
+    expect(committed).toEqual(tableSchema(machine));
   });
 });

@@ -1,5 +1,5 @@
 import { parse } from "csv-parse/sync";
-import { ironSettingKeys, washer } from "./machine";
+import { ironSettingKeys, type Machine } from "./machine";
 import type { ColourGroup, Instruction, MixTag } from "./types";
 import { colourGroups, mixTags } from "./types";
 
@@ -56,11 +56,13 @@ function boolean(line: number, column: string, value: string): boolean {
 
 /**
  * Parses the instruction CSV, checking every machine-facing value against what
- * the appliances in `machine.ts` can actually be set to. A typo in a programme
- * name fails here rather than producing a PDF that tells you to turn the dial
- * to a position that does not exist.
+ * the appliances in the machine file can actually be set to. A typo in a
+ * programme name fails here rather than producing a PDF that tells you to turn
+ * the dial to a position that does not exist — and so does a chart written for
+ * a different machine than the one you passed.
  */
-export function parseInstructions(source: string): Instruction[] {
+export function parseInstructions(source: string, machine: Machine): Instruction[] {
+  const { washer } = machine;
   const records: Record<string, string>[] = parse(source, {
     columns: true,
     skip_empty_lines: true,
@@ -101,10 +103,7 @@ export function parseInstructions(source: string): Instruction[] {
       program: oneOf(line, "program", record.program ?? "", washer.programs),
       options,
       ironing: record.ironing ?? "",
-      ironSetting: oneOf(line, "iron_setting", record.iron_setting ?? "", [
-        ...ironSettingKeys,
-        "none",
-      ] as const),
+      ironSetting: oneOf(line, "iron_setting", record.iron_setting ?? "", ironSettingKeys(machine)),
       drying: record.drying ?? "",
       colourGroup: oneOf<ColourGroup>(
         line,

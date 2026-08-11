@@ -46,6 +46,7 @@ check:
   script:
     - bun run lint
     - bun run lint:md
+    - bun run lint:data
     - bun run typecheck
     - bun test
 
