@@ -2,10 +2,10 @@
 Biome
 Bosch
 Bun
-CHANGELOG
 Cloudflare
 Easygliss
-GitLab
+Dependabot
+GitHub
 Helvetica
 Icebreaker
 JavaScript

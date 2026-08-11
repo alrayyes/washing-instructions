@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://gitlab.higherlearning.eu/alrayyes/washing-instructions/machine.schema.json",
+  "$id": "https://github.com/alrayyes/washing-instructions/raw/main/data/machine.schema.json",
   "title": "Appliances",
   "description": "The washing machine and iron a chart is drawn for. Every label here is copied from the fascia in front of you, in whatever language it is printed in — the tool never translates them, because the point is that the drawing matches the machine.",
   "type": "object",

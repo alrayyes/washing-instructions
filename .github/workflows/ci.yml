@@ -1,0 +1,122 @@
+# Runs the same commands as the git hooks in lefthook.yml, so the two cannot
+# drift: the hook catches it early, this is the gate that cannot be skipped.
+#
+# Every action is pinned to a commit SHA with the version in the comment. A tag
+# like v7 is a mutable pointer someone else controls, and a workflow with write
+# permission is not a thing to hand to a moving target.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Nothing here needs more than the source it was given.
+permissions:
+  contents: read
+
+# A push that supersedes an older run cancels it rather than queueing behind it.
+# main is excluded: its runs are what the release job waits on.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.14
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run lint:md
+      - run: bun run lint:data
+      - run: bun run typecheck
+      - run: bun test
+
+  # The commit-msg hook already reads every message, but a hook is skippable and
+  # these messages are load-bearing: semantic-release reads the Conventional
+  # Commits that landed to decide the next version, so a stray "wip" is a
+  # release that does not happen. Pull requests only — there is no range to
+  # check on a push, and rewriting history to fix an old message is worse than
+  # the typo. fetch-depth 0 because the range needs both ends of it.
+  commits:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.14
+      # commitlint resolves @commitlint/config-conventional as a sibling
+      # package, so bunx alone will not find it.
+      - run: bun install --frozen-lockfile
+      - run: bunx --bun commitlint --from "${{ github.event.pull_request.base.sha }}" --to HEAD --verbose
+
+  # Prose gets its own two jobs rather than a line in the one above, so that
+  # when the run goes red the job name says which tier failed: a grammar error
+  # is a mistake and a style alert is an opinion, answered differently.
+
+  # Mechanics. LanguageTool's rule database — grammar, spelling, punctuation,
+  # the phonetic article — and mechanics have a right answer, so this blocks.
+  ltex:
+    runs-on: ubuntu-latest
+    env:
+      LTEX_VERSION: "18.7.0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Fetch ltex-cli-plus
+        run: |
+          curl -sSfL -o ltex.tar.gz \
+            "https://github.com/ltex-plus/ltex-ls-plus/releases/download/${LTEX_VERSION}/ltex-ls-plus-${LTEX_VERSION}-linux-x64.tar.gz"
+          tar xzf ltex.tar.gz
+      # It reports findings with exit code 3, not 1, so a step testing for a
+      # specific code would pass a failing document. Let the shell judge
+      # non-zero. The files are named rather than passing `.`: LTeX traverses
+      # recursively and reads plain text as prose, so a bare dot lints the
+      # committed Vale vocabulary as though it were a document.
+      - run: ./ltex-ls-plus-${LTEX_VERSION}/bin/ltex-cli-plus --client-configuration=.ltex.json README.md CLAUDE.md SECURITY.md
+
+  # Style. House voice, weasel words, wordiness, undefined jargon. Advice
+  # rather than a verdict: Vale exits non-zero only on error-severity alerts,
+  # so its warnings are reported without failing anything.
+  vale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.14
+      - run: bun install --frozen-lockfile
+      - run: bun run prose:sync
+      - run: bun run lint:prose:advice
+
+  # hadolint reads the Dockerfile without a daemon. It catches an unpinned
+  # base, an apt-get without --no-install-recommends, a RUN cd that quietly
+  # does nothing. Nothing builds the image yet — see the issue tracker.
+  dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: docker run --rm -i hadolint/hadolint:v2.15.1-alpine@sha256:a1d49ae1a4e83c1dbad26b8c1ad7588c8bd1e04f4866b34ad3cac50335198552 < Dockerfile
+
+  # The PDFs themselves, kept as an artifact so a reviewer can read the thing
+  # rather than a description of it.
+  pdfs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.14
+      - run: bun install --frozen-lockfile
+      - run: bun run generate
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: washing-instructions-pdfs
+          path: out/
+          retention-days: 30

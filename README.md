@@ -1,10 +1,12 @@
 <!--
-Maintainer note (not rendered): add a release badge in the same commit that
-adds semantic-release. The licence badge is static because there is no registry
-release to read the licence off yet.
+Maintainer note (not rendered): the licence badge is static because nothing is
+published to a registry that could be read for it. Every other badge measures
+something real — do not add one that reads "unknown".
 -->
 
-[![pipeline status](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/badges/main/pipeline.svg)](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/commits/main)
+[![check](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml)
+[![release](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml)
+[![latest release](https://img.shields.io/github/v/release/alrayyes/washing-instructions?sort=semver)](https://github.com/alrayyes/washing-instructions/releases/latest)
 [![licence: GPL v3+](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](LICENSE)
 
 # Washing instructions
@@ -40,11 +42,12 @@ printed sheet carries a full compatibility matrix with the reason for every no.
 | <img src="docs/phone.png" alt="The top of the phone PDF: a loads table, a note explaining the dial drawings, and the first card" width="260"> | <img src="docs/print-card.png" alt="An A4 page of the printable PDF showing two cards, each with a programme dial, temperature and spin chips, and an iron thermostat ring" width="420"> |
 
 Both are the committed example chart, not anyone's real laundry. The PDFs
-themselves come out of every pipeline, so you can read the real thing rather
-than a picture of it — these two links always serve the newest build of `main`:
-
-- [`washing-instructions-phone.pdf`](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/jobs/artifacts/main/raw/out/washing-instructions-phone.pdf?job=pdfs)
-- [`washing-instructions-print.pdf`](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/jobs/artifacts/main/raw/out/washing-instructions-print.pdf?job=pdfs)
+themselves come out of every run, so you can read the real thing rather than a
+picture of it: open the newest
+[run of `check` on `main`](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml?query=branch%3Amain)
+and take the `washing-instructions-pdfs` artifact from the bottom of the page.
+Downloading one needs a GitHub account — the artifact API asks anyone for a
+token, which is why these are a link to the run rather than to the file.
 
 ## Requirements
 
@@ -316,19 +319,19 @@ it, which is the point:
 
 - **Mechanics** — [LTeX+](https://github.com/ltex-plus/ltex-ls-plus) wrapping
   LanguageTool: grammar, spelling, punctuation, the phonetic article. These have
-  a right answer, so the `ltex` job blocks the pipeline. It reports findings
+  a right answer, so the `ltex` job blocks the run. It reports findings
   with exit code **3**, not 1, which is worth knowing before you write anything
   that tests for a number. It stays out of the git hooks because it is a 300 MB
   download carrying its own Java runtime; run the same engine in your editor
   over LSP and CI is only the fallback.
 - **Style** — [Vale](https://vale.sh) with the Google and proselint packages:
-  house voice, wordiness, clichés. This is advice, so the `vale` job is allowed
-  to fail and shows warnings without blocking. It is fast, so the commit hook
+  house voice, wordiness, clichés. This is advice, and Vale exits non-zero only
+  on error-severity alerts, so its warnings are reported without blocking. It is fast, so the commit hook
   runs it too, but only at error level. It arrives through
   `scripts/install-vale.ts` rather than the `@vvago/vale` npm package: that
   package downloads its binary from a postinstall that shells out to `node`,
-  and the CI image has Bun and no Node, so it installs an empty `bin/` and says
-  nothing until the linter is called, and the shell answers 127.
+  a Bun runner has no Node, so it installs an empty `bin/` and says nothing
+  until the linter is called, and the shell answers 127.
 
 `.vale.ini` and `.ltex.json` each say why a rule was turned off. The short
 version: spelling belongs to LTeX alone, because two tools underlining the same
@@ -379,6 +382,13 @@ they are worth a gate rather than only a reminder.
 
 Branch, commit under [Conventional Commits](https://www.conventionalcommits.org/),
 open a pull request. Run `bun run check` first.
+
+Those commit subjects are not decoration: semantic-release reads them when a
+pull request lands to decide the next version. `feat:` takes the minor, `fix:`
+the patch, a `BREAKING CHANGE:` footer the major, and a branch of nothing but
+`docs:` and `chore:` releases nothing at all. A run of `check` on `main` that
+goes green is what lets the release job tag, write the changelog and publish the
+notes, so nobody picks a version by hand.
 
 Care advice is sourced, not guessed. If you change a wash setting, say in the
 commit body what the source was — a manufacturer's guidance, a care label, or
