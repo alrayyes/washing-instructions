@@ -23,3 +23,6 @@ globs:
 ignores:
   - "node_modules/**"
   - "out/**"
+  # Vendored by `vale sync`. Generated text belongs to nobody.
+  - "styles/Google/**"
+  - "styles/proselint/**"

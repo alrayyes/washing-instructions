@@ -20,6 +20,14 @@ pre-commit:
           - name: markdownlint
             glob: "*.md"
             run: bunx --bun markdownlint-cli2 {staged_files}
+    # Error level only. Vale's warnings are style advice, and advice that blocks
+    # a commit is how you teach someone to reach for --no-verify; `bun run
+    # lint:prose:advice` and the CI job are where the full read lives. LTeX is
+    # deliberately absent — a ~300 MB download with its own Java runtime is more
+    # than a commit should wait on, so it runs in CI and in the editor over LSP.
+    - name: vale
+      glob: "*.md"
+      run: node_modules/@vvago/vale/bin/vale --minAlertLevel=error {staged_files}
 
 commit-msg:
   jobs:
@@ -38,6 +46,8 @@ pre-push:
       run: bun run lint
     - name: markdownlint
       run: bun run lint:md
+    - name: vale
+      run: bun run lint:prose
     - name: typecheck
       run: bun run typecheck
     - name: test

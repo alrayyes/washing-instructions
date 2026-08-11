@@ -22,6 +22,39 @@ check:
     - bun run typecheck
     - bun test
 
+# Prose gets its own two jobs rather than a line in the one above, so that when
+# the pipeline goes red the job name says which tier failed: a grammar error is
+# a mistake and a style alert is an opinion, and they are answered differently.
+
+# Mechanics. LanguageTool's rule database — grammar, spelling, punctuation, the
+# phonetic article — and mechanics have a right answer, so this one blocks.
+# Its own image because the release bundles a glibc JRE that will not run on the
+# musl base above, and no bun install because it reads the Markdown directly.
+ltex:
+  stage: check
+  image: debian:bookworm-slim@sha256:abd67ffcfa541b485a3dff59865ab629aa048a6c613e639d36e7456b0b229241
+  variables:
+    LTEX_VERSION: "18.7.0"
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends ca-certificates curl
+    - curl -sSfL -o ltex.tar.gz "https://github.com/ltex-plus/ltex-ls-plus/releases/download/${LTEX_VERSION}/ltex-ls-plus-${LTEX_VERSION}-linux-x64.tar.gz"
+    - tar xzf ltex.tar.gz
+  script:
+    # It reports findings with exit code 3, not 1, so anything a job tests for
+    # by number passes a failing document. Let the shell fail on non-zero.
+    - ./ltex-ls-plus-${LTEX_VERSION}/bin/ltex-cli-plus --client-configuration=.ltex.json README.md CLAUDE.md
+
+# Style. House voice, weasel words, wordiness, undefined jargon. Advice rather
+# than a verdict, so it reports at warning level and is allowed to fail: style
+# that blocks a merge only teaches people to skip the hooks.
+vale:
+  stage: check
+  extends: .install
+  script:
+    - bun run prose:sync
+    - bun run lint:prose:advice
+  allow_failure: true
+
 pdfs:
   stage: build
   extends: .install

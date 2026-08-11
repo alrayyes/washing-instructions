@@ -1,0 +1,35 @@
+{
+  "language": "en-GB",
+  "dictionary": {
+    "en-GB": [
+      "AIRism",
+      "Biome",
+      "Bosch",
+      "Easygliss",
+      "Fijn",
+      "GitLab",
+      "Hiut",
+      "Icebreaker",
+      "LTeX",
+      "LanguageTool",
+      "Serie",
+      "Tefal",
+      "VarioPerfect",
+      "WinAnsi",
+      "Zijde",
+      "activewear",
+      "bunx",
+      "commitlint",
+      "lefthook",
+      "linted",
+      "markdownlint",
+      "proselint",
+      "selvedge",
+      "typecheck",
+      "typechecks"
+    ]
+  },
+  "disabledRules": {
+    "en-GB": ["PASSIVE_VOICE", "UPPERCASE_SENTENCE_START", "THIS_NNS"]
+  }
+}
