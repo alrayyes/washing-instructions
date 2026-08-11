@@ -7,7 +7,10 @@ is where the prose explanation lives; this file is the set of traps.
 # washing-instructions
 
 Reads `data/washing-instructions.csv` and renders two PDFs: a single tall page
-for the phone, and an A4 reference sheet plus detail cards for printing.
+for the phone, and an A4 reference sheet plus detail cards for printing. That
+file is gitignored — one household's laundry is nobody else's business — so the
+committed chart is `data/washing-instructions.csv.dist` and the CLI falls back
+to it. Tests and CI read the `.dist`; never point them at the other one.
 
 ## Commands
 

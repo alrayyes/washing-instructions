@@ -1,6 +1,10 @@
 # dependencies (bun install)
 node_modules
 
+# your own chart. data/washing-instructions.csv.dist is the committed dummy one;
+# copy it across, or just run the tool and let it fall back
+data/washing-instructions.csv
+
 # output
 out
 dist

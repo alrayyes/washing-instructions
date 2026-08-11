@@ -11,9 +11,31 @@ function usage(): string {
   return [
     "Usage: bun run generate [csv] [--out <dir>]",
     "",
-    `  csv          instruction CSV to read (default: ${DEFAULT_CSV})`,
+    `  csv          instruction CSV to read (default: ${DEFAULT_CSV},`,
+    "               falling back to the committed .dist)",
     `  --out <dir>  where the PDFs go (default: ${DEFAULT_OUT})`,
   ].join("\n");
+}
+
+/**
+ * Which file to actually read. `data/washing-instructions.csv` describes one
+ * household's laundry and is gitignored, so a fresh clone has only the .dist
+ * beside it — fall back to that rather than failing on a checkout that is
+ * perfectly fine. Falling back needs a .dist to exist, so naming a file that
+ * simply is not there still fails, which is what you want when you meant your
+ * own chart and mistyped it.
+ */
+export async function resolveCsv(csv: string): Promise<string> {
+  if (await Bun.file(csv).exists()) return csv;
+  if (await Bun.file(`${csv}.dist`).exists()) return `${csv}.dist`;
+  throw new Error(`no such file: ${csv}`);
+}
+
+/** What the PDFs are named after. The .dist suffix is not part of the name. */
+export function outputStem(csv: string): string {
+  return basename(csv)
+    .replace(/\.dist$/i, "")
+    .replace(/\.csv$/i, "");
 }
 
 interface Args {
@@ -46,13 +68,14 @@ export function parseArgs(argv: string[]): Args {
 }
 
 async function main(argv: string[]): Promise<void> {
-  const { csv, out } = parseArgs(argv);
+  const { csv: requested, out } = parseArgs(argv);
+  const csv = await resolveCsv(requested);
 
   const source = await Bun.file(csv).text();
   const items = resolve(parseInstructions(source));
 
   await mkdir(out, { recursive: true });
-  const stem = basename(csv).replace(/\.csv$/i, "");
+  const stem = outputStem(csv);
   const phonePath = join(out, `${stem}-phone.pdf`);
   const printPath = join(out, `${stem}-print.pdf`);
 

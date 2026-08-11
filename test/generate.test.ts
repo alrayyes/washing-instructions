@@ -6,7 +6,9 @@ import { PDFDocument } from "pdf-lib";
 import { parseInstructions } from "../src/csv";
 import { cardGroups } from "../src/mixing";
 
-const CSV = "data/washing-instructions.csv";
+// The committed dummy chart, not `data/washing-instructions.csv` — that one is
+// gitignored, so on a fresh clone and in CI it is not there to read.
+const CSV = "data/washing-instructions.csv.dist";
 
 /**
  * The outer test: run the tool exactly as a person would and check the two

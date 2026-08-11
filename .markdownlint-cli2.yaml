@@ -3,6 +3,12 @@ config:
   MD013: false
   # The README opens with a badge row, not a heading.
   MD041: false
+  # Markdown's image syntax carries no width, and the screenshots are a tall
+  # phone page next to a wide A4 one. <img> is the only way to show them side by
+  # side at sensible sizes, so it is allowed and nothing else is.
+  MD033:
+    allowed_elements:
+      - img
 
   # Below here: layout Prettier already decides. Prettier runs first and
   # markdownlint judges what it produced, so leaving these on would only give us
