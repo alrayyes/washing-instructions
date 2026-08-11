@@ -408,6 +408,26 @@ for the thermostat markings, and
 [Dirty Labs](https://dirtylabs.com/blogs/the-dirt/how-to-wash-your-activewear)
 on synthetic activewear.
 
+## Releasing
+
+Nobody picks a version. When a pull request lands on `main` and the checks pass,
+semantic-release reads the Conventional Commits that arrived with it, tags,
+writes `CHANGELOG.md` and publishes the notes. `feat:` takes the minor, `fix:`
+the patch, a `BREAKING CHANGE:` footer the major, and a branch of nothing but
+`docs:` and `chore:` releases nothing at all.
+
+It needs one secret, `RELEASE_TOKEN`: a fine-grained personal access token
+scoped to this repository with **contents: read and write**, saved under
+Settings → Secrets and variables → Actions. The job token that Actions hands out
+by default is not enough, and the reason is worth knowing. `main` requires status
+checks, a ruleset applies those to a direct push as well as to a pull request,
+and the changelog commit is a direct push from `github-actions[bot]` carrying no
+checks of its own — so it is rejected. A token belonging to someone the ruleset
+lets bypass is what gets it in.
+
+Until that secret exists the release job stops on its first step and says so,
+rather than failing somewhere less obvious.
+
 ## Licence
 
 [GNU General Public License v3.0 or later](LICENSE). Use it, change it, pass it
