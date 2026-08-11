@@ -132,10 +132,17 @@ jobs:
       # The build proving it compiles is worth less than the run proving it
       # works. Both PDFs have to come out of a container started the way the
       # README tells you to start one.
+      #
+      # --user is not decoration here. The image runs as 1000 and a GitHub
+      # runner checks out as 1001, so the bind mount is unwritable without it:
+      # "EACCES: permission denied, open '/out/...'". That is the same mismatch
+      # anyone whose account is not 1000 will hit, and the same flag the README
+      # tells them to reach for — so this runs the documented workaround rather
+      # than a special case invented for CI.
       - name: Generate from the bundled chart
         run: |
           mkdir -p out
-          docker run --rm -v "$PWD/out:/out" washing-instructions:ci
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/out:/out" washing-instructions:ci
           test -s out/washing-instructions-phone.pdf
           test -s out/washing-instructions-print.pdf
 
