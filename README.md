@@ -34,9 +34,10 @@ printed sheet carries a full compatibility matrix with the reason for every no.
   runner. Nothing else is needed; there is no build step and no browser.
 - Linux, macOS or WSL. Bun's Windows support should work but is untested here.
 - Optional, for the git hooks: nothing extra — `lefthook` and the linters
-  install as dev dependencies. Two of them fetch things over the network on
-  installation rather than shipping in the package: Vale pulls its binary, and
-  `bun run prose:sync` pulls the style packages it lints against.
+  install as dev dependencies. Vale is the exception, because it is a Go binary
+  rather than a package: `bun run prose:sync` fetches it into `.tools/`, checks
+  it against the release's own checksums, and pulls down the style packages it
+  lints against. That wants network access and `tar`, once.
 
 No network access is needed at run time, and no fonts are downloaded: the PDFs
 use the Helvetica that every PDF reader already has.
@@ -186,7 +187,11 @@ it, which is the point:
 - **Style** — [Vale](https://vale.sh) with the Google and proselint packages:
   house voice, wordiness, clichés. This is advice, so the `vale` job is allowed
   to fail and shows warnings without blocking. It is fast, so the commit hook
-  runs it too, but only at error level.
+  runs it too, but only at error level. It arrives through
+  `scripts/install-vale.ts` rather than the `@vvago/vale` npm package: that
+  package downloads its binary from a postinstall that shells out to `node`,
+  and the CI image has Bun and no Node, so it installs an empty `bin/` and says
+  nothing until the linter is called, and the shell answers 127.
 
 `.vale.ini` and `.ltex.json` each say why a rule was turned off. The short
 version: spelling belongs to LTeX alone, because two tools underlining the same

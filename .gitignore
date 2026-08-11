@@ -27,7 +27,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .cache
 *.tsbuildinfo
 
-# vale sync downloads these; styles/config is ours and stays committed, so the
-# package directories are ignored by name rather than the whole styles/ tree
+# downloaded by bun run prose:sync — the Vale binary, and the style packages it
+# lints against. styles/config is ours and stays committed, so the package
+# directories are ignored by name rather than the whole styles/ tree
+.tools
 styles/Google
 styles/proselint

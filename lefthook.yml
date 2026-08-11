@@ -27,7 +27,7 @@ pre-commit:
     # than a commit should wait on, so it runs in CI and in the editor over LSP.
     - name: vale
       glob: "*.md"
-      run: node_modules/@vvago/vale/bin/vale --minAlertLevel=error {staged_files}
+      run: .tools/vale --minAlertLevel=error {staged_files}
 
 commit-msg:
   jobs:

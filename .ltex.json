@@ -23,6 +23,8 @@
       "lefthook",
       "linted",
       "markdownlint",
+      "npm",
+      "postinstall",
       "proselint",
       "selvedge",
       "typecheck",
