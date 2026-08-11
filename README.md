@@ -98,7 +98,8 @@ The output filenames follow the input, so `my-laundry.csv` gives you
 
 One row per pile. Adding a pile never needs a code change.
 
-The chart that ships with the repo is `data/washing-instructions.csv.dist`, and
+The chart that ships with the repo is
+[`data/washing-instructions.csv.dist`](data/washing-instructions.csv.dist), and
 it is a made-up one — nobody's actual wardrobe. Yours goes in
 `data/washing-instructions.csv` beside it, which is gitignored, so your laundry
 never lands in a commit. Copy the dist across and edit it:
@@ -135,7 +136,8 @@ to turn the dial somewhere it does not go:
 row 8, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
 ```
 
-`data/washing-instructions.schema.json` says the same thing in a form other
+[`data/washing-instructions.schema.json`](data/washing-instructions.schema.json)
+says the same thing in a form other
 tools understand: a [Frictionless Table
 Schema](https://datapackage.org/standard/table-schema/) naming every column, its
 type, and the values it accepts. Point a validator at the pair and it tells you
