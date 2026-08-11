@@ -80,6 +80,25 @@ vale:
     - bun run lint:prose:advice
   allow_failure: true
 
+# The commit-msg hook already reads every message, but a hook is skippable and
+# these messages are load-bearing: a release tool reads the Conventional Commits
+# that landed to decide the next version, so a stray "wip" is a release that
+# does not happen. Merge requests only — there is no range to check on a branch
+# pipeline, and rewriting history to fix an old message is worse than the typo.
+#
+# commitlint resolves @commitlint/config-conventional as a sibling package, so
+# bunx alone will not do; the pinned devDependencies have to be installed. It
+# also shells out to git for the range, and the bun image ships without it.
+lint:commits:
+  stage: check
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends git
+    - bun install --frozen-lockfile
+  script:
+    - bunx --bun commitlint --from "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --to HEAD --verbose
+
 pdfs:
   stage: build
   extends: .install
