@@ -165,8 +165,11 @@ container or end-to-end layer:
   and the mixing rules, including that the rules are symmetric and that a group
   only forms when every member is compatible with every other.
 
-The git hooks (`lefthook.yml`) run the same commands: Biome and markdownlint on
-commit, commitlint on the message, typecheck and tests on push.
+The git hooks (`lefthook.yml`) run the same commands. On commit, Biome and
+markdownlint fix what they can over the staged files and restage it, and
+commitlint reads the message. On push, every linter runs again in check mode
+over the whole tree, followed by the typecheck and the tests — nothing at that
+point writes, so the commit you push is the one you reviewed.
 
 ### Gotchas
 
