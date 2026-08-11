@@ -3,6 +3,7 @@ Maintainer note (not rendered): only the pipeline badge is here because it is
 the only thing wired up. Add a release badge in the same commit that adds
 semantic-release, and a licence badge when a licence is chosen.
 -->
+
 [![pipeline status](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/badges/main/pipeline.svg)](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/commits/main)
 
 # Washing instructions
@@ -16,12 +17,12 @@ is. This turns a CSV of laundry piles into two PDFs that answer all of it:
 - **`out/washing-instructions-print.pdf`** — an A4 reference sheet to pin next
   to the machine, followed by a full-page card for each pile.
 
-Both are drawn for *specific appliances*: a Bosch Serie 6 VarioPerfect and a
+Both are drawn for _specific appliances_: a Bosch Serie 6 VarioPerfect and a
 Tefal Easygliss Plus. Every card shows the programme dial with the pointer
 where you need to turn it, the temperature and spin values picked out of the
 row the display steps through, which of the four option buttons to press, and
 the iron's thermostat ring with its steam zone marked. You are not translating
-generic advice onto your machine; the drawing *is* your machine.
+generic advice onto your machine; the drawing _is_ your machine.
 
 It also answers the question that actually causes arguments: what can go in
 together. Piles are grouped into loads, each card names its bedfellows, and the
@@ -82,22 +83,22 @@ The output filenames follow the input, so `my-laundry.csv` gives you
 One row per pile, in `data/washing-instructions.csv`. Adding a pile never needs
 a code change.
 
-| Column | What goes in it |
-| --- | --- |
-| `clothing_type` | What you call the pile — this is the card heading |
-| `detergent` | Which detergent and how much |
-| `fabric_softener` | `yes` or `no` |
-| `temperature` | `koud`, `20`, `30`, `40`, `60` or `90` |
-| `spin` | `0`, `400`, `600`, `800`, `1200` or `1400` |
-| `duration` | Roughly how long it runs, for planning |
-| `program` | A dial position, spelled exactly as on the fascia |
-| `options` | Option buttons, pipe-separated; empty for none |
-| `ironing` | Prose: how to iron it |
-| `iron_setting` | `none`, `min`, `1`, `2`, `3` or `max` |
-| `drying` | Prose: how to dry it |
-| `colour_group` | `white`, `colour`, `dark`, `sport` or `any` |
-| `mix_tags` | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo` |
-| `notes` | Anything else worth knowing |
+| Column            | What goes in it                                                      |
+| ----------------- | -------------------------------------------------------------------- |
+| `clothing_type`   | What you call the pile — this is the card heading                    |
+| `detergent`       | Which detergent and how much                                         |
+| `fabric_softener` | `yes` or `no`                                                        |
+| `temperature`     | `koud`, `20`, `30`, `40`, `60` or `90`                               |
+| `spin`            | `0`, `400`, `600`, `800`, `1200` or `1400`                           |
+| `duration`        | Roughly how long it runs, for planning                               |
+| `program`         | A dial position, spelled exactly as on the fascia                    |
+| `options`         | Option buttons, pipe-separated; empty for none                       |
+| `ironing`         | Prose: how to iron it                                                |
+| `iron_setting`    | `none`, `min`, `1`, `2`, `3` or `max`                                |
+| `drying`          | Prose: how to dry it                                                 |
+| `colour_group`    | `white`, `colour`, `dark`, `sport` or `any`                          |
+| `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo` |
+| `notes`           | Anything else worth knowing                                          |
 
 Every machine-facing value is checked against what the appliances can actually
 be set to, so a typo fails the run rather than producing a PDF that tells you
@@ -116,7 +117,7 @@ fails is the reason shown in the matrix.
 2. If either is a `lint-shedder`, the other must be too — terry sheds over
    everything, so towels only ever go with towels.
 3. Their `colour_group` matches (`any` matches everything).
-4. Programme, temperature, spin *and* the set of option buttons are identical.
+4. Programme, temperature, spin _and_ the set of option buttons are identical.
 
 Rule 4 is why White and White Socks share a load but White Towels do not: the
 towels want 1400 rpm and an extra rinse, which is a different wash even though
@@ -128,7 +129,7 @@ Sharing a load still gets you a card each. Dark, Black Socks and Denim wash
 identically but want a two-dot iron, no iron and a three-dot iron respectively,
 so the iron drawing alone justifies three cards.
 
-Piles merge onto one card when everything you physically *set* agrees:
+Piles merge onto one card when everything you physically _set_ agrees:
 programme, temperature, spin, option buttons, whether softener goes in, and
 where the iron's thermostat points. Every dial drawing would be the same
 drawing, so one card carries all the names — Merino Wool and Cashmere Blend, for
@@ -149,9 +150,18 @@ that one file and everything follows.
 ## Development
 
 ```sh
-bun run check   # biome, markdownlint, tsc --noEmit, then the tests
-bun test        # just the tests
+bun run check     # biome, prettier, markdownlint, tsc --noEmit, then the tests
+bun run format:md # let Prettier lay the Markdown out
+bun test          # just the tests
 ```
+
+Two formatters, split by file type and never overlapping. Biome owns everything
+it supports; Markdown is the one thing it does not format, so that goes to
+Prettier and `.prettierignore` names the file types Prettier must keep its hands
+off. Prettier runs before markdownlint, never after — Prettier decides the
+layout and markdownlint judges what came out, so the rules the two would argue
+over (list markers, list indentation, emphasis characters) are switched off on
+markdownlint's side.
 
 Tests run at two levels, and skip the ones that cannot fail here. There is no
 database, service or deployed system to integrate with, so there is no
@@ -165,8 +175,8 @@ container or end-to-end layer:
   and the mixing rules, including that the rules are symmetric and that a group
   only forms when every member is compatible with every other.
 
-The git hooks (`lefthook.yml`) run the same commands. On commit, Biome and
-markdownlint fix what they can over the staged files and restage it, and
+The git hooks (`lefthook.yml`) run the same commands. On commit, Biome, Prettier
+and markdownlint fix what they can over the staged files and restage it, and
 commitlint reads the message. On push, every linter runs again in check mode
 over the whole tree, followed by the typecheck and the tests — nothing at that
 point writes, so the commit you push is the one you reviewed.
@@ -176,7 +186,7 @@ point writes, so the commit you push is the one you reviewed.
 - Only Helvetica is embedded, so the PDFs can only render WinAnsi characters.
   `•`, `°`, `—`, `–` are fine; `≈`, `✓` and curly quotes vanish silently. Watch
   this when editing prose in the CSV.
-- The phone page's height is *measured*, not chosen: `renderPhone` renders the
+- The phone page's height is _measured_, not chosen: `renderPhone` renders the
   document repeatedly and bisects until it fits on one page with under 8 pt to
   spare. That is why the run reports a number of layout passes.
 

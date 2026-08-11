@@ -6,9 +6,20 @@ pre-commit:
       glob: "*.{js,jsx,ts,tsx,json,jsonc,css}"
       run: bunx --bun biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
-    - name: markdownlint
-      glob: "*.md"
-      run: bunx --bun markdownlint-cli2 {staged_files}
+    # Prettier decides the layout and markdownlint then judges what Prettier
+    # produced, so these two are piped rather than parallel. The other order has
+    # markdownlint fixing something Prettier is about to overwrite.
+    - name: markdown
+      group:
+        piped: true
+        jobs:
+          - name: prettier
+            glob: "*.md"
+            run: bunx --bun prettier --write {staged_files}
+            stage_fixed: true
+          - name: markdownlint
+            glob: "*.md"
+            run: bunx --bun markdownlint-cli2 {staged_files}
 
 commit-msg:
   jobs:
