@@ -129,6 +129,25 @@ to turn the dial somewhere it does not go:
 row 8, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
 ```
 
+`data/washing-instructions.schema.json` says the same thing in a form other
+tools understand: a [Frictionless Table
+Schema](https://datapackage.org/standard/table-schema/) naming every column, its
+type, and the values it accepts. Point a validator at the pair and it tells you
+which row is wrong; point an editor at it and you get the programme names in an
+autocomplete rather than in another window.
+
+It is generated, never edited — `src/machine.ts` stays the one authority on the
+appliances, and a second copy of those lists would drift the first time a
+programme is renamed:
+
+```sh
+bun run schema   # after changing src/machine.ts
+```
+
+A test compares the committed file against what the generator produces, so
+forgetting that command fails CI rather than leaving a schema that quietly
+disagrees with the parser.
+
 ### Let a chatbot write the first draft
 
 Filling in fifteen rows of care advice from scratch is the tedious part, and it

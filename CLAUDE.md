@@ -15,6 +15,8 @@ to it. Tests and CI read the `.dist`; never point them at the other one.
 ## Commands
 
 - `bun run generate` — write both PDFs to `out/`
+- `bun run schema` — regenerate `data/washing-instructions.schema.json`; run it after
+  touching `src/machine.ts` or a test fails on the stale copy
 - `bun run check` — every linter, `tsc --noEmit` and the tests, in that order
 - `bun run format:md` — Prettier over the Markdown; it owns `*.md` and nothing else
 - `bun run prose:sync` — fetch Vale's style packages; needed once before `check` works
