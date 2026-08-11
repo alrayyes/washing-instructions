@@ -425,8 +425,15 @@ and the changelog commit is a direct push from `github-actions[bot]` carrying no
 checks of its own — so it is rejected. A token belonging to someone the ruleset
 lets bypass is what gets it in.
 
-Until that secret exists the release job stops on its first step and says so,
-rather than failing somewhere less obvious.
+Until that secret exists the release job reports that it did nothing and stops.
+It does not fail: nothing is broken, there is just no token, and a release badge
+stuck on red would be saying otherwise.
+
+One wrinkle worth knowing if you touch that workflow. semantic-release checks
+the runtime version at startup and refuses anything outside `^22.14 || >=24.10`,
+and Bun answers `process.version` with the Node version it implements — 24.3.0 —
+so `bunx --bun semantic-release` dies on the version gate before doing anything
+at all. Bun installs it and Node runs it.
 
 ## Licence
 
