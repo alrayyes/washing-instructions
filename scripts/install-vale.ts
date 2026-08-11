@@ -5,17 +5,16 @@
  * pinned version, this does nothing and costs a process start.
  */
 import { chmod, mkdir } from "node:fs/promises";
-import { CHECKSUMS_URL, releaseUrl, VALE_VERSION, valeAsset } from "./vale-release";
+import {
+  CHECKSUMS_URL,
+  installedVersion,
+  releaseUrl,
+  VALE_VERSION,
+  valeAsset,
+} from "./vale-release";
 
 const TOOLS = ".tools";
 const BINARY = `${TOOLS}/vale`;
-
-async function installedVersion(): Promise<string | null> {
-  if (!(await Bun.file(BINARY).exists())) return null;
-  const probe = Bun.spawnSync([BINARY, "--version"]);
-  if (!probe.success) return null;
-  return probe.stdout.toString().trim().split(/\s+/).at(-1) ?? null;
-}
 
 async function fetchOrDie(url: string): Promise<Response> {
   const response = await fetch(url);
@@ -39,7 +38,7 @@ async function expectedDigest(asset: string): Promise<string> {
 
 const asset = valeAsset(process.platform, process.arch);
 
-if ((await installedVersion()) === VALE_VERSION) {
+if ((await installedVersion(BINARY)) === VALE_VERSION) {
   console.log(`vale ${VALE_VERSION} already in ${TOOLS}/`);
   process.exit(0);
 }
@@ -71,7 +70,7 @@ if (!untar.success) {
 await chmod(BINARY, 0o755);
 await Bun.file(tarball).delete();
 
-const version = await installedVersion();
+const version = await installedVersion(BINARY);
 if (version !== VALE_VERSION) {
   throw new Error(`installed vale reports ${version}, expected ${VALE_VERSION}`);
 }
