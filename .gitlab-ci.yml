@@ -106,6 +106,10 @@ lint:commits:
     - if: $CI_MERGE_REQUEST_IID
   before_script:
     - apt-get update -qq && apt-get install -y -qq --no-install-recommends git
+    # The runner checks out as one user and the job runs as another, so git
+    # refuses to read the repository it was just handed: "detected dubious
+    # ownership". Nothing here writes to the tree, and the runner put it there.
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
     - bun install --frozen-lockfile
   script:
     - bunx --bun commitlint --from "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --to HEAD --verbose
