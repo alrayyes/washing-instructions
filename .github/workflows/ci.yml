@@ -109,12 +109,42 @@ jobs:
 
   # hadolint reads the Dockerfile without a daemon. It catches an unpinned
   # base, an apt-get without --no-install-recommends, a RUN cd that quietly
-  # does nothing. Nothing builds the image yet — see the issue tracker.
+  # does nothing.
+  #
+  # Then the image is actually built and run, because linting is not building:
+  # a Dockerfile can be spotless and still fail on a missing file or a package
+  # that has moved. amd64 only here — the release builds arm64 too, and putting
+  # an emulated build in front of every pull request buys little.
   dockerfile:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: docker run --rm -i hadolint/hadolint:v2.15.1-alpine@sha256:a1d49ae1a4e83c1dbad26b8c1ad7588c8bd1e04f4866b34ad3cac50335198552 < Dockerfile
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+      - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          push: false
+          load: true
+          tags: washing-instructions:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      # The build proving it compiles is worth less than the run proving it
+      # works. Both PDFs have to come out of a container started the way the
+      # README tells you to start one.
+      #
+      # --user is not decoration here. The image runs as 1000 and a GitHub
+      # runner checks out as 1001, so the bind mount is unwritable without it:
+      # "EACCES: permission denied, open '/out/...'". That is the same mismatch
+      # anyone whose account is not 1000 will hit, and the same flag the README
+      # tells them to reach for — so this runs the documented workaround rather
+      # than a special case invented for CI.
+      - name: Generate from the bundled chart
+        run: |
+          mkdir -p out
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/out:/out" washing-instructions:ci
+          test -s out/washing-instructions-phone.pdf
+          test -s out/washing-instructions-print.pdf
 
   # The PDFs themselves, kept as an artifact so a reviewer can read the thing
   # rather than a description of it.
