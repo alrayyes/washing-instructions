@@ -3,6 +3,7 @@ Maintainer note (stripped before this file enters context).
 Keep this short and only about what the code cannot say for itself. The README
 is where the prose explanation lives; this file is the set of traps.
 -->
+
 # washing-instructions
 
 Reads `data/washing-instructions.csv` and renders two PDFs: a single tall page
@@ -11,7 +12,9 @@ for the phone, and an A4 reference sheet plus detail cards for printing.
 ## Commands
 
 - `bun run generate` — write both PDFs to `out/`
-- `bun run check` — Biome, markdownlint, `tsc --noEmit` and the tests, in that order
+- `bun run check` — every linter, `tsc --noEmit` and the tests, in that order
+- `bun run format:md` — Prettier over the Markdown; it owns `*.md` and nothing else
+- `bun run prose:sync` — fetch Vale's style packages; needed once before `check` works
 - `bun test test/csv.test.ts` — one file, when iterating
 
 ## Gotchas

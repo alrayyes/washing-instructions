@@ -10,8 +10,12 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "lint:md": "markdownlint-cli2 \"**/*.md\"",
-    "check": "bun run lint && bun run lint:md && bun run typecheck && bun test"
+    "format:md": "prettier --write \"**/*.md\"",
+    "lint:md": "prettier --check \"**/*.md\" && markdownlint-cli2 \"**/*.md\"",
+    "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
+    "lint:prose": ".tools/vale --glob='!styles/**' --minAlertLevel=error .",
+    "lint:prose:advice": ".tools/vale --glob='!styles/**' .",
+    "check": "bun run lint && bun run lint:md && bun run lint:prose && bun run typecheck && bun test"
   },
   "dependencies": {
     "@react-pdf/renderer": "4.6.0",
@@ -27,6 +31,7 @@
     "@types/react": "19.2.18",
     "lefthook": "2.1.10",
     "markdownlint-cli2": "0.23.2",
+    "prettier": "3.9.6",
     "typescript": "5.9.3"
   }
 }

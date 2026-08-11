@@ -6,9 +6,28 @@ pre-commit:
       glob: "*.{js,jsx,ts,tsx,json,jsonc,css}"
       run: bunx --bun biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
-    - name: markdownlint
+    # Prettier decides the layout and markdownlint then judges what Prettier
+    # produced, so these two are piped rather than parallel. The other order has
+    # markdownlint fixing something Prettier is about to overwrite.
+    - name: markdown
+      group:
+        piped: true
+        jobs:
+          - name: prettier
+            glob: "*.md"
+            run: bunx --bun prettier --write {staged_files}
+            stage_fixed: true
+          - name: markdownlint
+            glob: "*.md"
+            run: bunx --bun markdownlint-cli2 {staged_files}
+    # Error level only. Vale's warnings are style advice, and advice that blocks
+    # a commit is how you teach someone to reach for --no-verify; `bun run
+    # lint:prose:advice` and the CI job are where the full read lives. LTeX is
+    # deliberately absent — a ~300 MB download with its own Java runtime is more
+    # than a commit should wait on, so it runs in CI and in the editor over LSP.
+    - name: vale
       glob: "*.md"
-      run: bunx --bun markdownlint-cli2 {staged_files}
+      run: .tools/vale --minAlertLevel=error {staged_files}
 
 commit-msg:
   jobs:
@@ -27,6 +46,8 @@ pre-push:
       run: bun run lint
     - name: markdownlint
       run: bun run lint:md
+    - name: vale
+      run: bun run lint:prose
     - name: typecheck
       run: bun run typecheck
     - name: test
