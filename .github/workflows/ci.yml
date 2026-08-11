@@ -74,6 +74,12 @@ jobs:
           curl -sSfL -o ltex.tar.gz \
             "https://github.com/ltex-plus/ltex-ls-plus/releases/download/${LTEX_VERSION}/ltex-ls-plus-${LTEX_VERSION}-linux-x64.tar.gz"
           tar xzf ltex.tar.gz
+          # The release carries its own Java 21, but the launcher is a Gradle
+          # start script and prefers JAVA_HOME — which a GitHub runner sets to
+          # its own Java 17. The class files are version 65 and 17 reads up to
+          # 61, so it fails to load rather than falling back. Point JAVA_HOME
+          # at the runtime that shipped beside it.
+          echo "JAVA_HOME=$PWD/$(ls -d ltex-ls-plus-${LTEX_VERSION}/jdk-*)" >> "$GITHUB_ENV"
       # It reports findings with exit code 3, not 1, so a step testing for a
       # specific code would pass a failing document. Let the shell judge
       # non-zero. The files are named rather than passing `.`: LTeX traverses
