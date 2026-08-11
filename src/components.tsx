@@ -1,5 +1,6 @@
 import { Circle, G, Line, Path, Svg, Text, View } from "@react-pdf/renderer";
-import { ironSetting, washer } from "./machine";
+import { useMachine } from "./appliances";
+import { ironSetting, NO_IRON } from "./machine";
 import { theme } from "./theme";
 import type { Instruction } from "./types";
 
@@ -19,15 +20,16 @@ function arc(cx: number, cy: number, radius: number, from: number, to: number): 
 }
 
 /**
- * The programme dial, drawn to scale: one tick per position on the real
- * fascia, in the real order, with the pointer on the one you want. "Uit" sits
- * at twelve o'clock exactly as it does on the machine.
+ * The programme dial, drawn to scale: one tick per position on the real fascia,
+ * in the real order, with the pointer on the one you want. The machine file's
+ * first programme sits at twelve o'clock exactly as it does on the machine.
  */
 export function ProgramDial({ program, size = 76 }: { program: string; size?: number }) {
+  const { washer } = useMachine();
   const centre = size / 2;
   const outer = centre - 3;
   const knob = outer * 0.45;
-  const index = Math.max(0, washer.programs.indexOf(program as never));
+  const index = Math.max(0, washer.programs.indexOf(program));
   const step = 360 / washer.programs.length;
 
   return (
@@ -39,7 +41,7 @@ export function ProgramDial({ program, size = 76 }: { program: string; size?: nu
       viewBox={`0 0 ${size} ${size}`}
       style={{ width: size, height: size }}
     >
-      {/* The red arc printed on the fascia, running clockwise from Uit. */}
+      {/* The red arc printed on the fascia, running clockwise from the off position. */}
       <Path
         d={arc(centre, centre, outer, step * 0.6, 360 - step * 0.6)}
         stroke={colour.accent}
@@ -91,20 +93,24 @@ export function ProgramDial({ program, size = 76 }: { program: string; size?: nu
  * where the iron actually makes steam, and the pointer on the right setting.
  */
 export function IronDial({ setting, size = 76 }: { setting: string; size?: number }) {
+  const machine = useMachine();
+  const settings = machine.iron.settings;
   const centre = size / 2;
   const outer = centre - 3;
   const knob = outer * 0.42;
   const sweep = 280;
   const first = -sweep / 2;
-  const positions = ironSetting("min") ? [0, 1, 2, 3, 4] : [];
-  const step = sweep / (positions.length - 1);
+  const positions = settings.map((_, position) => position);
+  const step = sweep / Math.max(1, positions.length - 1);
   const index = Math.max(
     0,
-    [...Array(5).keys()].find((i) => ["min", "1", "2", "3", "max"][i] === setting) ?? 0,
+    settings.findIndex((entry) => entry.key === setting),
   );
-  const off = setting === "none";
+  const off = setting === NO_IRON;
   const angleOf = (position: number) => (first + position * step + 360) % 360;
   const pointer = polar(centre, centre, knob - 1.5, angleOf(index));
+  const steamFrom = settings.findIndex((entry) => entry.steam);
+  const steamTo = settings.reduce((last, entry, at) => (entry.steam ? at : last), -1);
 
   return (
     // An Svg carries no intrinsic height in the layout, so without the style
@@ -121,10 +127,10 @@ export function IronDial({ setting, size = 76 }: { setting: string; size?: numbe
         strokeWidth={1}
         fill="none"
       />
-      {/* Steam zone: two dots through MAX. */}
-      {!off && (
+      {/* The steam band, spanning whichever positions the machine file marks. */}
+      {!off && steamFrom >= 0 && (
         <Path
-          d={arc(centre, centre, outer, angleOf(2), angleOf(2) + step * 2)}
+          d={arc(centre, centre, outer, angleOf(steamFrom), angleOf(steamTo))}
           stroke={colour.steam}
           strokeWidth={3}
           fill="none"
@@ -251,7 +257,9 @@ export function ChipRow({
 
 /** The full fascia for one pile: dial, display values and option buttons. */
 export function ControlPanel({ item, dialSize = 76 }: { item: Instruction; dialSize?: number }) {
-  const position = washer.programs.indexOf(item.program as never);
+  const { washer } = useMachine();
+  const position = washer.programs.indexOf(item.program);
+  const off = washer.programs[0] ?? "";
 
   return (
     <View
@@ -279,12 +287,12 @@ export function ControlPanel({ item, dialSize = 76 }: { item: Instruction; dialS
           {item.program}
         </Text>
         <Text style={{ fontFamily: font.sans, fontSize: 5.8, color: colour.muted }}>
-          {position} clockwise from Uit
+          {position} clockwise from {off}
         </Text>
       </View>
 
       <View style={{ flex: 1, justifyContent: "center" }}>
-        <ChipRow label="Temp °C" values={washer.temperatures} selected={[item.temperature]} />
+        <ChipRow label="Temp" values={washer.temperatures} selected={[item.temperature]} />
         <ChipRow label="Spin rpm" values={washer.spins} selected={[item.spin]} />
         <ChipRow label="Buttons" values={washer.options} selected={item.options} size={6.4} />
       </View>
@@ -294,8 +302,9 @@ export function ControlPanel({ item, dialSize = 76 }: { item: Instruction; dialS
 
 /** The iron half of a card: dial plus what the setting means in words. */
 export function IronPanel({ items, dialSize = 62 }: { items: Instruction[]; dialSize?: number }) {
+  const machine = useMachine();
   const item = items[0] as Instruction;
-  const setting = item.ironSetting === "none" ? undefined : ironSetting(item.ironSetting);
+  const setting = item.ironSetting === NO_IRON ? undefined : ironSetting(machine, item.ironSetting);
 
   return (
     <View

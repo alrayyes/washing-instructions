@@ -9,6 +9,7 @@
     "generate": "bun run src/cli.ts",
     "test": "bun test",
     "schema": "bun run scripts/csv-schema.ts",
+    "lint:data": "bun run scripts/validate-csv.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -17,7 +18,7 @@
     "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
     "lint:prose": ".tools/vale --glob='!styles/**' --minAlertLevel=error .",
     "lint:prose:advice": ".tools/vale --glob='!styles/**' .",
-    "check": "bun run lint && bun run lint:md && bun run lint:prose && bun run typecheck && bun test"
+    "check": "bun run lint && bun run lint:md && bun run lint:prose && bun run lint:data && bun run typecheck && bun test"
   },
   "dependencies": {
     "@react-pdf/renderer": "4.6.0",

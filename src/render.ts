@@ -1,6 +1,7 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { PDFDocument } from "pdf-lib";
 import { PhoneDocument, PrintDocument } from "./documents";
+import type { Machine } from "./machine";
 import type { ResolvedInstruction } from "./types";
 
 async function pageCount(pdf: Uint8Array): Promise<number> {
@@ -33,9 +34,10 @@ export interface PhoneRender {
  */
 export async function renderPhone(
   items: ResolvedInstruction[],
+  machine: Machine,
   tolerance = 8,
 ): Promise<PhoneRender> {
-  const render = (height: number) => renderToBuffer(PhoneDocument({ items, height }));
+  const render = (height: number) => renderToBuffer(PhoneDocument({ items, height, machine }));
   let attempts = 0;
 
   const fits = async (height: number) => {
@@ -74,6 +76,9 @@ export async function renderPhone(
   return { pdf: best.pdf, height: best.height, attempts };
 }
 
-export async function renderPrint(items: ResolvedInstruction[]): Promise<Uint8Array> {
-  return renderToBuffer(PrintDocument({ items }));
+export async function renderPrint(
+  items: ResolvedInstruction[],
+  machine: Machine,
+): Promise<Uint8Array> {
+  return renderToBuffer(PrintDocument({ items, machine }));
 }

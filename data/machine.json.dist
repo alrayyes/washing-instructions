@@ -1,0 +1,38 @@
+{
+  "$schema": "./machine.schema.json",
+  "washer": {
+    "name": "Generic front loader",
+    "capacity": "1–8 kg",
+    "programs": [
+      "Off",
+      "Cottons",
+      "Cottons + Prewash",
+      "Easy Care",
+      "Easy Care + Prewash",
+      "Quick Mixed",
+      "Delicates / Silk",
+      "Wool",
+      "Rinse / Spin",
+      "Drain",
+      "Gentle Spin",
+      "Super Quick 15'",
+      "Easy Care Special",
+      "Extra Delicate",
+      "Sportswear",
+      "Allergy Plus"
+    ],
+    "temperatures": ["cold", "20", "30", "40", "60", "90"],
+    "spins": ["0", "400", "600", "800", "1200", "1400"],
+    "options": ["Speed", "Eco", "Easy Iron", "Extra Rinse"]
+  },
+  "iron": {
+    "name": "Generic steam iron",
+    "settings": [
+      { "key": "min", "dots": "", "label": "MIN", "detail": "no heat", "steam": false },
+      { "key": "1", "dots": "•", "label": "•", "detail": "synthetics · 110 °C", "steam": false },
+      { "key": "2", "dots": "••", "label": "••", "detail": "wool, silk · 150 °C", "steam": true },
+      { "key": "3", "dots": "•••", "label": "•••", "detail": "cotton, linen · 200 °C", "steam": true },
+      { "key": "max", "dots": "•••", "label": "MAX", "detail": "linen · 230 °C", "steam": true }
+    ]
+  }
+}

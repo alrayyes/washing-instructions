@@ -18,12 +18,18 @@ is. This turns a CSV of laundry piles into two PDFs that answer all of it:
 - **`out/washing-instructions-print.pdf`** — an A4 reference sheet to pin next
   to the machine, followed by a full-page card for each pile.
 
-Both are drawn for _specific appliances_: a Bosch Serie 6 VarioPerfect and a
-Tefal Easygliss Plus. Every card shows the programme dial with the pointer
-where you need to turn it, the temperature and spin values picked out of the
-row the display steps through, which of the four option buttons to press, and
-the iron's thermostat ring with its steam zone marked. You are not translating
-generic advice onto your machine; the drawing _is_ your machine.
+Both are drawn for _your_ appliances. You describe the washing machine and the
+iron once, in a JSON file, and every card then shows the programme dial with the
+pointer where you need to turn it, the temperature and spin values picked out of
+the row the display steps through, which option buttons to press, and the iron's
+thermostat ring with its steam zone marked. You are not translating generic
+advice onto your machine; the drawing _is_ your machine.
+
+Nothing here translates a fascia label, ever. If the dial says `Fijn/Zijde`, the
+card says `Fijn/Zijde` — a chart you have to translate back while standing in
+front of the machine is worse than no chart. Everything the tool says _about_
+the machine is in English; everything printed _on_ the machine is whatever you
+typed into the machine file.
 
 It also answers the question that actually causes arguments: what can go in
 together. Piles are grouped into loads, each card names its bedfellows, and the
@@ -58,9 +64,16 @@ use the Helvetica that every PDF reader already has.
 
 ```sh
 bun install --frozen-lockfile
+cp data/machine.json.dist data/machine.json             # then describe your appliances
+cp data/washing-instructions.csv.dist data/washing-instructions.csv
 bunx lefthook install   # only if you intend to commit
 bun run prose:sync      # only if you intend to commit
 ```
+
+Neither copy is required. With no files of your own the tool reads the two
+committed `.dist` examples, so `bun run generate` works on a fresh clone and
+produces a chart for a machine that is not yours — useful for seeing the shape
+of the thing, useless for actually doing laundry.
 
 ## Usage
 
@@ -72,7 +85,8 @@ bun run generate
 
 ```text
 Read 15 piles from /home/you/washing-instructions/data/washing-instructions.csv.dist
-  out/washing-instructions-phone.pdf  one page, 6029 pt tall (10 layout passes)
+  drawn for Generic front loader · Generic steam iron
+  out/washing-instructions-phone.pdf  one page, 5818 pt tall (10 layout passes)
   out/washing-instructions-print.pdf
 
 Piles that can share a drum:
@@ -85,10 +99,11 @@ Set up identically on both appliances, so sharing one card:
   Merino Wool + Cashmere Blend
 ```
 
-Point it at your own file, or somewhere else for the output:
+Point it at your own file, at different appliances, or somewhere else for the
+output:
 
 ```sh
-bun run generate my-laundry.csv --out ~/Documents
+bun run generate my-laundry.csv --machine my-machine.json --out ~/Documents
 ```
 
 The output filenames follow the input, so `my-laundry.csv` gives you
@@ -141,13 +156,13 @@ the dist and says so.
 | `clothing_type`   | What you call the pile — this is the card heading                    |
 | `detergent`       | Which detergent and how much                                         |
 | `fabric_softener` | `yes` or `no`                                                        |
-| `temperature`     | `koud`, `20`, `30`, `40`, `60` or `90`                               |
-| `spin`            | `0`, `400`, `600`, `800`, `1200` or `1400`                           |
+| `temperature`     | A temperature your machine offers                                    |
+| `spin`            | A spin speed your machine offers                                     |
 | `duration`        | Roughly how long it runs, for planning                               |
 | `program`         | A dial position, spelled exactly as on the fascia                    |
 | `options`         | Option buttons, pipe-separated; empty for none                       |
 | `ironing`         | Prose: how to iron it                                                |
-| `iron_setting`    | `none`, `min`, `1`, `2`, `3` or `max`                                |
+| `iron_setting`    | A thermostat position, or `none` for do not iron                     |
 | `drying`          | Prose: how to dry it                                                 |
 | `colour_group`    | `white`, `colour`, `dark`, `sport` or `any`                          |
 | `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo` |
@@ -241,13 +256,37 @@ Prose is deliberately not part of that key. Those two want different detergent
 and different drying, and the card lists both lines against the pile they belong
 to rather than letting one stand in for the other.
 
-### Retargeting it to different appliances
+## Your appliances
 
-`src/machine.ts` holds both appliances — the dial labels in physical order, the
-temperatures and spin speeds the display offers, the option buttons, and the
-iron's thermostat positions. The dial drawings take their angles from the order
-of that list, and the CSV validator takes its allowed values from it. Change
-that one file and everything follows.
+The machine is data, not code. `data/machine.json.dist` describes a generic
+front loader and a generic steam iron; yours goes in `data/machine.json` beside
+it, which is gitignored like the chart:
+
+```sh
+cp data/machine.json.dist data/machine.json
+```
+
+Inside are the dial labels in physical order, the temperatures and spin speeds
+the display offers, the option buttons, and the iron's thermostat positions.
+Copy each label exactly as it is printed in front of you, in whatever language
+that is — the whole point is that the drawing matches the machine.
+
+Two things follow from the order of `programs`. The first entry is the off
+position and is drawn at twelve o'clock, and every other tick takes its angle
+from where it sits in the list, so a programme left out does not merely go
+missing: it moves all the others. `temperatures` are printed as they stand,
+except that a plain number gets a degree sign, which is why a machine whose
+display says `cold` or `koud` needs no special case anywhere in the code.
+
+[`data/machine.schema.json`](data/machine.schema.json) describes the file, and
+the `$schema` line at the top of the `.dist` points at it, so an editor will
+complete the fields and complain before the tool does. The CSV validator takes
+its allowed values from whichever machine you load, so a chart written for one
+machine is refused by another rather than silently drawn wrong:
+
+```text
+row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
+```
 
 ## Development
 

@@ -1,4 +1,5 @@
 import { Document, Page, Text, View } from "@react-pdf/renderer";
+import { ApplianceContext, useMachine } from "./appliances";
 import {
   ControlPanel,
   Field,
@@ -7,7 +8,8 @@ import {
   SoftenerBadge,
   SplitField,
 } from "./components";
-import { iron, ironSetting, washer } from "./machine";
+import type { Machine } from "./machine";
+import { formatTemperature, ironSetting, NO_IRON } from "./machine";
 import {
   type Blocker,
   blockerCode,
@@ -25,9 +27,9 @@ const { colour, font } = theme;
 const A4 = { width: 595.28, height: 841.89 };
 const PHONE_WIDTH = 244;
 
-function ironLabel(item: ResolvedInstruction): string {
-  if (item.ironSetting === "none") return "do not iron";
-  return ironSetting(item.ironSetting)?.label ?? item.ironSetting;
+function ironLabel(machine: Machine, item: ResolvedInstruction): string {
+  if (item.ironSetting === NO_IRON) return "do not iron";
+  return ironSetting(machine, item.ironSetting)?.label ?? item.ironSetting;
 }
 
 function SectionHeading({ children }: { children: string }) {
@@ -149,6 +151,8 @@ function Card({
 }
 
 function Masthead({ subtitle }: { subtitle: string }) {
+  const { washer, iron } = useMachine();
+
   return (
     <View style={{ marginBottom: 10 }}>
       <Text style={{ fontFamily: font.bold, fontSize: 15, color: colour.ink }}>
@@ -205,7 +209,7 @@ function Loads({ items }: { items: ResolvedInstruction[] }) {
                   width: 58,
                 }}
               >
-                {first.program} {first.temperature === "koud" ? "koud" : `${first.temperature}°`}
+                {first.program} {formatTemperature(first.temperature)}
               </Text>
               <Text
                 style={{
@@ -227,7 +231,11 @@ function Loads({ items }: { items: ResolvedInstruction[] }) {
 }
 
 /** How to read the dial drawings, printed once per document. */
-function Legend() {
+function Legend({ last = false }: { last?: boolean }) {
+  const { washer } = useMachine();
+  const off = washer.programs[0] ?? "";
+  const example = washer.programs[1] ?? off;
+
   return (
     <View
       style={{
@@ -236,7 +244,7 @@ function Legend() {
         backgroundColor: colour.panel,
         borderRadius: 3,
         padding: 8,
-        marginBottom: 10,
+        marginBottom: last ? 0 : 10,
       }}
     >
       {/*
@@ -245,7 +253,7 @@ function Legend() {
         the dial spills out of the top.
       */}
       <View style={{ width: 54, height: 66, alignItems: "center" }}>
-        <ProgramDial program="Katoen" size={54} />
+        <ProgramDial program={example} size={54} />
         <Text
           style={{
             fontFamily: font.sans,
@@ -267,9 +275,9 @@ function Legend() {
             paddingRight: 2,
           }}
         >
-          The dials are drawn as they sit on the machine: twelve o'clock is Uit, and the red pointer
-          is where to turn it. Chips show every value the display steps through, filled in on the
-          one you want. On the iron, the blue band is the zone where it makes steam.
+          The dials are drawn as they sit on the machine: twelve o'clock is {off}, and the red
+          pointer is where to turn it. Chips show every value the display steps through, filled in
+          on the one you want. On the iron, the blue band is the zone where it makes steam.
         </Text>
       </View>
     </View>
@@ -277,38 +285,52 @@ function Legend() {
 }
 
 /** The phone version: one narrow page you scroll from top to bottom. */
-export function PhoneDocument({ items, height }: { items: ResolvedInstruction[]; height: number }) {
+export function PhoneDocument({
+  items,
+  height,
+  machine,
+}: {
+  items: ResolvedInstruction[];
+  height: number;
+  machine: Machine;
+}) {
   return (
-    <Document title="Washing instructions (phone)" author="washing-instructions">
-      <Page size={{ width: PHONE_WIDTH, height }} style={{ padding: 12, backgroundColor: "#fff" }}>
-        <Masthead subtitle="Scroll for the pile you are holding." />
-        <Loads items={items} />
-        <Legend />
-        {cardGroups(items).map((group, index) => (
-          <Card
-            key={(group[0] as ResolvedInstruction).clothingType}
-            group={group}
-            index={index + 1}
-            compact
-          />
-        ))}
-        <Text
-          style={{
-            fontFamily: font.oblique,
-            fontSize: 6,
-            color: colour.faint,
-            marginTop: 4,
-            textAlign: "center",
-          }}
+    <ApplianceContext.Provider value={machine}>
+      <Document title="Washing instructions (phone)" author="washing-instructions">
+        <Page
+          size={{ width: PHONE_WIDTH, height }}
+          style={{ padding: 12, backgroundColor: "#fff" }}
         >
-          Durations are the machine's own estimates and vary with load.
-        </Text>
-      </Page>
-    </Document>
+          <Masthead subtitle="Scroll for the pile you are holding." />
+          <Loads items={items} />
+          <Legend />
+          {cardGroups(items).map((group, index) => (
+            <Card
+              key={(group[0] as ResolvedInstruction).clothingType}
+              group={group}
+              index={index + 1}
+              compact
+            />
+          ))}
+          <Text
+            style={{
+              fontFamily: font.oblique,
+              fontSize: 6,
+              color: colour.faint,
+              marginTop: 4,
+              textAlign: "center",
+            }}
+          >
+            Durations are the machine's own estimates and vary with load.
+          </Text>
+        </Page>
+      </Document>
+    </ApplianceContext.Provider>
   );
 }
 
 function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
+  const machine = useMachine();
   const columns: { label: string; width: number; value: (item: ResolvedInstruction) => string }[] =
     [
       { label: "Pile", width: 118, value: (i) => i.clothingType },
@@ -317,7 +339,7 @@ function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
       { label: "Spin", width: 32, value: (i) => i.spin },
       { label: "Buttons", width: 78, value: (i) => i.options.join(", ") || "—" },
       { label: "Softener", width: 42, value: (i) => (i.fabricSoftener ? "yes" : "no") },
-      { label: "Iron", width: 44, value: (i) => ironLabel(i) },
+      { label: "Iron", width: 44, value: (i) => ironLabel(machine, i) },
       { label: "Detergent", width: 105, value: (i) => i.detergent.split(/[—.:]/)[0]?.trim() ?? "" },
     ];
 
@@ -477,35 +499,50 @@ function MixMatrix({ items }: { items: ResolvedInstruction[] }) {
 }
 
 /** The printable version: a reference sheet, then two detail cards per page. */
-export function PrintDocument({ items }: { items: ResolvedInstruction[] }) {
+export function PrintDocument({
+  items,
+  machine,
+}: {
+  items: ResolvedInstruction[];
+  machine: Machine;
+}) {
   const cards = cardGroups(items);
 
   return (
-    <Document title="Washing instructions (print)" author="washing-instructions">
-      <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
-        <Masthead subtitle="Pin this next to the machine." />
-        <Loads items={items} />
-        <SummaryTable items={items} />
-        <MixMatrix items={items} />
-        <View style={{ marginTop: 14 }}>
-          <Legend />
-        </View>
-      </Page>
-      {/*
+    <ApplianceContext.Provider value={machine}>
+      <Document title="Washing instructions (print)" author="washing-instructions">
+        <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
+          <Masthead subtitle="Pin this next to the machine." />
+          <Loads items={items} />
+          <SummaryTable items={items} />
+          <MixMatrix items={items} />
+          {/*
+            No trailing margin. A margin below the last thing on a page is
+            still height, and @react-pdf answers a page it cannot fit with an
+            empty sheet rather than an error — which is how a blank page 2
+            appeared the first time a machine with longer programme names
+            widened the table above.
+          */}
+          <View style={{ marginTop: 12 }}>
+            <Legend last />
+          </View>
+        </Page>
+        {/*
         The cards flow onto as many A4 sheets as they need. Each card is
         `wrap={false}`, so one is never split across a page break; how many
         land on a sheet depends on how much prose the CSV carries.
       */}
-      <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
-        {cards.map((group, index) => (
-          <Card
-            key={(group[0] as ResolvedInstruction).clothingType}
-            group={group}
-            index={index + 1}
-          />
-        ))}
-      </Page>
-    </Document>
+        <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
+          {cards.map((group, index) => (
+            <Card
+              key={(group[0] as ResolvedInstruction).clothingType}
+              group={group}
+              index={index + 1}
+            />
+          ))}
+        </Page>
+      </Document>
+    </ApplianceContext.Provider>
   );
 }
 

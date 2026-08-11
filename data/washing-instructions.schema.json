@@ -2,7 +2,7 @@
   "$schema": "https://datapackage.org/profiles/2.0/tableschema.json",
   "name": "washing-instructions",
   "title": "Washing instructions",
-  "description": "One row per pile of laundry. Every machine-facing value is a setting the Bosch Serie 6 VarioPerfect can actually be turned to.",
+  "description": "One row per pile of laundry. Every machine-facing value is a setting the Generic front loader can actually be turned to.",
   "fields": [
     {
       "name": "clothing_type",
@@ -22,6 +22,8 @@
     {
       "name": "fabric_softener",
       "type": "boolean",
+      "trueValues": ["yes", "y", "true", "1"],
+      "falseValues": ["no", "n", "false", "0"],
       "title": "Fabric softener",
       "description": "Whether softener goes in. Written yes or no."
     },
@@ -32,7 +34,7 @@
       "description": "A temperature the display steps through. koud is the snowflake.",
       "constraints": {
         "required": true,
-        "enum": ["koud", "20", "30", "40", "60", "90"]
+        "enum": ["cold", "20", "30", "40", "60", "90"]
       }
     },
     {
@@ -59,22 +61,22 @@
       "constraints": {
         "required": true,
         "enum": [
-          "Uit",
-          "Katoen",
-          "Katoen + Voorwas",
-          "Kreukherstellend",
-          "Kreukherstellend + Voorwas",
-          "Snel + Mix",
-          "Fijn/Zijde",
-          "Wol",
-          "Spoelen/Centrifugeren",
-          "Afpompen",
-          "Voorzichtig centrifugeren",
-          "Extra snel 15'",
-          "Kreukherstellend speciaal",
-          "Extra fijn",
-          "Sport",
-          "Allergie +"
+          "Off",
+          "Cottons",
+          "Cottons + Prewash",
+          "Easy Care",
+          "Easy Care + Prewash",
+          "Quick Mixed",
+          "Delicates / Silk",
+          "Wool",
+          "Rinse / Spin",
+          "Drain",
+          "Gentle Spin",
+          "Super Quick 15'",
+          "Easy Care Special",
+          "Extra Delicate",
+          "Sportswear",
+          "Allergy Plus"
         ]
       }
     },
@@ -84,7 +86,7 @@
       "title": "Option buttons",
       "description": "Option buttons to press, pipe-separated. Empty for none.",
       "constraints": {
-        "pattern": "^$|^(Speed Perfect|Eco Perfect|Licht strijken|Extra spoelen)( *\\| *(Speed Perfect|Eco Perfect|Licht strijken|Extra spoelen))*$"
+        "pattern": "^$|^(Speed|Eco|Easy Iron|Extra Rinse)( *\\| *(Speed|Eco|Easy Iron|Extra Rinse))*$"
       }
     },
     {

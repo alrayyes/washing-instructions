@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { basename, join, resolve as resolvePath } from "node:path";
 import { parseInstructions } from "./csv";
+import { DEFAULT_MACHINE, loadMachine } from "./machine";
 import { cardGroups, loadGroups, resolve } from "./mixing";
 import { renderPhone, renderPrint } from "./render";
 
@@ -9,11 +10,13 @@ const DEFAULT_OUT = "out";
 
 function usage(): string {
   return [
-    "Usage: bun run generate [csv] [--out <dir>]",
+    "Usage: bun run generate [csv] [--out <dir>] [--machine <file>]",
     "",
-    `  csv          instruction CSV to read (default: ${DEFAULT_CSV},`,
-    "               falling back to the committed .dist)",
-    `  --out <dir>  where the PDFs go (default: ${DEFAULT_OUT})`,
+    `  csv               instruction CSV to read (default: ${DEFAULT_CSV},`,
+    "                    falling back to the committed .dist)",
+    `  --out <dir>       where the PDFs go (default: ${DEFAULT_OUT})`,
+    `  --machine <file>  the appliances to draw (default: ${DEFAULT_MACHINE},`,
+    "                    falling back to the committed .dist)",
   ].join("\n");
 }
 
@@ -41,11 +44,13 @@ export function outputStem(csv: string): string {
 interface Args {
   csv: string;
   out: string;
+  machine: string;
 }
 
 export function parseArgs(argv: string[]): Args {
   let csv = DEFAULT_CSV;
   let out = DEFAULT_OUT;
+  let machine = DEFAULT_MACHINE;
   const positional: string[] = [];
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -54,6 +59,11 @@ export function parseArgs(argv: string[]): Args {
       const value = argv[index + 1];
       if (value === undefined) throw new Error("--out needs a directory");
       out = value;
+      index += 1;
+    } else if (argument === "--machine" || argument === "-m") {
+      const value = argv[index + 1];
+      if (value === undefined) throw new Error("--machine needs a file");
+      machine = value;
       index += 1;
     } else if (argument === "--help" || argument === "-h") {
       throw new Error(usage());
@@ -64,28 +74,33 @@ export function parseArgs(argv: string[]): Args {
 
   if (positional.length > 1) throw new Error(`unexpected argument: ${positional[1]}`);
   if (positional[0] !== undefined) csv = positional[0];
-  return { csv, out };
+  return { csv, out, machine };
 }
 
 async function main(argv: string[]): Promise<void> {
-  const { csv: requested, out } = parseArgs(argv);
+  const { csv: requested, out, machine: machinePath } = parseArgs(argv);
   const csv = await resolveCsv(requested);
+  const machine = await loadMachine(machinePath);
 
   const source = await Bun.file(csv).text();
-  const items = resolve(parseInstructions(source));
+  const items = resolve(parseInstructions(source, machine));
 
   await mkdir(out, { recursive: true });
   const stem = outputStem(csv);
   const phonePath = join(out, `${stem}-phone.pdf`);
   const printPath = join(out, `${stem}-print.pdf`);
 
-  const [phone, print] = await Promise.all([renderPhone(items), renderPrint(items)]);
+  const [phone, print] = await Promise.all([
+    renderPhone(items, machine),
+    renderPrint(items, machine),
+  ]);
   await Promise.all([writeFile(phonePath, phone.pdf), writeFile(printPath, print)]);
 
   const groups = loadGroups(items).filter((group) => group.length > 1);
   const merged = cardGroups(items).filter((group) => group.length > 1);
 
   console.log(`Read ${items.length} piles from ${resolvePath(csv)}`);
+  console.log(`  drawn for ${machine.washer.name} · ${machine.iron.name}`);
   console.log(
     `  ${phonePath}  one page, ${Math.round(phone.height)} pt tall ` +
       `(${phone.attempts} layout passes)`,
