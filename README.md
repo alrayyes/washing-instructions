@@ -32,7 +32,12 @@ printed sheet carries a full compatibility matrix with the reason for every no.
 | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | <img src="docs/phone.png" alt="The top of the phone PDF: a loads table, a note explaining the dial drawings, and the first card" width="260"> | <img src="docs/print-card.png" alt="An A4 page of the printable PDF showing two cards, each with a programme dial, temperature and spin chips, and an iron thermostat ring" width="420"> |
 
-Both are the committed example chart, not anyone's real laundry.
+Both are the committed example chart, not anyone's real laundry. The PDFs
+themselves come out of every pipeline, so you can read the real thing rather
+than a picture of it — these two links always serve the newest build of `main`:
+
+- [`washing-instructions-phone.pdf`](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/jobs/artifacts/main/raw/out/washing-instructions-phone.pdf?job=pdfs)
+- [`washing-instructions-print.pdf`](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/jobs/artifacts/main/raw/out/washing-instructions-print.pdf?job=pdfs)
 
 ## Requirements
 
