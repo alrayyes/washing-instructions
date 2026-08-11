@@ -14,6 +14,17 @@ stages:
   - check
   - build
 
+# A job that runs only on merge requests makes GitLab build a merge request
+# pipeline, and by default it keeps building the branch pipeline alongside it —
+# two runs of everything on every push. These rules pick one: the merge request
+# pipeline while a merge request is open, the branch pipeline otherwise.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
 default:
   interruptible: true
 
