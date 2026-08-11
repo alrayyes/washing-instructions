@@ -114,6 +114,17 @@ lint:commits:
   script:
     - bunx --bun commitlint --from "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --to HEAD --verbose
 
+# The Dockerfile, checked without a daemon: hadolint reads it and never builds
+# it. That catches an unpinned base, an apt-get without --no-install-recommends
+# and a RUN cd that quietly does nothing, which is most of what goes wrong in
+# one. Building the image in CI is a separate question — see #10.
+lint:docker:
+  stage: check
+  image: hadolint/hadolint:v2.15.1-alpine@sha256:a1d49ae1a4e83c1dbad26b8c1ad7588c8bd1e04f4866b34ad3cac50335198552
+  before_script: []
+  script:
+    - hadolint Dockerfile
+
 pdfs:
   stage: build
   extends: .install

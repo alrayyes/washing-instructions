@@ -15,6 +15,9 @@ to it. Tests and CI read the `.dist`; never point them at the other one.
 ## Commands
 
 - `bun run generate` — write both PDFs to `out/`
+- `docker build -t washing-instructions . && docker run --rm -v "$PWD/out:/out" washing-instructions`
+  — the same thing without Bun on the host; CI only lints the `Dockerfile`, so build it
+  yourself before claiming a change to it works
 - `bun run schema` — regenerate `data/washing-instructions.schema.json`; run it after
   touching `src/machine.ts` or a test fails on the stale copy
 - `bun run check` — every linter, `tsc --noEmit` and the tests, in that order
