@@ -1,10 +1,11 @@
 <!--
-Maintainer note (not rendered): only the pipeline badge is here because it is
-the only thing wired up. Add a release badge in the same commit that adds
-semantic-release, and a licence badge when a licence is chosen.
+Maintainer note (not rendered): add a release badge in the same commit that
+adds semantic-release. The licence badge is static because there is no registry
+release to read the licence off yet.
 -->
 
 [![pipeline status](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/badges/main/pipeline.svg)](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/commits/main)
+[![licence: GPL v3+](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](LICENSE)
 
 # Washing instructions
 
@@ -27,6 +28,17 @@ generic advice onto your machine; the drawing _is_ your machine.
 It also answers the question that actually causes arguments: what can go in
 together. Piles are grouped into loads, each card names its bedfellows, and the
 printed sheet carries a full compatibility matrix with the reason for every no.
+
+| The phone sheet, from the top                                                                                                                 | A card from the printable set                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/phone.png" alt="The top of the phone PDF: a loads table, a note explaining the dial drawings, and the first card" width="260"> | <img src="docs/print-card.png" alt="An A4 page of the printable PDF showing two cards, each with a programme dial, temperature and spin chips, and an iron thermostat ring" width="420"> |
+
+Both are the committed example chart, not anyone's real laundry. The PDFs
+themselves come out of every pipeline, so you can read the real thing rather
+than a picture of it — these two links always serve the newest build of `main`:
+
+- [`washing-instructions-phone.pdf`](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/jobs/artifacts/main/raw/out/washing-instructions-phone.pdf?job=pdfs)
+- [`washing-instructions-print.pdf`](https://gitlab.higherlearning.eu/alrayyes/washing-instructions/-/jobs/artifacts/main/raw/out/washing-instructions-print.pdf?job=pdfs)
 
 ## Requirements
 
@@ -59,8 +71,8 @@ bun run generate
 ```
 
 ```text
-Read 15 piles from /home/you/washing-instructions/data/washing-instructions.csv
-  out/washing-instructions-phone.pdf  one page, 6053 pt tall (10 layout passes)
+Read 15 piles from /home/you/washing-instructions/data/washing-instructions.csv.dist
+  out/washing-instructions-phone.pdf  one page, 6029 pt tall (10 layout passes)
   out/washing-instructions-print.pdf
 
 Piles that can share a drum:
@@ -84,8 +96,19 @@ The output filenames follow the input, so `my-laundry.csv` gives you
 
 ## The CSV
 
-One row per pile, in `data/washing-instructions.csv`. Adding a pile never needs
-a code change.
+One row per pile. Adding a pile never needs a code change.
+
+The chart that ships with the repo is `data/washing-instructions.csv.dist`, and
+it is a made-up one — nobody's actual wardrobe. Yours goes in
+`data/washing-instructions.csv` beside it, which is gitignored, so your laundry
+never lands in a commit. Copy the dist across and edit it:
+
+```sh
+cp data/washing-instructions.csv.dist data/washing-instructions.csv
+```
+
+There is no need to hurry: with no file of your own, `bun run generate` reads
+the dist and says so.
 
 | Column            | What goes in it                                                      |
 | ----------------- | -------------------------------------------------------------------- |
@@ -112,12 +135,60 @@ to turn the dial somewhere it does not go:
 row 8, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
 ```
 
+`data/washing-instructions.schema.json` says the same thing in a form other
+tools understand: a [Frictionless Table
+Schema](https://datapackage.org/standard/table-schema/) naming every column, its
+type, and the values it accepts. Point a validator at the pair and it tells you
+which row is wrong; point an editor at it and you get the programme names in an
+autocomplete rather than in another window.
+
+It is generated, never edited — `src/machine.ts` stays the one authority on the
+appliances, and a second copy of those lists would drift the first time a
+programme is renamed:
+
+```sh
+bun run schema   # after changing src/machine.ts
+```
+
+A test compares the committed file against what the generator produces, so
+forgetting that command fails CI rather than leaving a schema that quietly
+disagrees with the parser.
+
+### Let a chatbot write the first draft
+
+Filling in fifteen rows of care advice from scratch is the tedious part, and it
+is the part a language model is genuinely good at. Paste it the dist file as the
+format, the list of programmes and settings out of `src/machine.ts` as the only
+values it may use, and a description of what you actually own — a flat share
+with two sets of bed linen and a lot of running kit is a different chart from a
+household with school uniforms.
+
+Something like this works:
+
+```text
+Here is a CSV format and an example row. Write me one row per pile for the
+laundry I describe. Only use these programmes: <paste washer.programs>. Only
+these temperatures: <paste>. Only these spin speeds: <paste>. Only these option
+buttons: <paste>. iron_setting must be one of none, min, 1, 2, 3, max.
+
+My laundry: <describe it — fabrics, colours, what you own a lot of, what you
+line dry, anything with a care label you actually follow>.
+```
+
+Two things to do with the answer. Run it: the CSV validator checks every
+machine-facing value against `src/machine.ts`, so an invented programme name
+fails the run rather than reaching a PDF. Then read it: a model will state a
+wash temperature with total confidence and be wrong, so check anything that
+would ruin a garment — wool, silk, anything with elastane — against the care
+label or the maker's own guidance before you trust the chart taped to your
+machine.
+
 ### How "can these wash together" is decided
 
 Two piles may share a drum only when all of these hold. The first one that
 fails is the reason shown in the matrix.
 
-1. Neither is tagged `solo`. Raw selvedge and trainers go in alone, full stop.
+1. Neither is tagged `solo`. Raw denim and trainers go in alone, full stop.
 2. If either is a `lint-shedder`, the other must be too — terry sheds over
    everything, so towels only ever go with towels.
 3. Their `colour_group` matches (`any` matches everything).
@@ -258,4 +329,10 @@ on synthetic activewear.
 
 ## Licence
 
-Not yet chosen — add one before this goes anywhere public.
+[GNU General Public License v3.0 or later](LICENSE). Use it, change it, pass it
+on — but anything you distribute that is built on it comes with the same freedom
+attached, source included.
+
+The care advice in `data/washing-instructions.csv.dist` is assembled from the
+manufacturer and trade sources listed above, and is offered in the same spirit
+as the code: no warranty. Your care labels outrank it.

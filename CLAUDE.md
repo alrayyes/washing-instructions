@@ -7,11 +7,16 @@ is where the prose explanation lives; this file is the set of traps.
 # washing-instructions
 
 Reads `data/washing-instructions.csv` and renders two PDFs: a single tall page
-for the phone, and an A4 reference sheet plus detail cards for printing.
+for the phone, and an A4 reference sheet plus detail cards for printing. That
+file is gitignored — one household's laundry is nobody else's business — so the
+committed chart is `data/washing-instructions.csv.dist` and the CLI falls back
+to it. Tests and CI read the `.dist`; never point them at the other one.
 
 ## Commands
 
 - `bun run generate` — write both PDFs to `out/`
+- `bun run schema` — regenerate `data/washing-instructions.schema.json`; run it after
+  touching `src/machine.ts` or a test fails on the stale copy
 - `bun run check` — every linter, `tsc --noEmit` and the tests, in that order
 - `bun run format:md` — Prettier over the Markdown; it owns `*.md` and nothing else
 - `bun run prose:sync` — fetch Vale's style packages; needed once before `check` works

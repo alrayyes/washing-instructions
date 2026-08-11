@@ -1,0 +1,139 @@
+{
+  "$schema": "https://datapackage.org/profiles/2.0/tableschema.json",
+  "name": "washing-instructions",
+  "title": "Washing instructions",
+  "description": "One row per pile of laundry. Every machine-facing value is a setting the Bosch Serie 6 VarioPerfect can actually be turned to.",
+  "fields": [
+    {
+      "name": "clothing_type",
+      "type": "string",
+      "title": "Pile",
+      "description": "What you call the pile. This becomes the heading on its card.",
+      "constraints": {
+        "required": true
+      }
+    },
+    {
+      "name": "detergent",
+      "type": "string",
+      "title": "Detergent",
+      "description": "Which detergent, and how much of it."
+    },
+    {
+      "name": "fabric_softener",
+      "type": "boolean",
+      "title": "Fabric softener",
+      "description": "Whether softener goes in. Written yes or no."
+    },
+    {
+      "name": "temperature",
+      "type": "string",
+      "title": "Temperature",
+      "description": "A temperature the display steps through. koud is the snowflake.",
+      "constraints": {
+        "required": true,
+        "enum": ["koud", "20", "30", "40", "60", "90"]
+      }
+    },
+    {
+      "name": "spin",
+      "type": "string",
+      "title": "Spin speed",
+      "description": "Spin in rpm. 0 is drain without spinning.",
+      "constraints": {
+        "required": true,
+        "enum": ["0", "400", "600", "800", "1200", "1400"]
+      }
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "title": "Duration",
+      "description": "Roughly how long the programme runs, for planning the day around it."
+    },
+    {
+      "name": "program",
+      "type": "string",
+      "title": "Programme",
+      "description": "A dial position, spelled exactly as it is printed on the fascia.",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "Uit",
+          "Katoen",
+          "Katoen + Voorwas",
+          "Kreukherstellend",
+          "Kreukherstellend + Voorwas",
+          "Snel + Mix",
+          "Fijn/Zijde",
+          "Wol",
+          "Spoelen/Centrifugeren",
+          "Afpompen",
+          "Voorzichtig centrifugeren",
+          "Extra snel 15'",
+          "Kreukherstellend speciaal",
+          "Extra fijn",
+          "Sport",
+          "Allergie +"
+        ]
+      }
+    },
+    {
+      "name": "options",
+      "type": "string",
+      "title": "Option buttons",
+      "description": "Option buttons to press, pipe-separated. Empty for none.",
+      "constraints": {
+        "pattern": "^$|^(Speed Perfect|Eco Perfect|Licht strijken|Extra spoelen)( *\\| *(Speed Perfect|Eco Perfect|Licht strijken|Extra spoelen))*$"
+      }
+    },
+    {
+      "name": "ironing",
+      "type": "string",
+      "title": "Ironing",
+      "description": "Prose: how to iron it, or why not to."
+    },
+    {
+      "name": "iron_setting",
+      "type": "string",
+      "title": "Iron thermostat",
+      "description": "Where the iron's thermostat points. none means do not iron this at all.",
+      "constraints": {
+        "required": true,
+        "enum": ["min", "1", "2", "3", "max", "none"]
+      }
+    },
+    {
+      "name": "drying",
+      "type": "string",
+      "title": "Drying",
+      "description": "Prose: how to dry it."
+    },
+    {
+      "name": "colour_group",
+      "type": "string",
+      "title": "Colour group",
+      "description": "Which piles it may share a drum with on colour grounds. any mixes with all.",
+      "constraints": {
+        "required": true,
+        "enum": ["white", "colour", "dark", "sport", "any"]
+      }
+    },
+    {
+      "name": "mix_tags",
+      "type": "string",
+      "title": "Mixing tags",
+      "description": "Reasons this pile cannot share a drum even when the settings agree, pipe-separated.",
+      "constraints": {
+        "pattern": "^$|^(lint-shedder|lint-magnet|dye-bleeder|solo)( *\\| *(lint-shedder|lint-magnet|dye-bleeder|solo))*$"
+      }
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "title": "Notes",
+      "description": "Anything else worth knowing while you are standing at the machine."
+    }
+  ],
+  "primaryKey": ["clothing_type"]
+}
