@@ -42,8 +42,14 @@ jobs:
   # release that does not happen. Pull requests only — there is no range to
   # check on a push, and rewriting history to fix an old message is worse than
   # the typo. fetch-depth 0 because the range needs both ends of it.
+  #
+  # Dependabot is exempt. Its subject is always "Bump x from a to b", and
+  # config-conventional's subject-case rule rejects the capital B — which is
+  # not something a bot can be argued with about. What lands on main is
+  # normalised by the auto-merge workflow's squash subject instead, so main
+  # stays conventional without this job failing on every dependency bump.
   commits:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
