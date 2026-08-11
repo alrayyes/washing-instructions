@@ -295,6 +295,11 @@ message. On push, every linter runs again in check mode over the whole tree,
 followed by the typecheck and the tests — nothing at that point writes, so the
 commit you push is the one you reviewed.
 
+Every hook is skippable with `--no-verify`, which is why CI checks the same
+things again and why the message check runs a second time over the whole range
+of a merge request. These messages decide the version a release tool picks, so
+they are worth a gate rather than only a reminder.
+
 ### Gotchas
 
 - Only Helvetica is embedded, so the PDFs can only render WinAnsi characters.

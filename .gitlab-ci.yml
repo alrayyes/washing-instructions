@@ -14,6 +14,17 @@ stages:
   - check
   - build
 
+# A job that runs only on merge requests makes GitLab build a merge request
+# pipeline, and by default it keeps building the branch pipeline alongside it —
+# two runs of everything on every push. These rules pick one: the merge request
+# pipeline while a merge request is open, the branch pipeline otherwise.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
 default:
   interruptible: true
 
@@ -79,6 +90,29 @@ vale:
     - bun run prose:sync
     - bun run lint:prose:advice
   allow_failure: true
+
+# The commit-msg hook already reads every message, but a hook is skippable and
+# these messages are load-bearing: a release tool reads the Conventional Commits
+# that landed to decide the next version, so a stray "wip" is a release that
+# does not happen. Merge requests only — there is no range to check on a branch
+# pipeline, and rewriting history to fix an old message is worse than the typo.
+#
+# commitlint resolves @commitlint/config-conventional as a sibling package, so
+# bunx alone will not do; the pinned devDependencies have to be installed. It
+# also shells out to git for the range, and the bun image ships without it.
+lint:commits:
+  stage: check
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends git
+    # The runner checks out as one user and the job runs as another, so git
+    # refuses to read the repository it was just handed: "detected dubious
+    # ownership". Nothing here writes to the tree, and the runner put it there.
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - bun install --frozen-lockfile
+  script:
+    - bunx --bun commitlint --from "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --to HEAD --verbose
 
 pdfs:
   stage: build
