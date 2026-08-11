@@ -15,8 +15,18 @@ commit-msg:
     - name: commitlint
       run: bunx --bun commitlint --edit {1}
 
+# Nothing here writes. A hook that rewrote files under a push would leave the
+# pushed commit and the working tree disagreeing about what was reviewed. Every
+# linter runs in check mode over the whole tree rather than the staged set, so a
+# file that reached a commit through --no-verify or arrived in a rebase is still
+# caught before it is anyone else's problem.
 pre-push:
+  parallel: true
   jobs:
+    - name: biome
+      run: bun run lint
+    - name: markdownlint
+      run: bun run lint:md
     - name: typecheck
       run: bun run typecheck
     - name: test
