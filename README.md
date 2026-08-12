@@ -466,6 +466,20 @@ and Bun answers `process.version` with the Node version it implements — 24.3.0
 so `bunx --bun semantic-release` dies on the version gate before doing anything
 at all. Bun installs it and Node runs it.
 
+A second wrinkle, from the same family of things that fail quietly. The notes
+are written by the `conventionalcommits` preset, which arrives as its own pinned
+package, and version 10 of it changed the shape of the config object it exports.
+`@semantic-release/release-notes-generator` 14 still reads the old shape, so it
+finds no template, writes a version heading with nothing under it, and reports
+success. That is what shipped as v1.0.0 and v1.1.0. The preset is held at 9.x,
+Dependabot is told not to carry it past that, and `test/release-notes.test.ts`
+checks that generated notes have sections in them — a version range would not
+have caught this, and neither did a green pipeline.
+
+`CHANGELOG.md` is written by that job, which runs no git hook, so Prettier,
+markdownlint and Vale are all told to leave it alone. Its bullets are the
+generator's; reformatting them by hand only lasts until the next release.
+
 ## Licence
 
 [GNU General Public License v3.0 or later](LICENSE). Use it, change it, pass it
