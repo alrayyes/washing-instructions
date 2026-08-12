@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/alrayyes/washing-instructions/compare/v1.1.0...v1.1.1) (2026-08-12)
+
+### Bug Fixes
+
+* **release:** write notes that list what landed ([#9](https://github.com/alrayyes/washing-instructions/issues/9)) ([ba7184d](https://github.com/alrayyes/washing-instructions/commit/ba7184d693a8310826bc161e1d9d74c3a09ea293))
+
 ## [1.1.0](https://github.com/alrayyes/washing-instructions/compare/v1.0.0...v1.1.0) (2026-08-11)
 
 ### Features
