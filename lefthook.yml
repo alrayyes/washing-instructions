@@ -55,6 +55,8 @@ pre-push:
       run: bun run lint:md
     - name: yaml
       run: bun run lint:yaml
+    - name: data
+      run: bun run lint:data
     - name: vale
       run: bun run lint:prose
     - name: typecheck
