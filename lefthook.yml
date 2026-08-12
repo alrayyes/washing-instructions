@@ -32,8 +32,14 @@ pre-commit:
     # lint:prose:advice` and the CI job are where the full read lives. LTeX is
     # deliberately absent — a ~300 MB download with its own Java runtime is more
     # than a commit should wait on, so it runs in CI and in the editor over LSP.
+    # CHANGELOG.md is excluded here as well as in `lint:prose`, because this job
+    # is handed the staged files by name and never sees that script's glob.
+    # Vale reads "vale sync" out of a commit subject and asks for a capital V,
+    # which is not a thing anyone can fix in a file its generator rewrites.
     - name: vale
       glob: "*.md"
+      exclude:
+        - CHANGELOG.md
       run: .tools/vale --minAlertLevel=error {staged_files}
 
 commit-msg:
