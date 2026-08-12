@@ -325,18 +325,19 @@ row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, 
 
 ```sh
 bun run check              # every linter, tsc --noEmit, then the tests
-bun run format:md          # let Prettier lay the Markdown out
+bun run format             # let Prettier lay the Markdown and YAML out
 bun run lint:prose:advice  # Vale's style advice, warnings and all
 bun test                   # just the tests
 ```
 
 Two formatters, split by file type and never overlapping. Biome owns everything
-it supports; Markdown is the one thing it does not format, so that goes to
+it supports; Markdown and YAML are what it does not format, so those go to
 Prettier and `.prettierignore` names the file types Prettier must keep its hands
 off. Prettier runs before markdownlint, never after — Prettier decides the
 layout and markdownlint judges what came out, so the rules the two would argue
 over (list markers, list indentation, emphasis characters) are switched off on
-markdownlint's side.
+markdownlint's side. Nothing judges the YAML after Prettier has laid it out, so
+`lint:yaml` is the check on its own.
 
 ### The prose is linted too
 
