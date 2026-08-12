@@ -20,6 +20,13 @@ pre-commit:
           - name: markdownlint
             glob: "*.md"
             run: bunx --bun markdownlint-cli2 {staged_files}
+    # Biome does not read YAML, so the workflows and this file are Prettier's
+    # too. Nothing judges the result afterwards the way markdownlint judges the
+    # Markdown, so it is one job rather than a pipe.
+    - name: yaml
+      glob: "*.{yml,yaml}"
+      run: bunx --bun prettier --write {staged_files}
+      stage_fixed: true
     # Error level only. Vale's warnings are style advice, and advice that blocks
     # a commit is how you teach someone to reach for --no-verify; `bun run
     # lint:prose:advice` and the CI job are where the full read lives. LTeX is
@@ -46,6 +53,8 @@ pre-push:
       run: bun run lint
     - name: markdownlint
       run: bun run lint:md
+    - name: yaml
+      run: bun run lint:yaml
     - name: vale
       run: bun run lint:prose
     - name: typecheck

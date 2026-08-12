@@ -13,12 +13,13 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "format:md": "prettier --write \"**/*.md\"",
+    "format": "prettier --write .",
     "lint:md": "prettier --check \"**/*.md\" && markdownlint-cli2 \"**/*.md\"",
+    "lint:yaml": "prettier --check \"**/*.{yml,yaml}\"",
     "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
     "lint:prose": ".tools/vale --glob='!styles/**' --minAlertLevel=error .",
     "lint:prose:advice": ".tools/vale --glob='!styles/**' .",
-    "check": "bun run lint && bun run lint:md && bun run lint:prose && bun run lint:data && bun run typecheck && bun test"
+    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run typecheck && bun test"
   },
   "dependencies": {
     "@react-pdf/renderer": "4.6.0",
