@@ -88,9 +88,9 @@ bun run generate
 ```
 
 ```text
-Read 15 piles from /home/you/washing-instructions/data/washing-instructions.csv.dist
+Read 16 piles from /home/you/washing-instructions/data/washing-instructions.csv.dist
   drawn for Generic front loader · Generic steam iron
-  out/washing-instructions-phone.pdf  one page, 5818 pt tall (10 layout passes)
+  out/washing-instructions-phone.pdf  one page, 6225 pt tall (11 layout passes)
   out/washing-instructions-print.pdf
 
 Piles that can share a drum:
