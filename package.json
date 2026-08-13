@@ -6,6 +6,7 @@
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
+    "prepare": "lefthook install",
     "generate": "bun run src/cli.ts",
     "test": "bun test",
     "schema": "bun run scripts/csv-schema.ts",
@@ -21,6 +22,9 @@
     "lint:prose:advice": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' .",
     "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run typecheck && bun test"
   },
+  "trustedDependencies": [
+    "lefthook"
+  ],
   "dependencies": {
     "@react-pdf/renderer": "4.6.0",
     "csv-parse": "7.0.2",

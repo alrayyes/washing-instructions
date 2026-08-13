@@ -55,11 +55,12 @@ token, which is why these are a link to the run rather than to the file.
 - **[Bun](https://bun.sh) 1.3 or newer** — runtime, package manager and test
   runner. Nothing else is needed; there is no build step and no browser.
 - Linux, macOS or WSL. Bun's Windows support should work but is untested here.
-- Optional, for the git hooks: nothing extra — `lefthook` and the linters
-  install as dev dependencies. Vale is the exception, because it is a Go binary
-  rather than a package: `bun run prose:sync` fetches it into `.tools/`, checks
-  it against the release's own checksums, and pulls down the style packages it
-  lints against. That wants network access and `tar`, once.
+- Nothing extra for the git hooks — `lefthook` and the linters are dev
+  dependencies, and `bun install` puts the hooks in place for you. Vale is the
+  exception, because it is a Go binary rather than a package:
+  `bun run prose:sync` fetches it into `.tools/`, checks it against the
+  release's own checksums, and pulls down the style packages it lints against.
+  That wants network access and `tar`, once.
 
 No network access is needed at run time, and no fonts are downloaded: the PDFs
 use the Helvetica that every PDF reader already has.
@@ -70,7 +71,6 @@ use the Helvetica that every PDF reader already has.
 bun install --frozen-lockfile
 cp data/machine.json.dist data/machine.json             # then describe your appliances
 cp data/washing-instructions.csv.dist data/washing-instructions.csv
-bunx lefthook install   # only if you intend to commit
 bun run prose:sync      # only if you intend to commit
 ```
 
@@ -388,7 +388,11 @@ container or end-to-end layer:
 
 ### The git hooks
 
-`lefthook.yml` runs the same commands CI does, so the two cannot drift. On
+`lefthook.yml` runs the same commands CI does, so the two cannot drift. The
+hooks install themselves: lefthook is pinned like every other tool here and the
+`prepare` script runs `lefthook install` on `bun install`, so there is no step
+to forget and no clone that quietly has no hooks. The Dockerfile passes
+`--ignore-scripts`, so the image build skips it. On
 commit, Biome, Prettier and markdownlint fix what they can over the staged files
 and restage it, Vale checks the prose for errors, and commitlint reads the
 message. On push, every linter runs again in check mode over the whole tree,
