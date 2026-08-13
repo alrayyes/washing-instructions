@@ -1,3 +1,15 @@
+## [1.2.0](https://github.com/alrayyes/washing-instructions/compare/v1.1.1...v1.2.0) (2026-08-13)
+
+### Features
+
+* add microfibre towels to the chart ([848101a](https://github.com/alrayyes/washing-instructions/commit/848101a55828d8a9ed368168d05621f42147edc4))
+* set the reference sheet to fit rather than spill ([37fe04e](https://github.com/alrayyes/washing-instructions/commit/37fe04e71fb86fe67541d1acadadd87b318b65a4))
+
+### Bug Fixes
+
+* **release:** actually set LEFTHOOK=0 on the push ([#17](https://github.com/alrayyes/washing-instructions/issues/17)) ([851aa28](https://github.com/alrayyes/washing-instructions/commit/851aa28b10540055ba51bf30bf212183d7162b7d)), closes [#16](https://github.com/alrayyes/washing-instructions/issues/16)
+* **release:** push the changelog with the hooks turned off ([#16](https://github.com/alrayyes/washing-instructions/issues/16)) ([25d91df](https://github.com/alrayyes/washing-instructions/commit/25d91df79103d16f062616c94f5d6e6141c57492)), closes [#12](https://github.com/alrayyes/washing-instructions/issues/12) [#14](https://github.com/alrayyes/washing-instructions/issues/14) [#15](https://github.com/alrayyes/washing-instructions/issues/15)
+
 ## [1.1.1](https://github.com/alrayyes/washing-instructions/compare/v1.1.0...v1.1.1) (2026-08-12)
 
 ### Bug Fixes
