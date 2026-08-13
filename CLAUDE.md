@@ -15,6 +15,8 @@ to it. Tests and CI read the `.dist`; never point them at the other one.
 ## Commands
 
 - `bun run generate` — write both PDFs to `out/`
+- `bun run examples` — redraw the two PDFs under `docs/` that the README links,
+  from the `.dist` chart and the `.dist` machine
 - `docker build -t washing-instructions . && docker run --rm -v "$PWD/out:/out" washing-instructions`
   — the same thing without Bun on the host. CI builds and runs it too, so a
   `Dockerfile` that lints and does not work fails there; releases push it to GHCR
@@ -53,4 +55,8 @@ to it. Tests and CI read the `.dist`; never point them at the other one.
 - The CSV is data, not code: adding a pile should never need a code change.
 - Care advice is sourced. When you change a wash setting, say in the commit body
   why — the manufacturer, a care label, a test — not just that it seemed better.
-- `out/` is generated. Never commit a PDF.
+- `out/` is generated. Never commit a PDF from it. The two under `docs/` are
+  the exception — the README links them — and they are written by
+  `bun run examples`, which names both `.dist` files, so your own appliances
+  cannot get into them. A test in `test/generate.test.ts` fails while they are
+  stale.
