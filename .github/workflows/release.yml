@@ -79,6 +79,14 @@ jobs:
       - run: ./node_modules/.bin/semantic-release
         if: steps.token.outputs.present == 'true'
         env:
+          # The install above puts the git hooks in place, and this step pushes
+          # the changelog commit — so pre-push fires here and runs the whole
+          # check suite, including a Vale that only exists after `prose:sync`.
+          # It failed on `.tools/vale: No such file or directory` and took the
+          # release down with it. The hooks are there to catch a human before
+          # they push; whatever this one would check already ran on this exact
+          # commit, and that green run is what started this job.
+          LEFTHOOK: "0"
           # Not the job token. main requires status checks, and a ruleset
           # applies those to a direct push as well as to a pull request, so the
           # changelog commit from github-actions[bot] is rejected. A token
