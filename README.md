@@ -485,9 +485,15 @@ Dependabot is told not to carry it past that, and `test/release-notes.test.ts`
 checks that generated notes have sections in them — a version range would not
 have caught this, and neither did a green pipeline.
 
-`CHANGELOG.md` is written by that job, which runs no git hook, so Prettier,
-markdownlint and Vale are all told to leave it alone. Its bullets are the
-generator's; reformatting them by hand only lasts until the next release.
+`CHANGELOG.md` is written by that job, and Prettier, markdownlint and Vale are
+all told to leave it alone. Its bullets are the generator's; reformatting them by
+hand only lasts until the next release.
+
+That job pushes with `LEFTHOOK=0`. The hooks install themselves on `bun install`,
+so they land there too, and its push fired a `pre-push` that went looking for a
+Vale it had never downloaded — failing the release over the tooling rather than
+the prose. Whatever that hook would have checked already ran on that exact
+commit, and it is the green run that starts the release in the first place.
 
 ## Licence
 
