@@ -43,12 +43,13 @@ printed sheet carries a full compatibility matrix with the reason for every no.
 | <img src="docs/phone.png" alt="The top of the phone PDF: a loads table, a note explaining the dial drawings, and the first card" width="260"> | <img src="docs/print-card.png" alt="An A4 page of the printable PDF showing two cards, each with a programme dial, temperature and spin chips, and an iron thermostat ring" width="420"> |
 
 Both are the committed example chart, not anyone's real laundry. The PDFs
-themselves come out of every run, so you can read the real thing rather than a
-picture of it: open the newest
-[run of `check` on `main`](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml?query=branch%3Amain)
-and take the `washing-instructions-pdfs` artifact from the bottom of the page.
-Downloading one needs a GitHub account — the artifact API asks anyone for a
-token, which is why these are a link to the run rather than to the file.
+themselves are here too, so you can read the whole thing rather than a picture
+of the top of it: [the phone sheet](docs/washing-instructions-phone.pdf) and
+[the printable set](docs/washing-instructions-print.pdf), drawn for the generic
+appliances in `data/machine.json.dist`. A test redraws both and compares them
+page by page against what is committed, so the pair you open is what the
+current chart draws, not what it drew whenever someone last remembered to
+redraw them.
 
 ## Requirements
 
@@ -328,7 +329,15 @@ bun run check              # every linter, tsc --noEmit, then the tests
 bun run format             # let Prettier lay the Markdown and YAML out
 bun run lint:prose:advice  # Vale's style advice, warnings and all
 bun test                   # just the tests
+bun run examples           # redraw the two PDFs the README links
 ```
+
+`out/` is generated and nothing in it is ever committed. The pair under `docs/`
+is the exception, because a README that links a PDF has to have one to link.
+Change the chart, the machine file or anything that draws, and `bun test` fails
+until `bun run examples` has run. That command names both `.dist` files rather
+than letting the CLI pick, because the defaults prefer your own appliances and
+an example in the repository is the last place they should turn up.
 
 Two formatters, split by file type and never overlapping. Biome owns everything
 it supports; Markdown and YAML are what it does not format, so those go to
