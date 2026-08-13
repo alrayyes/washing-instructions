@@ -412,6 +412,11 @@ they are worth a gate rather than only a reminder.
 - The phone page's height is _measured_, not chosen: `renderPhone` renders the
   document repeatedly and bisects until it fits on one page with under 8 pt to
   spare. That is why the run reports a number of layout passes.
+- The reference sheet is measured the same way, in the other direction. Its page
+  size is fixed at A4, so what gives is the type: `renderPrint` renders the sheet
+  on its own and bisects the size of the two tables down until it comes back one
+  page. Adding piles sets them tighter rather than spilling onto a second sheet,
+  and past roughly thirty the run stops with an error instead.
 
 ## Contributing
 

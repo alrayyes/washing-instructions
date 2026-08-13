@@ -1,6 +1,6 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { PDFDocument } from "pdf-lib";
-import { PhoneDocument, PrintDocument } from "./documents";
+import { PhoneDocument, PrintDocument, ReferenceDocument } from "./documents";
 import type { Machine } from "./machine";
 import type { ResolvedInstruction } from "./types";
 
@@ -76,9 +76,51 @@ export async function renderPhone(
   return { pdf: best.pdf, height: best.height, attempts };
 }
 
+/** Full size, and as tight as the tables are still worth reading at. */
+const LOOSEST = 1;
+const TIGHTEST = 0.7;
+
+/**
+ * How tightly to set the reference sheet's two tables.
+ *
+ * Each pile costs them a row each, so a long enough chart runs off the bottom
+ * of the A4 — and @react-pdf answers a page it cannot fit with an almost empty
+ * sheet rather than an error. Same trick as the phone sheet, in the other
+ * direction: the page size is fixed here, so it is the type that gives. Set it
+ * full size and measure, then bisect to the loosest setting that still comes
+ * back one page.
+ */
+async function fittingDensity(
+  items: ResolvedInstruction[],
+  machine: Machine,
+  tolerance = 0.02,
+): Promise<number> {
+  const fits = async (density: number) => {
+    const pdf = await renderToBuffer(ReferenceDocument({ items, machine, density }));
+    return (await pageCount(pdf)) === 1;
+  };
+
+  if (await fits(LOOSEST)) return LOOSEST;
+  if (!(await fits(TIGHTEST)))
+    throw new Error(
+      `the reference sheet will not fit one A4 with ${items.length} piles, even set as tight as it goes`,
+    );
+
+  let tight = TIGHTEST;
+  let loose = LOOSEST;
+  while (loose - tight > tolerance) {
+    const middle = (loose + tight) / 2;
+    if (await fits(middle)) tight = middle;
+    else loose = middle;
+  }
+  return tight;
+}
+
 export async function renderPrint(
   items: ResolvedInstruction[],
   machine: Machine,
 ): Promise<Uint8Array> {
-  return renderToBuffer(PrintDocument({ items, machine }));
+  return renderToBuffer(
+    PrintDocument({ items, machine, density: await fittingDensity(items, machine) }),
+  );
 }
