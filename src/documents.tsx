@@ -329,7 +329,7 @@ export function PhoneDocument({
   );
 }
 
-function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
+function SummaryTable({ items, density }: { items: ResolvedInstruction[]; density: number }) {
   const machine = useMachine();
   const columns: { label: string; width: number; value: (item: ResolvedInstruction) => string }[] =
     [
@@ -354,7 +354,9 @@ function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
           paddingBottom: 2.5,
         }}
       >
-        <Text style={{ fontFamily: font.bold, fontSize: 6.5, width: 14, color: colour.ink }}>
+        <Text
+          style={{ fontFamily: font.bold, fontSize: 6.5 * density, width: 14, color: colour.ink }}
+        >
           #
         </Text>
         {columns.map((column) => (
@@ -362,7 +364,7 @@ function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
             key={column.label}
             style={{
               fontFamily: font.bold,
-              fontSize: 6.5,
+              fontSize: 6.5 * density,
               width: column.width,
               color: colour.ink,
             }}
@@ -376,13 +378,20 @@ function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
           key={item.clothingType}
           style={{
             flexDirection: "row",
-            paddingVertical: 2.6,
+            paddingVertical: 2.6 * density,
             borderBottomWidth: 0.4,
             borderBottomColor: colour.hairline,
             backgroundColor: index % 2 === 1 ? colour.panel : "#ffffff",
           }}
         >
-          <Text style={{ fontFamily: font.sans, fontSize: 6.8, width: 14, color: colour.muted }}>
+          <Text
+            style={{
+              fontFamily: font.sans,
+              fontSize: 6.8 * density,
+              width: 14,
+              color: colour.muted,
+            }}
+          >
             {index + 1}
           </Text>
           {columns.map((column, position) => (
@@ -390,7 +399,7 @@ function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
               key={column.label}
               style={{
                 fontFamily: position === 0 ? font.bold : font.sans,
-                fontSize: 6.8,
+                fontSize: 6.8 * density,
                 width: column.width,
                 color: position === 0 ? colour.ink : colour.body,
                 paddingRight: 4,
@@ -409,7 +418,7 @@ function SummaryTable({ items }: { items: ResolvedInstruction[] }) {
  * The answer to "can these two go in together" for every pair, as a grid.
  * Columns are numbered to match the rows so the header stays narrow.
  */
-function MixMatrix({ items }: { items: ResolvedInstruction[] }) {
+function MixMatrix({ items, density }: { items: ResolvedInstruction[]; density: number }) {
   const labelWidth = 118;
   const cell = (A4.width - 72 - labelWidth) / items.length;
   const used = new Set<Blocker>();
@@ -429,7 +438,7 @@ function MixMatrix({ items }: { items: ResolvedInstruction[] }) {
             key={item.clothingType}
             style={{
               fontFamily: font.bold,
-              fontSize: 6,
+              fontSize: 6 * density,
               width: cell,
               textAlign: "center",
               color: colour.muted,
@@ -444,10 +453,10 @@ function MixMatrix({ items }: { items: ResolvedInstruction[] }) {
           <Text
             style={{
               fontFamily: font.sans,
-              fontSize: 6.6,
+              fontSize: 6.6 * density,
               width: labelWidth,
               color: colour.ink,
-              paddingVertical: 2.2,
+              paddingVertical: 2.2 * density,
               paddingRight: 4,
             }}
           >
@@ -467,13 +476,13 @@ function MixMatrix({ items }: { items: ResolvedInstruction[] }) {
                   borderColor: colour.hairline,
                   alignItems: "center",
                   justifyContent: "center",
-                  paddingVertical: 2.2,
+                  paddingVertical: 2.2 * density,
                 }}
               >
                 <Text
                   style={{
                     fontFamily: font.bold,
-                    fontSize: 6,
+                    fontSize: 6 * density,
                     color: blocker ? colour.faint : colour.yes,
                   }}
                 >
@@ -498,35 +507,69 @@ function MixMatrix({ items }: { items: ResolvedInstruction[] }) {
   );
 }
 
+/**
+ * The one sheet you pin up: every pile at a glance, and what may share a drum.
+ *
+ * `density` scales the two tables, whose height is the only part of the sheet
+ * that grows with the chart. It is not chosen here — `renderPrint` finds the
+ * loosest setting this still fits an A4 at, because there is no way to ask the
+ * layout engine how tall the content came out.
+ */
+function ReferenceSheet({ items, density }: { items: ResolvedInstruction[]; density: number }) {
+  return (
+    <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
+      <Masthead subtitle="Pin this next to the machine." />
+      <Loads items={items} />
+      <SummaryTable items={items} density={density} />
+      <MixMatrix items={items} density={density} />
+      {/*
+        No trailing margin. A margin below the last thing on a page is still
+        height, and @react-pdf answers a page it cannot fit with an empty sheet
+        rather than an error — which is how a blank page 2 appeared the first
+        time a machine with longer programme names widened the table above.
+      */}
+      <View style={{ marginTop: 12 }}>
+        <Legend last />
+      </View>
+    </Page>
+  );
+}
+
+/** The reference sheet on its own, which is what the fitting pass measures. */
+export function ReferenceDocument({
+  items,
+  machine,
+  density,
+}: {
+  items: ResolvedInstruction[];
+  machine: Machine;
+  density: number;
+}) {
+  return (
+    <ApplianceContext.Provider value={machine}>
+      <Document title="Washing instructions (reference)" author="washing-instructions">
+        <ReferenceSheet items={items} density={density} />
+      </Document>
+    </ApplianceContext.Provider>
+  );
+}
+
 /** The printable version: a reference sheet, then two detail cards per page. */
 export function PrintDocument({
   items,
   machine,
+  density,
 }: {
   items: ResolvedInstruction[];
   machine: Machine;
+  density: number;
 }) {
   const cards = cardGroups(items);
 
   return (
     <ApplianceContext.Provider value={machine}>
       <Document title="Washing instructions (print)" author="washing-instructions">
-        <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
-          <Masthead subtitle="Pin this next to the machine." />
-          <Loads items={items} />
-          <SummaryTable items={items} />
-          <MixMatrix items={items} />
-          {/*
-            No trailing margin. A margin below the last thing on a page is
-            still height, and @react-pdf answers a page it cannot fit with an
-            empty sheet rather than an error — which is how a blank page 2
-            appeared the first time a machine with longer programme names
-            widened the table above.
-          */}
-          <View style={{ marginTop: 12 }}>
-            <Legend last />
-          </View>
-        </Page>
+        <ReferenceSheet items={items} density={density} />
         {/*
         The cards flow onto as many A4 sheets as they need. Each card is
         `wrap={false}`, so one is never split across a page break; how many
