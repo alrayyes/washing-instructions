@@ -37,6 +37,25 @@ the chart, the machine file or anything that draws, and `bun test` fails until
 letting the CLI pick, because the defaults prefer your own appliances and an
 example in the repository is the last place they should turn up.
 
+### The two screenshots
+
+`docs/phone.png` and `docs/print-card.png` are the pictures at the top of the
+README, and **nothing checks that they are current** — the staleness test covers
+the PDFs only, so these drift silently. Re-shoot them by hand after `bun run
+examples`, whenever the thing they show changes:
+
+```sh
+pdftoppm -png -r 150 -f 1 -l 1 docs/washing-instructions-phone.pdf /tmp/phone
+magick /tmp/phone-1.png -crop 509x1500+0+0 +repage docs/phone.png
+pdftoppm -png -r 110 -f 2 -l 2 docs/washing-instructions-print.pdf /tmp/card
+mv /tmp/card-2.png docs/print-card.png
+```
+
+The numbers are not arbitrary. 150 dpi over a 244 pt page gives the 509 px width
+the committed file has, and 110 dpi over an A4 gives 910×1287 — match them or
+the README's `width=` attributes render at a different scale. Check the alt text
+still describes what the picture shows while you are there. See issue #29.
+
 Two formatters, split by file type and never overlapping. Biome owns everything
 it supports; Markdown and YAML are what it does not format, so those go to
 Prettier and `.prettierignore` names the file types Prettier must keep its hands
