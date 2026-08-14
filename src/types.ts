@@ -39,3 +39,27 @@ export interface Instruction {
 export interface ResolvedInstruction extends Instruction {
   mixesWith: string[];
 }
+
+/**
+ * How long a card or a load is going to tie the machine up.
+ *
+ * Usually one figure. Piles sharing a load agree on every setting, so they
+ * ought to agree on this too — but the chart is data somebody types, and
+ * printing both is more honest than picking the first one and hoping.
+ */
+export function durationsOf(group: Instruction[]): string {
+  return [...new Set(group.map((item) => item.duration).filter((value) => value !== ""))].join(
+    " / ",
+  );
+}
+
+/**
+ * Which sheet to draw.
+ *
+ * `full` is the whole chart. The other two are the same chart cut where the
+ * work is: washing happens in front of the machine on a Sunday morning, ironing
+ * happens at a board on a Wednesday evening, and neither job wants to read past
+ * the other's advice to find its own.
+ */
+export const variants = ["full", "wash", "iron"] as const;
+export type Variant = (typeof variants)[number];

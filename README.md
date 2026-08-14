@@ -14,12 +14,18 @@ something real — do not add one that reads "unknown".
 
 Nobody remembers whether the towels go in at 40 or 60, which button stops the
 black t-shirts coming out streaky, or where on the dial "Fijn/Zijde" actually
-is. This turns a CSV of laundry piles into two PDFs that answer all of it:
+is. This turns a CSV of laundry piles into PDFs that answer all of it, in two
+shapes:
 
 - **`out/washing-instructions-phone.pdf`** — one tall, narrow page you scroll
   through on your phone while standing in front of the machine.
 - **`out/washing-instructions-print.pdf`** — an A4 reference sheet to pin next
   to the machine, followed by a full-page card for each pile.
+
+Each of those also comes cut in half, because the two jobs happen in different
+rooms hours apart and neither wants to read past the other to find its own:
+`-washing` drops the iron, and `-ironing` drops everything about the machine.
+Six files out of one run — see [the split sheets](#the-split-sheets).
 
 Both are drawn for _your_ appliances. You describe the washing machine and the
 iron once, in a JSON file, and every card then shows the programme dial with the
@@ -44,12 +50,19 @@ printed sheet carries a full compatibility matrix with the reason for every no.
 
 Both are the committed example chart, not anyone's real laundry. The PDFs
 themselves are here too, so you can read the whole thing rather than a picture
-of the top of it: [the phone sheet](docs/washing-instructions-phone.pdf) and
-[the printable set](docs/washing-instructions-print.pdf), drawn for the generic
-appliances in `data/machine.json.dist`. A test redraws both and compares them
-page by page against what is committed, so the pair you open is what the
-current chart draws, not what it drew whenever someone last remembered to
-redraw them.
+of the top of it, all drawn for the generic appliances in
+`data/machine.json.dist`:
+
+- The phone sheet: [the lot](docs/washing-instructions-phone.pdf),
+  [washing](docs/washing-instructions-phone-washing.pdf),
+  [ironing](docs/washing-instructions-phone-ironing.pdf).
+- The printable set: [the lot](docs/washing-instructions-print.pdf),
+  [washing](docs/washing-instructions-print-washing.pdf),
+  [ironing](docs/washing-instructions-print-ironing.pdf).
+
+A test redraws all six and compares them page by page against what is
+committed, so the one you open is what the current chart draws, not what it
+drew whenever someone last remembered to redraw them.
 
 ## Requirements
 
@@ -75,7 +88,7 @@ of the thing, useless for actually doing laundry.
 
 ## Usage
 
-Generate both PDFs from the bundled data:
+Generate every PDF from the bundled data:
 
 ```sh
 bun run generate
@@ -86,12 +99,16 @@ Read 16 piles from /home/you/washing-instructions/data/washing-instructions.csv.
   drawn for Generic front loader · Generic steam iron
   out/washing-instructions-phone.pdf  one page, 6225 pt tall (11 layout passes)
   out/washing-instructions-print.pdf
+  out/washing-instructions-phone-washing.pdf  one page, 4272 pt tall (10 layout passes)
+  out/washing-instructions-print-washing.pdf
+  out/washing-instructions-phone-ironing.pdf  one page, 900 pt tall (9 layout passes)
+  out/washing-instructions-print-ironing.pdf
 
 Piles that can share a drum:
-  White + White Socks
-  Coloured + Coloured Socks
-  Dark + Black Socks + Denim
-  Merino Wool + Cashmere Blend
+  White + White Socks           ~2:30
+  Coloured + Coloured Socks     ~2:15
+  Dark + Black Socks + Denim    ~2:00
+  Merino Wool + Cashmere Blend  ~0:40
 
 Set up identically on both appliances, so sharing one card:
   Merino Wool + Cashmere Blend
@@ -105,7 +122,31 @@ bun run generate my-laundry.csv --machine my-machine.json --out ~/Documents
 ```
 
 The output filenames follow the input, so `my-laundry.csv` gives you
-`my-laundry-phone.pdf` and `my-laundry-print.pdf`.
+`my-laundry-phone.pdf`, `my-laundry-print.pdf` and the four split sheets
+beside them.
+
+### The split sheets
+
+Washing and ironing are the same chart read at two different moments. You stand
+at the machine on a Sunday morning wanting a programme, a temperature and a
+spin speed; you stand at the board on a Wednesday evening wanting a thermostat
+position. Carrying the other half of the advice to either place is what makes a
+card too long to read, so each run writes both halves and the whole thing.
+
+**`-washing`** drops the iron block from every card and the iron column from the
+reference sheet. It also merges harder. Dark, Black Socks and Denim each need
+their own card on the full chart only because they want three different
+thermostat positions — with the iron gone they are one wash and one card.
+
+**`-ironing`** turns the chart inside out. The heading is the thermostat
+position rather than the pile, because that is the order you actually work in:
+set the iron once, then go through everything that goes at that heat. Piles that
+are never ironed gather on a last card of their own, which is worth printing —
+"is this safe to press" is the question that ruins a shirt.
+
+Neither is a subset you could have got by folding a printout. The grouping is
+different, the tables carry different columns, and the phone sheet is measured
+to its own height.
 
 ### Without installing anything
 
@@ -178,22 +219,22 @@ cp data/washing-instructions.csv.dist data/washing-instructions.csv
 There is no need to hurry: with no file of your own, `bun run generate` reads
 the dist and says so.
 
-| Column            | What goes in it                                                      |
-| ----------------- | -------------------------------------------------------------------- |
-| `clothing_type`   | What you call the pile — this is the card heading                    |
-| `detergent`       | Which detergent and how much                                         |
-| `fabric_softener` | `yes` or `no`                                                        |
-| `temperature`     | A temperature your machine offers                                    |
-| `spin`            | A spin speed your machine offers                                     |
-| `duration`        | Roughly how long it runs, for planning                               |
-| `program`         | A dial position, spelled exactly as on the fascia                    |
-| `options`         | Option buttons, pipe-separated; empty for none                       |
-| `ironing`         | Prose: how to iron it                                                |
-| `iron_setting`    | A thermostat position, or `none` for do not iron                     |
-| `drying`          | Prose: how to dry it                                                 |
-| `colour_group`    | `white`, `colour`, `dark`, `sport` or `any`                          |
-| `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo` |
-| `notes`           | Anything else worth knowing                                          |
+| Column            | What goes in it                                                         |
+| ----------------- | ----------------------------------------------------------------------- |
+| `clothing_type`   | What you call the pile — this is the card heading                       |
+| `detergent`       | Which detergent and how much                                            |
+| `fabric_softener` | `yes` or `no`                                                           |
+| `temperature`     | A temperature your machine offers                                       |
+| `spin`            | A spin speed your machine offers                                        |
+| `duration`        | Roughly how long it runs — on the loads table, the summary and the card |
+| `program`         | A dial position, spelled exactly as on the fascia                       |
+| `options`         | Option buttons, pipe-separated; empty for none                          |
+| `ironing`         | Prose: how to iron it                                                   |
+| `iron_setting`    | A thermostat position, or `none` for do not iron                        |
+| `drying`          | Prose: how to dry it                                                    |
+| `colour_group`    | `white`, `colour`, `dark`, `sport` or `any`                             |
+| `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo`    |
+| `notes`           | Anything else worth knowing                                             |
 
 Every machine-facing value is checked against what the appliances can actually
 be set to, so a typo fails the run rather than producing a PDF that tells you
@@ -282,6 +323,10 @@ instance.
 Prose is deliberately not part of that key. Those two want different detergent
 and different drying, and the card lists both lines against the pile they belong
 to rather than letting one stand in for the other.
+
+The washing-only sheet drops the thermostat from that key and the ironing-only
+sheet keeps nothing else, which is why the same chart draws a different number
+of cards on each. See [the split sheets](#the-split-sheets).
 
 ## Your appliances
 

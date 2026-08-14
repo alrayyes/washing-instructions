@@ -80,22 +80,31 @@ export function loadGroups<T extends Instruction>(instructions: T[]): T[][] {
   return groups;
 }
 
+function groupBy<T>(items: T[], key: (item: T) => string): T[][] {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const existing = groups.get(key(item));
+    if (existing) existing.push(item);
+    else groups.set(key(item), [item]);
+  }
+  return [...groups.values()];
+}
+
 /**
- * Everything you physically set: the programme, what the display reads, which
- * buttons are lit, whether softener goes in, and where the iron's ring points.
+ * Everything you physically set on the washing machine: the programme, what
+ * the display reads, which buttons are lit, and whether softener goes in.
  *
- * Deliberately *not* the prose. Two piles can want the same six settings and
+ * Deliberately *not* the prose. Two piles can want the same five settings and
  * still want different detergent or a different drying rack, and those the card
  * lists per pile rather than splitting into two near-identical cards.
  */
-function fingerprint(item: Instruction): string {
+function washFingerprint(item: Instruction): string {
   return JSON.stringify([
     item.program,
     item.temperature,
     item.spin,
     [...item.options].sort(),
     item.fabricSoftener,
-    item.ironSetting,
   ]);
 }
 
@@ -105,12 +114,36 @@ function fingerprint(item: Instruction): string {
  * listing all the names.
  */
 export function cardGroups<T extends Instruction>(instructions: T[]): T[][] {
-  const groups = new Map<string, T[]>();
-  for (const item of instructions) {
-    const key = fingerprint(item);
-    const existing = groups.get(key);
-    if (existing) existing.push(item);
-    else groups.set(key, [item]);
-  }
-  return [...groups.values()];
+  return groupBy(instructions, (item) => JSON.stringify([washFingerprint(item), item.ironSetting]));
+}
+
+/**
+ * The same, for a sheet with no iron on it. Dark, Black Socks and Denim each
+ * need their own card on the full chart only because they want three different
+ * thermostat positions; standing at the machine they are one wash.
+ */
+export function washGroups<T extends Instruction>(instructions: T[]): T[][] {
+  return groupBy(instructions, washFingerprint);
+}
+
+/**
+ * Piles by where the iron's thermostat points, coolest first.
+ *
+ * An ironing sheet is read the other way round from a washing one. You do not
+ * fetch a pile and look up its setting — you set the iron once and work through
+ * everything that goes at that heat, so the thermostat position is the heading
+ * and the piles are the list under it. `order` is `ironSettingKeys`, which puts
+ * "do not iron" last for the same reason: it is the pile you never pick up.
+ */
+export function ironGroups<T extends Instruction>(
+  instructions: T[],
+  order: readonly string[],
+): T[][] {
+  const rank = (setting: string) => {
+    const at = order.indexOf(setting);
+    return at < 0 ? order.length : at;
+  };
+  return groupBy(instructions, (item) => item.ironSetting).sort(
+    (a, b) => rank((a[0] as T).ironSetting) - rank((b[0] as T).ironSetting),
+  );
 }

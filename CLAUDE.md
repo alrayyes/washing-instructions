@@ -6,16 +6,17 @@ is where the prose explanation lives; this file is the set of traps.
 
 # washing-instructions
 
-Reads `data/washing-instructions.csv` and renders two PDFs: a single tall page
-for the phone, and an A4 reference sheet plus detail cards for printing. That
-file is gitignored — one household's laundry is nobody else's business — so the
-committed chart is `data/washing-instructions.csv.dist` and the CLI falls back
-to it. Tests and CI read the `.dist`; never point them at the other one.
+Reads `data/washing-instructions.csv` and renders six PDFs: a single tall page
+for the phone and an A4 reference sheet plus detail cards for printing, each in
+three cuts — everything, washing only, ironing only. That file is gitignored —
+one household's laundry is nobody else's business — so the committed chart is
+`data/washing-instructions.csv.dist` and the CLI falls back to it. Tests and CI
+read the `.dist`; never point them at the other one.
 
 ## Commands
 
-- `bun run generate` — write both PDFs to `out/`
-- `bun run examples` — redraw the two PDFs under `docs/` that the README links,
+- `bun run generate` — write all six PDFs to `out/`
+- `bun run examples` — redraw the six PDFs under `docs/` that the README links,
   from the `.dist` chart and the `.dist` machine
 - `docker build -t washing-instructions . && docker run --rm -v "$PWD/out:/out" washing-instructions`
   — the same thing without Bun on the host. CI builds and runs it too, so a
@@ -48,7 +49,12 @@ to it. Tests and CI read the `.dist`; never point them at the other one.
   running them happens to own.
 - **`src/mixing.ts` is the only place that decides what can share a drum.** The
   per-card "wash together with" line, the compatibility matrix and the CLI
-  summary all read from it, so a rule change lands in all three at once.
+  summary all read from it, so a rule change lands in all three at once. It also
+  owns how each sheet cuts the chart into cards: `cardGroups` for the full one,
+  `washGroups` with the thermostat dropped, `ironGroups` with nothing else kept.
+- **A sheet is defined by what it leaves out**, so `test/generate.test.ts`
+  inflates the content streams and reads the words back. Adding an iron word to
+  the washing sheet fails there, not in review.
 
 ## Conventions
 

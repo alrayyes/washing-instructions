@@ -3,24 +3,27 @@ import { ApplianceContext, useMachine } from "./appliances";
 import {
   ControlPanel,
   Field,
+  IronDial,
   IronPanel,
   ProgramDial,
   SoftenerBadge,
   SplitField,
 } from "./components";
 import type { Machine } from "./machine";
-import { formatTemperature, ironSetting, NO_IRON } from "./machine";
+import { formatTemperature, ironSetting, ironSettingKeys, NO_IRON } from "./machine";
 import {
   type Blocker,
   blockerCode,
   blockerLegend,
   canMix,
   cardGroups,
+  ironGroups,
   loadGroups,
   mixBlocker,
+  washGroups,
 } from "./mixing";
 import { theme } from "./theme";
-import type { ResolvedInstruction } from "./types";
+import { durationsOf, type ResolvedInstruction, type Variant } from "./types";
 
 const { colour, font } = theme;
 
@@ -31,6 +34,38 @@ function ironLabel(machine: Machine, item: ResolvedInstruction): string {
   if (item.ironSetting === NO_IRON) return "do not iron";
   return ironSetting(machine, item.ironSetting)?.label ?? item.ironSetting;
 }
+
+/**
+ * How a sheet divides the chart into cards, which is not the same question on
+ * each. See `cardGroups`, `washGroups` and `ironGroups` for why.
+ */
+function sheetGroups(
+  items: ResolvedInstruction[],
+  machine: Machine,
+  variant: Variant,
+): ResolvedInstruction[][] {
+  if (variant === "wash") return washGroups(items);
+  if (variant === "iron") return ironGroups(items, ironSettingKeys(machine));
+  return cardGroups(items);
+}
+
+const sheet: Record<Variant, { title: string; phone: string; print: string }> = {
+  full: {
+    title: "Washing instructions",
+    phone: "Scroll for the pile you are holding.",
+    print: "Pin this next to the machine.",
+  },
+  wash: {
+    title: "Washing instructions (washing only)",
+    phone: "Getting it into the machine. Ironing is on the other sheet.",
+    print: "Pin this next to the machine. Ironing is on the other sheet.",
+  },
+  iron: {
+    title: "Washing instructions (ironing only)",
+    phone: "At the board. Washing is on the other sheet.",
+    print: "Pin this next to the board. Washing is on the other sheet.",
+  },
+};
 
 function SectionHeading({ children }: { children: string }) {
   return (
@@ -54,15 +89,20 @@ function SectionHeading({ children }: { children: string }) {
  * `group` is usually a single pile. Where several piles are set up identically
  * on both appliances they share one card, and any prose they disagree on is
  * listed per pile rather than one pile's advice standing in for the rest.
+ *
+ * On a washing-only sheet the iron block comes off and the group is wider,
+ * because the thermostat is the only thing those piles disagreed about.
  */
 function Card({
   group,
   index,
   compact = false,
+  variant = "full",
 }: {
   group: ResolvedInstruction[];
   index: number;
   compact?: boolean;
+  variant?: Variant;
 }) {
   const item = group[0] as ResolvedInstruction;
   const heading = group.map((member) => member.clothingType).join(" + ");
@@ -74,7 +114,6 @@ function Card({
   const alsoWith = item.mixesWith.filter(
     (name) => !names.has(name) && group.every((member) => member.mixesWith.includes(name)),
   );
-  const durations = [...new Set(group.map((member) => member.duration))];
 
   return (
     <View
@@ -109,8 +148,8 @@ function Card({
         >
           {index}. {heading}
         </Text>
-        <Text style={{ fontFamily: font.sans, fontSize: 7, color: colour.muted }}>
-          {durations.join(" / ")}
+        <Text style={{ fontFamily: font.bold, fontSize: 7.5, color: colour.accent }}>
+          {durationsOf(group)}
         </Text>
       </View>
 
@@ -126,10 +165,12 @@ function Card({
 
       <SplitField label="Detergent" items={group} pick={(member) => member.detergent} />
 
-      <View style={{ marginTop: 5 }}>
-        <SectionHeading>Iron</SectionHeading>
-        <IronPanel items={group} dialSize={compact ? 54 : 62} />
-      </View>
+      {variant !== "wash" && (
+        <View style={{ marginTop: 5 }}>
+          <SectionHeading>Iron</SectionHeading>
+          <IronPanel items={group} dialSize={compact ? 54 : 62} />
+        </View>
+      )}
 
       <SplitField label="Drying" items={group} pick={(member) => member.drying} />
       <Field
@@ -146,6 +187,129 @@ function Card({
         emphasis
       />
       <SplitField label="Notes" items={group} pick={(member) => member.notes} />
+    </View>
+  );
+}
+
+/**
+ * One thermostat position and everything that goes at it.
+ *
+ * The heading is the setting rather than the pile, because that is the order
+ * you work in: set the iron once, then go through the basket. The last card is
+ * always the one nothing on it ever gets ironed, which is worth printing — "is
+ * this safe to press" is the question that ruins a shirt.
+ */
+function IronCard({
+  group,
+  index,
+  compact = false,
+}: {
+  group: ResolvedInstruction[];
+  index: number;
+  compact?: boolean;
+}) {
+  const machine = useMachine();
+  const item = group[0] as ResolvedInstruction;
+  const setting = item.ironSetting === NO_IRON ? undefined : ironSetting(machine, item.ironSetting);
+
+  return (
+    <View
+      style={{
+        borderWidth: 0.8,
+        borderColor: colour.line,
+        borderRadius: 4,
+        padding: compact ? 8 : 10,
+        marginBottom: compact ? 8 : 12,
+      }}
+      wrap={false}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottomWidth: 0.8,
+          borderBottomColor: colour.ink,
+          paddingBottom: 3,
+          marginBottom: 5,
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: font.bold,
+            fontSize: compact ? 11 : 13,
+            color: colour.ink,
+            flex: 1,
+            paddingRight: 6,
+          }}
+        >
+          {index}. {setting ? `${setting.label} — ${setting.detail}` : "Do not iron"}
+        </Text>
+        <Text style={{ fontFamily: font.sans, fontSize: 7, color: colour.muted }}>
+          {group.length} {group.length === 1 ? "pile" : "piles"}
+        </Text>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: colour.panel,
+          borderWidth: 0.6,
+          borderColor: colour.hairline,
+          borderRadius: 3,
+          padding: 6,
+          gap: 8,
+        }}
+      >
+        <IronDial setting={item.ironSetting} size={compact ? 54 : 62} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontFamily: font.bold, fontSize: 8.5, color: colour.ink }}>
+            {setting ? `Thermostat on ${setting.label}` : "Leave the iron off"}
+          </Text>
+          <Text style={{ fontFamily: font.sans, fontSize: 6.6, color: colour.muted }}>
+            {setting
+              ? setting.steam
+                ? "inside the steam zone"
+                : "below the steam zone — dry iron only"
+              : "nothing on this card ever goes near the board"}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{ marginTop: 4 }}>
+        <SectionHeading>How</SectionHeading>
+        {group.map((member) => (
+          <View
+            key={member.clothingType}
+            style={{ flexDirection: "row", alignItems: "flex-start", marginTop: 1.5 }}
+          >
+            <Text
+              style={{
+                fontFamily: font.bold,
+                fontSize: 7.4,
+                lineHeight: 1.35,
+                color: colour.ink,
+                width: compact ? 74 : 112,
+                paddingRight: 4,
+              }}
+            >
+              {member.clothingType}
+            </Text>
+            <Text
+              style={{
+                fontFamily: font.sans,
+                fontSize: 7.4,
+                lineHeight: 1.35,
+                color: colour.body,
+                flex: 1,
+              }}
+            >
+              {member.ironing === "" ? "—" : member.ironing}
+            </Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
@@ -222,6 +386,18 @@ function Loads({ items }: { items: ResolvedInstruction[] }) {
                 {group.map((item) => item.clothingType).join("  +  ")}
                 {group.length === 1 ? "   (on its own)" : ""}
               </Text>
+              {/* How long the drum is busy, which is the other half of planning a day. */}
+              <Text
+                style={{
+                  fontFamily: font.sans,
+                  fontSize: 6.6,
+                  color: colour.muted,
+                  width: 34,
+                  textAlign: "right",
+                }}
+              >
+                {durationsOf(group)}
+              </Text>
             </View>
           );
         })}
@@ -231,10 +407,13 @@ function Loads({ items }: { items: ResolvedInstruction[] }) {
 }
 
 /** How to read the dial drawings, printed once per document. */
-function Legend({ last = false }: { last?: boolean }) {
-  const { washer } = useMachine();
+function Legend({ last = false, variant = "full" }: { last?: boolean; variant?: Variant }) {
+  const machine = useMachine();
+  const { washer } = machine;
   const off = washer.programs[0] ?? "";
   const example = washer.programs[1] ?? off;
+  // The hottest position the iron offers, so the drawing shows a full ring.
+  const hottest = machine.iron.settings[machine.iron.settings.length - 1]?.key ?? NO_IRON;
 
   return (
     <View
@@ -253,7 +432,11 @@ function Legend({ last = false }: { last?: boolean }) {
         the dial spills out of the top.
       */}
       <View style={{ width: 54, height: 66, alignItems: "center" }}>
-        <ProgramDial program={example} size={54} />
+        {variant === "iron" ? (
+          <IronDial setting={hottest} size={54} />
+        ) : (
+          <ProgramDial program={example} size={54} />
+        )}
         <Text
           style={{
             fontFamily: font.sans,
@@ -262,7 +445,7 @@ function Legend({ last = false }: { last?: boolean }) {
             marginTop: 2,
           }}
         >
-          programme
+          {variant === "iron" ? "thermostat" : "programme"}
         </Text>
       </View>
       <View style={{ flex: 1, justifyContent: "center" }}>
@@ -275,9 +458,21 @@ function Legend({ last = false }: { last?: boolean }) {
             paddingRight: 2,
           }}
         >
-          The dials are drawn as they sit on the machine: twelve o'clock is {off}, and the red
-          pointer is where to turn it. Chips show every value the display steps through, filled in
-          on the one you want. On the iron, the blue band is the zone where it makes steam.
+          {variant === "iron" ? (
+            <>
+              The ring is the iron's thermostat as it sits on the dial, and the red pointer is where
+              to turn it. The blue band is the zone where it makes steam; a setting below it is a
+              dry iron. A crossed-out ring means leave the iron in the cupboard.
+            </>
+          ) : (
+            <>
+              The dials are drawn as they sit on the machine: twelve o'clock is {off}, and the red
+              pointer is where to turn it. Chips show every value the display steps through, filled
+              in on the one you want.
+              {variant === "full" &&
+                " On the iron, the blue band is the zone where it makes steam."}
+            </>
+          )}
         </Text>
       </View>
     </View>
@@ -289,63 +484,124 @@ export function PhoneDocument({
   items,
   height,
   machine,
+  variant = "full",
 }: {
   items: ResolvedInstruction[];
   height: number;
   machine: Machine;
+  variant?: Variant;
 }) {
+  const groups = sheetGroups(items, machine, variant);
+
   return (
     <ApplianceContext.Provider value={machine}>
-      <Document title="Washing instructions (phone)" author="washing-instructions">
+      <Document title={`${sheet[variant].title} — phone`} author="washing-instructions">
         <Page
           size={{ width: PHONE_WIDTH, height }}
           style={{ padding: 12, backgroundColor: "#fff" }}
         >
-          <Masthead subtitle="Scroll for the pile you are holding." />
-          <Loads items={items} />
-          <Legend />
-          {cardGroups(items).map((group, index) => (
-            <Card
-              key={(group[0] as ResolvedInstruction).clothingType}
-              group={group}
-              index={index + 1}
-              compact
-            />
-          ))}
-          <Text
-            style={{
-              fontFamily: font.oblique,
-              fontSize: 6,
-              color: colour.faint,
-              marginTop: 4,
-              textAlign: "center",
-            }}
-          >
-            Durations are the machine's own estimates and vary with load.
-          </Text>
+          <Masthead subtitle={sheet[variant].phone} />
+          {variant !== "iron" && <Loads items={items} />}
+          <Legend variant={variant} />
+          {groups.map((group, index) =>
+            variant === "iron" ? (
+              <IronCard
+                key={(group[0] as ResolvedInstruction).ironSetting}
+                group={group}
+                index={index + 1}
+                compact
+              />
+            ) : (
+              <Card
+                key={(group[0] as ResolvedInstruction).clothingType}
+                group={group}
+                index={index + 1}
+                variant={variant}
+                compact
+              />
+            ),
+          )}
+          {variant !== "iron" && (
+            <Text
+              style={{
+                fontFamily: font.oblique,
+                fontSize: 6,
+                color: colour.faint,
+                marginTop: 4,
+                textAlign: "center",
+              }}
+            >
+              Durations are the machine's own estimates and vary with load.
+            </Text>
+          )}
         </Page>
       </Document>
     </ApplianceContext.Provider>
   );
 }
 
-function SummaryTable({ items, density }: { items: ResolvedInstruction[]; density: number }) {
-  const machine = useMachine();
-  const columns: { label: string; width: number; value: (item: ResolvedInstruction) => string }[] =
-    [
-      { label: "Pile", width: 118, value: (i) => i.clothingType },
-      { label: "Programme", width: 74, value: (i) => i.program },
-      { label: "°C", width: 30, value: (i) => i.temperature },
-      { label: "Spin", width: 32, value: (i) => i.spin },
-      { label: "Buttons", width: 78, value: (i) => i.options.join(", ") || "—" },
-      { label: "Softener", width: 42, value: (i) => (i.fabricSoftener ? "yes" : "no") },
-      { label: "Iron", width: 44, value: (i) => ironLabel(machine, i) },
-      { label: "Detergent", width: 105, value: (i) => i.detergent.split(/[—.:]/)[0]?.trim() ?? "" },
+interface Column {
+  label: string;
+  width: number;
+  value: (item: ResolvedInstruction) => string;
+}
+
+/** The first clause of a sentence, which is all a table cell has room for. */
+function gist(prose: string): string {
+  return prose.split(/[—.:]/)[0]?.trim() ?? "";
+}
+
+/**
+ * What the pinned sheet lists per pile, which differs by sheet.
+ *
+ * The columns are laid out by hand rather than flexed, so their widths have to
+ * come to less than the A4 minus its margins — 523 pt — with 14 pt of that
+ * already spent on the row number.
+ */
+function summaryColumns(machine: Machine, variant: Variant): Column[] {
+  if (variant === "iron") {
+    return [
+      { label: "Pile", width: 130, value: (i) => i.clothingType },
+      { label: "Thermostat", width: 46, value: (i) => ironLabel(machine, i) },
+      {
+        label: "Steam",
+        width: 34,
+        value: (i) => (ironSetting(machine, i.ironSetting)?.steam ? "yes" : "—"),
+      },
+      { label: "How", width: 295, value: (i) => gist(i.ironing) },
     ];
+  }
+
+  return [
+    { label: "Pile", width: 110, value: (i) => i.clothingType },
+    { label: "Programme", width: 70, value: (i) => i.program },
+    { label: "°C", width: 26, value: (i) => i.temperature },
+    { label: "Spin", width: 30, value: (i) => i.spin },
+    { label: "Time", width: 34, value: (i) => i.duration },
+    { label: "Buttons", width: 74, value: (i) => i.options.join(", ") || "—" },
+    { label: "Softener", width: 40, value: (i) => (i.fabricSoftener ? "yes" : "no") },
+    ...(variant === "full"
+      ? [{ label: "Iron", width: 40, value: (i: ResolvedInstruction) => ironLabel(machine, i) }]
+      : []),
+    { label: "Detergent", width: variant === "full" ? 90 : 130, value: (i) => gist(i.detergent) },
+  ];
+}
+
+function SummaryTable({
+  items,
+  density,
+  variant,
+}: {
+  items: ResolvedInstruction[];
+  density: number;
+  variant: Variant;
+}) {
+  const machine = useMachine();
+  const columns = summaryColumns(machine, variant);
 
   return (
     <View style={{ marginBottom: 14 }}>
-      <SectionHeading>At a glance</SectionHeading>
+      <SectionHeading>{variant === "iron" ? "On the board" : "At a glance"}</SectionHeading>
       <View
         style={{
           flexDirection: "row",
@@ -515,13 +771,26 @@ function MixMatrix({ items, density }: { items: ResolvedInstruction[]; density: 
  * loosest setting this still fits an A4 at, because there is no way to ask the
  * layout engine how tall the content came out.
  */
-function ReferenceSheet({ items, density }: { items: ResolvedInstruction[]; density: number }) {
+function ReferenceSheet({
+  items,
+  density,
+  variant,
+}: {
+  items: ResolvedInstruction[];
+  density: number;
+  variant: Variant;
+}) {
+  const machine = useMachine();
+  // The ironing sheet reads coolest to hottest, the order you work the basket
+  // in, rather than the order the chart happens to list the piles in.
+  const rows = variant === "iron" ? ironGroups(items, ironSettingKeys(machine)).flat() : items;
+
   return (
     <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
-      <Masthead subtitle="Pin this next to the machine." />
-      <Loads items={items} />
-      <SummaryTable items={items} density={density} />
-      <MixMatrix items={items} density={density} />
+      <Masthead subtitle={sheet[variant].print} />
+      {variant !== "iron" && <Loads items={items} />}
+      <SummaryTable items={rows} density={density} variant={variant} />
+      {variant !== "iron" && <MixMatrix items={items} density={density} />}
       {/*
         No trailing margin. A margin below the last thing on a page is still
         height, and @react-pdf answers a page it cannot fit with an empty sheet
@@ -529,7 +798,7 @@ function ReferenceSheet({ items, density }: { items: ResolvedInstruction[]; dens
         time a machine with longer programme names widened the table above.
       */}
       <View style={{ marginTop: 12 }}>
-        <Legend last />
+        <Legend last variant={variant} />
       </View>
     </Page>
   );
@@ -540,15 +809,17 @@ export function ReferenceDocument({
   items,
   machine,
   density,
+  variant = "full",
 }: {
   items: ResolvedInstruction[];
   machine: Machine;
   density: number;
+  variant?: Variant;
 }) {
   return (
     <ApplianceContext.Provider value={machine}>
-      <Document title="Washing instructions (reference)" author="washing-instructions">
-        <ReferenceSheet items={items} density={density} />
+      <Document title={`${sheet[variant].title} — reference`} author="washing-instructions">
+        <ReferenceSheet items={items} density={density} variant={variant} />
       </Document>
     </ApplianceContext.Provider>
   );
@@ -559,30 +830,41 @@ export function PrintDocument({
   items,
   machine,
   density,
+  variant = "full",
 }: {
   items: ResolvedInstruction[];
   machine: Machine;
   density: number;
+  variant?: Variant;
 }) {
-  const cards = cardGroups(items);
+  const groups = sheetGroups(items, machine, variant);
 
   return (
     <ApplianceContext.Provider value={machine}>
-      <Document title="Washing instructions (print)" author="washing-instructions">
-        <ReferenceSheet items={items} density={density} />
+      <Document title={`${sheet[variant].title} — print`} author="washing-instructions">
+        <ReferenceSheet items={items} density={density} variant={variant} />
         {/*
         The cards flow onto as many A4 sheets as they need. Each card is
         `wrap={false}`, so one is never split across a page break; how many
         land on a sheet depends on how much prose the CSV carries.
       */}
         <Page size={[A4.width, A4.height]} style={{ padding: 36, backgroundColor: "#fff" }}>
-          {cards.map((group, index) => (
-            <Card
-              key={(group[0] as ResolvedInstruction).clothingType}
-              group={group}
-              index={index + 1}
-            />
-          ))}
+          {groups.map((group, index) =>
+            variant === "iron" ? (
+              <IronCard
+                key={(group[0] as ResolvedInstruction).ironSetting}
+                group={group}
+                index={index + 1}
+              />
+            ) : (
+              <Card
+                key={(group[0] as ResolvedInstruction).clothingType}
+                group={group}
+                index={index + 1}
+                variant={variant}
+              />
+            ),
+          )}
         </Page>
       </Document>
     </ApplianceContext.Provider>
