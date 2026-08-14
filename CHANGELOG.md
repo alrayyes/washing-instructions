@@ -1,3 +1,16 @@
+## [2.0.0](https://github.com/alrayyes/washing-instructions/compare/v1.2.1...v2.0.0) (2026-08-14)
+
+### ⚠ BREAKING CHANGES
+
+* the instruction CSV gains an `ironing` yes/no column and an
+`ironing_notes` column, and `iron_setting` no longer accepts `none`. An existing
+chart fails to parse until the ironing column is split in two. Both committed
+charts are migrated; the run names the first row that disagrees.
+
+### Features
+
+* make ironing a boolean rather than a sentence to parse ([#28](https://github.com/alrayyes/washing-instructions/issues/28)) ([96a5c25](https://github.com/alrayyes/washing-instructions/commit/96a5c25666cc054dc9bdf239036e2837276d077d))
+
 ## [1.2.1](https://github.com/alrayyes/washing-instructions/compare/v1.2.0...v1.2.1) (2026-08-14)
 
 ### Bug Fixes
