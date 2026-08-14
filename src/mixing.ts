@@ -114,7 +114,9 @@ function washFingerprint(item: Instruction): string {
  * listing all the names.
  */
 export function cardGroups<T extends Instruction>(instructions: T[]): T[][] {
-  return groupBy(instructions, (item) => JSON.stringify([washFingerprint(item), item.ironSetting]));
+  return groupBy(instructions, (item) =>
+    JSON.stringify([washFingerprint(item), item.ironing, item.ironSetting]),
+  );
 }
 
 /**
@@ -132,8 +134,9 @@ export function washGroups<T extends Instruction>(instructions: T[]): T[][] {
  * An ironing sheet is read the other way round from a washing one. You do not
  * fetch a pile and look up its setting — you set the iron once and work through
  * everything that goes at that heat, so the thermostat position is the heading
- * and the piles are the list under it. `order` is `ironSettingKeys`, which puts
- * "do not iron" last for the same reason: it is the pile you never pick up.
+ * and the piles are the list under it. `order` is `ironSettingKeys`; a pile you
+ * never iron has no position in it and sorts last, which is right — it is the
+ * pile you never pick up.
  */
 export function ironGroups<T extends Instruction>(
   instructions: T[],

@@ -22,13 +22,13 @@ function guessHeight(items: ResolvedInstruction[], machine: Machine, variant: Va
 
   if (variant === "iron") {
     const cards = ironGroups(items, ironSettingKeys(machine)).length;
-    return 200 + cards * 110 + items.length * 12 + length((item) => item.ironing) * 0.35;
+    return 200 + cards * 110 + items.length * 12 + length((item) => item.ironingNotes) * 0.35;
   }
 
   const prose =
     length((item) => item.detergent) + length((item) => item.drying) + length((item) => item.notes);
   if (variant === "wash") return 260 + washGroups(items).length * 190 + prose * 0.35;
-  return 260 + items.length * 250 + (prose + length((item) => item.ironing)) * 0.35;
+  return 260 + items.length * 250 + (prose + length((item) => item.ironingNotes)) * 0.35;
 }
 
 export interface PhoneRender {

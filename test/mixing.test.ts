@@ -20,8 +20,9 @@ function pile(overrides: Partial<Instruction> = {}): Instruction {
     duration: "",
     program: "Katoen",
     options: ["Eco Perfect"],
-    ironing: "",
-    ironSetting: "none",
+    ironing: false,
+    ironingNotes: "",
+    ironSetting: "",
     drying: "",
     colourGroup: "colour",
     mixTags: [],
@@ -102,7 +103,7 @@ describe("cardGroups", () => {
       { spin: "400" },
       { options: [] },
       { fabricSoftener: true },
-      { ironSetting: "3" },
+      { ironing: true, ironSetting: "3" },
     ];
     for (const setting of settings) {
       const groups = cardGroups([
@@ -117,7 +118,7 @@ describe("cardGroups", () => {
     const prose: Partial<Instruction>[] = [
       { detergent: "Something else" },
       { duration: "~9:99" },
-      { ironing: "Carefully" },
+      { ironingNotes: "Carefully" },
       { drying: "On a line" },
       { notes: "Beware" },
     ];
@@ -151,9 +152,9 @@ describe("cardGroups", () => {
 describe("washGroups", () => {
   test("merges piles the iron would have split", () => {
     const groups = washGroups([
-      pile({ clothingType: "Dark", ironSetting: "2" }),
-      pile({ clothingType: "Black Socks", ironSetting: "none" }),
-      pile({ clothingType: "Denim", ironSetting: "3" }),
+      pile({ clothingType: "Dark", ironing: true, ironSetting: "2" }),
+      pile({ clothingType: "Black Socks", ironing: false, ironSetting: "" }),
+      pile({ clothingType: "Denim", ironing: true, ironSetting: "3" }),
     ]);
     expect(groups).toHaveLength(1);
   });
@@ -168,14 +169,15 @@ describe("washGroups", () => {
 });
 
 describe("ironGroups", () => {
-  const order = ["min", "1", "2", "3", "none"];
+  // What `ironSettingKeys` hands over: real positions only, no sentinel.
+  const order = ["min", "1", "2", "3"];
 
   test("gathers the piles that go at one thermostat position", () => {
     const groups = ironGroups(
       [
-        pile({ clothingType: "Socks", ironSetting: "none" }),
-        pile({ clothingType: "Merino", ironSetting: "2", temperature: "30" }),
-        pile({ clothingType: "Cashmere", ironSetting: "2", program: "Wol" }),
+        pile({ clothingType: "Socks", ironing: false, ironSetting: "" }),
+        pile({ clothingType: "Merino", ironing: true, ironSetting: "2", temperature: "30" }),
+        pile({ clothingType: "Cashmere", ironing: true, ironSetting: "2", program: "Wol" }),
       ],
       order,
     );
@@ -188,24 +190,20 @@ describe("ironGroups", () => {
   test("runs coolest first and leaves do-not-iron until last", () => {
     const groups = ironGroups(
       [
-        pile({ clothingType: "Never", ironSetting: "none" }),
-        pile({ clothingType: "Hot", ironSetting: "3" }),
-        pile({ clothingType: "Cool", ironSetting: "1" }),
+        pile({ clothingType: "Never", ironing: false, ironSetting: "" }),
+        pile({ clothingType: "Hot", ironing: true, ironSetting: "3" }),
+        pile({ clothingType: "Cool", ironing: true, ironSetting: "1" }),
       ],
       order,
     );
-    expect(groups.map((group) => (group[0] as Instruction).ironSetting)).toEqual([
-      "1",
-      "3",
-      "none",
-    ]);
+    expect(groups.map((group) => (group[0] as Instruction).ironSetting)).toEqual(["1", "3", ""]);
   });
 
   test("keeps every pile exactly once", () => {
     const items = [
-      pile({ clothingType: "A", ironSetting: "1" }),
-      pile({ clothingType: "B", ironSetting: "none" }),
-      pile({ clothingType: "C", ironSetting: "1" }),
+      pile({ clothingType: "A", ironing: true, ironSetting: "1" }),
+      pile({ clothingType: "B", ironing: false, ironSetting: "" }),
+      pile({ clothingType: "C", ironing: true, ironSetting: "1" }),
     ];
     expect(ironGroups(items, order).flat()).toHaveLength(items.length);
   });

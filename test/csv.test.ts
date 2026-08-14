@@ -6,10 +6,10 @@ const machine = await loadMachine(DIST_MACHINE);
 
 const HEADER =
   "clothing_type,detergent,fabric_softener,temperature,spin,duration,program,options," +
-  "ironing,iron_setting,drying,colour_group,mix_tags,notes";
+  "ironing,ironing_notes,iron_setting,drying,colour_group,mix_tags,notes";
 
 const ROW =
-  "Dark,Dark liquid,no,30,800,~2:00,Cottons,Extra Rinse,Inside out,2,Line dry,dark,dye-bleeder,";
+  "Dark,Dark liquid,no,30,800,~2:00,Cottons,Extra Rinse,yes,Inside out,2,Line dry,dark,dye-bleeder,";
 
 function csv(row = ROW): string {
   return `${HEADER}\n${row}\n`;
@@ -96,5 +96,58 @@ describe("parseInstructions", () => {
 
   test("rejects a header with no rows", () => {
     expect(() => parseInstructions(`${HEADER}\n`, machine)).toThrow(/no rows/);
+  });
+
+  /**
+   * `ironing` and `iron_setting` describe one decision between them, so the
+   * parser is where they are held to agreeing. Letting them drift is how you
+   * get a card with a crossed-out iron and a thermostat position on it.
+   */
+  describe("ironing and its thermostat", () => {
+    const noIron = (setting = "", notes = "") =>
+      ROW.replace("Extra Rinse,yes,Inside out,2", `Extra Rinse,no,${notes},${setting}`);
+
+    test("reads the boolean and keeps the notes apart from it", () => {
+      const [item] = parseInstructions(csv(), machine);
+      expect(item?.ironing).toBe(true);
+      expect(item?.ironingNotes).toBe("Inside out");
+      expect(item?.ironSetting).toBe("2");
+    });
+
+    test("leaves the thermostat empty for a pile you never iron", () => {
+      const [item] = parseInstructions(csv(noIron()), machine);
+      expect(item?.ironing).toBe(false);
+      expect(item?.ironSetting).toBe("");
+    });
+
+    test("still takes notes on a pile you never iron", () => {
+      const [item] = parseInstructions(csv(noIron("", "Melts")), machine);
+      expect(item?.ironing).toBe(false);
+      expect(item?.ironingNotes).toBe("Melts");
+    });
+
+    test("refuses a thermostat position on a pile you never iron", () => {
+      expect(() => parseInstructions(csv(noIron("3")), machine)).toThrow(
+        /column "iron_setting".*empty when ironing is no/,
+      );
+    });
+
+    test("insists on a thermostat position for a pile you do iron", () => {
+      expect(() =>
+        parseInstructions(csv(ROW.replace(",yes,Inside out,2", ",yes,Inside out,")), machine),
+      ).toThrow(/column "iron_setting"/);
+    });
+
+    test("refuses a thermostat position the iron does not have", () => {
+      expect(() =>
+        parseInstructions(csv(ROW.replace(",yes,Inside out,2", ",yes,Inside out,9")), machine),
+      ).toThrow(/column "iron_setting".*not one of/);
+    });
+
+    test("refuses an ironing value that is not yes or no", () => {
+      expect(() =>
+        parseInstructions(csv(ROW.replace(",yes,Inside out,2", ",maybe,Inside out,2")), machine),
+      ).toThrow(/column "ironing".*yes\/no/);
+    });
   });
 });

@@ -229,8 +229,9 @@ the dist and says so.
 | `duration`        | Roughly how long it runs — on the loads table, the summary and the card |
 | `program`         | A dial position, spelled exactly as on the fascia                       |
 | `options`         | Option buttons, pipe-separated; empty for none                          |
-| `ironing`         | Prose: how to iron it                                                   |
-| `iron_setting`    | A thermostat position, or `none` for do not iron                        |
+| `ironing`         | `yes` or `no` — whether you iron it at all                              |
+| `ironing_notes`   | Prose: how to iron it, or why you don't. Often empty                    |
+| `iron_setting`    | A thermostat position. Empty when `ironing` is `no`                     |
 | `drying`          | Prose: how to dry it                                                    |
 | `colour_group`    | `white`, `colour`, `dark`, `sport` or `any`                             |
 | `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo`    |
@@ -285,8 +286,10 @@ appliances. Write me one row per pile for the laundry I describe.
 
 Every machine-facing value has to come out of that file: program from
 washer.programs, temperature from washer.temperatures, spin from washer.spins,
-options from washer.options, and iron_setting from an iron.settings key or the
-word none. Spell them exactly as they appear there.
+options from washer.options, and iron_setting from an iron.settings key. Spell
+them exactly as they appear there.
+
+ironing is yes or no. When it is no, leave iron_setting empty.
 
 duration is roughly how long that programme runs on my machine, as ~H:MM.
 
