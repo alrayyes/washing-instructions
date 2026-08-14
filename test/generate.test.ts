@@ -196,6 +196,26 @@ describe("bun run generate", () => {
       expect(text.match(/Do not iron/g)?.length).toBeLessThan(3);
     });
 
+    /**
+     * The card heading already says do not iron, so a pile whose whole ironing
+     * line is "Don't." earns a blank rather than a row that repeats it. A pile
+     * that says why keeps the why.
+     */
+    test("leaves the no-iron rows blank unless they add something", async () => {
+      for (const name of ["-phone-ironing.pdf", "-print-ironing.pdf"]) {
+        const text = await words(await readFile(join(out, `washing-instructions${name}`)));
+        // The piles are still listed — it is the empty second column that changed.
+        expect(text).toContain("White Socks");
+        expect(text).toContain("Gym Socks");
+        // Nothing on the sheet just refuses any more. Capitalised, because
+        // "don't press hard" mid-sentence is advice and stays.
+        expect(text).not.toContain("Don't");
+        // The ones carrying a reason keep it, minus the refusal that led it.
+        expect(text).toContain("Ironing crushes the pile flat");
+        expect(text).toContain("Elastane starts degrading");
+      }
+    });
+
     test("names all six in what it reports", () => {
       for (const name of EXAMPLES) expect(stdout).toContain(name);
     });

@@ -54,6 +54,21 @@ export function durationsOf(group: Instruction[]): string {
 }
 
 /**
+ * What an ironing line says once "do not iron" has already been said.
+ *
+ * The no-iron card leads with the refusal, so a pile whose whole line is
+ * "Don't." earns a blank rather than a row repeating it — you already know you
+ * do not iron socks, and the eye still has to stop on every one of them. A pile
+ * that says *why* keeps the why, which is the part you did not know.
+ *
+ * Only a leading refusal goes. "Steam, don't press hard" is advice about
+ * ironing something, and survives untouched.
+ */
+export function beyondDoNotIron(ironing: string): string {
+  return ironing.replace(/^\s*(don'?t|do not iron|never)\b[.!]*\s*/i, "").trim();
+}
+
+/**
  * Which sheet to draw.
  *
  * `full` is the whole chart. The other two are the same chart cut where the
