@@ -56,12 +56,6 @@ redraw them.
 - **[Bun](https://bun.sh) 1.3 or newer** — runtime, package manager and test
   runner. Nothing else is needed; there is no build step and no browser.
 - Linux, macOS or WSL. Bun's Windows support should work but is untested here.
-- Nothing extra for the git hooks — `lefthook` and the linters are dev
-  dependencies, and `bun install` puts the hooks in place for you. Vale is the
-  exception, because it is a Go binary rather than a package:
-  `bun run prose:sync` fetches it into `.tools/`, checks it against the
-  release's own checksums, and pulls down the style packages it lints against.
-  That wants network access and `tar`, once.
 
 No network access is needed at run time, and no fonts are downloaded: the PDFs
 use the Helvetica that every PDF reader already has.
@@ -72,7 +66,6 @@ use the Helvetica that every PDF reader already has.
 bun install --frozen-lockfile
 cp data/machine.json.dist data/machine.json             # then describe your appliances
 cp data/washing-instructions.csv.dist data/washing-instructions.csv
-bun run prose:sync      # only if you intend to commit
 ```
 
 Neither copy is required. With no files of your own the tool reads the two
@@ -322,126 +315,14 @@ machine is refused by another rather than silently drawn wrong:
 row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
 ```
 
-## Development
-
-```sh
-bun run check              # every linter, tsc --noEmit, then the tests
-bun run format             # let Prettier lay the Markdown and YAML out
-bun run lint:prose:advice  # Vale's style advice, warnings and all
-bun test                   # just the tests
-bun run examples           # redraw the two PDFs the README links
-```
-
-`out/` is generated and nothing in it is ever committed. The pair under `docs/`
-is the exception, because a README that links a PDF has to have one to link.
-Change the chart, the machine file or anything that draws, and `bun test` fails
-until `bun run examples` has run. That command names both `.dist` files rather
-than letting the CLI pick, because the defaults prefer your own appliances and
-an example in the repository is the last place they should turn up.
-
-Two formatters, split by file type and never overlapping. Biome owns everything
-it supports; Markdown and YAML are what it does not format, so those go to
-Prettier and `.prettierignore` names the file types Prettier must keep its hands
-off. Prettier runs before markdownlint, never after — Prettier decides the
-layout and markdownlint judges what came out, so the rules the two would argue
-over (list markers, list indentation, emphasis characters) are switched off on
-markdownlint's side. Nothing judges the YAML after Prettier has laid it out, so
-`lint:yaml` is the check on its own.
-
-### The prose is linted too
-
-The README is the whole manual for this thing, so it gets checked the way the
-code does. markdownlint only judges structure — headings, list markers, blank
-lines — and happily passes a document that says `an unique setting`. Two more
-tiers sit over it, and they are deliberately answered differently. The specimen
-in the last sentence is in backticks because otherwise the mechanics tier finds
-it, which is the point:
-
-- **Mechanics** — [LTeX+](https://github.com/ltex-plus/ltex-ls-plus) wrapping
-  LanguageTool: grammar, spelling, punctuation, the phonetic article. These have
-  a right answer, so the `ltex` job blocks the run. It reports findings
-  with exit code **3**, not 1, which is worth knowing before you write anything
-  that tests for a number. It stays out of the git hooks because it is a 300 MB
-  download carrying its own Java runtime; run the same engine in your editor
-  over LSP and CI is only the fallback.
-- **Style** — [Vale](https://vale.sh) with the Google and proselint packages:
-  house voice, wordiness, clichés. This is advice, and Vale exits non-zero only
-  on error-severity alerts, so its warnings are reported without blocking. It is fast, so the commit hook
-  runs it too, but only at error level. It arrives through
-  `scripts/install-vale.ts` rather than the `@vvago/vale` npm package: that
-  package downloads its binary from a postinstall that shells out to `node`,
-  a Bun runner has no Node, so it installs an empty `bin/` and says nothing
-  until the linter is called, and the shell answers 127.
-
-`.vale.ini` and `.ltex.json` each say why a rule was turned off. The short
-version: spelling belongs to LTeX alone, because two tools underlining the same
-word is how you learn to ignore both, and the em dashes and missing serial
-commas here are house style rather than mistakes. Product names and Dutch dial
-labels go in the dictionaries — `styles/config/vocabularies/House/accept.txt`
-and the `dictionary` block in `.ltex.json` — never in an ignore comment buried
-in the prose.
-
-### Tests
-
-Tests run at two levels, and skip the ones that cannot fail here. There is no
-database, service or deployed system to integrate with, so there is no
-container or end-to-end layer:
-
-- **Acceptance** (`test/generate.test.ts`) — runs the CLI the way you would and
-  checks the PDFs that come out: the phone sheet is a single continuous page of
-  the right width, the printed one is A4 with the reference sheet first, and
-  the shared-load summary says what it should.
-- **Unit** (`test/csv.test.ts`, `test/mixing.test.ts`) — the validation errors
-  and the mixing rules, including that the rules are symmetric and that a group
-  only forms when every member is compatible with every other.
-
-### The git hooks
-
-`lefthook.yml` runs the same commands CI does, so the two cannot drift. The
-hooks install themselves: lefthook is pinned like every other tool here and the
-`prepare` script runs `lefthook install` on `bun install`, so there is no step
-to forget and no clone that quietly has no hooks. The Dockerfile passes
-`--ignore-scripts`, so the image build skips it. On
-commit, Biome, Prettier and markdownlint fix what they can over the staged files
-and restage it, Vale checks the prose for errors, and commitlint reads the
-message. On push, every linter runs again in check mode over the whole tree,
-followed by the typecheck and the tests — nothing at that point writes, so the
-commit you push is the one you reviewed.
-
-Every hook is skippable with `--no-verify`, which is why CI checks the same
-things again and why the message check runs a second time over the whole range
-of a merge request. These messages decide the version a release tool picks, so
-they are worth a gate rather than only a reminder.
-
-### Gotchas
-
-- Only Helvetica is embedded, so the PDFs can only render WinAnsi characters.
-  `•`, `°`, `—`, `–` are fine; `≈`, `✓` and curly quotes vanish silently. Watch
-  this when editing prose in the CSV.
-- The phone page's height is _measured_, not chosen: `renderPhone` renders the
-  document repeatedly and bisects until it fits on one page with under 8 pt to
-  spare. That is why the run reports a number of layout passes.
-- The reference sheet is measured the same way, in the other direction. Its page
-  size is fixed at A4, so what gives is the type: `renderPrint` renders the sheet
-  on its own and bisects the size of the two tables down until it comes back one
-  page. Adding piles sets them tighter rather than spilling onto a second sheet,
-  and past roughly thirty the run stops with an error instead.
-
 ## Contributing
 
-Branch, commit under [Conventional Commits](https://www.conventionalcommits.org/),
-open a pull request. Run `bun run check` first.
-
-Those commit subjects are not decoration: semantic-release reads them when a
-pull request lands to decide the next version. `feat:` takes the minor, `fix:`
-the patch, a `BREAKING CHANGE:` footer the major, and a branch of nothing but
-`docs:` and `chore:` releases nothing at all. A run of `check` on `main` that
-goes green is what lets the release job tag, write the changelog and publish the
-notes, so nobody picks a version by hand.
-
-Care advice is sourced, not guessed. If you change a wash setting, say in the
-commit body what the source was — a manufacturer's guidance, a care label, or
-something you tested — rather than that it seemed better.
+Everything about working on this — the commands, the linters, the tests, the git
+hooks and how a release is cut — is in [CONTRIBUTING.md](CONTRIBUTING.md). Short
+version: `bun run check` before you push, commit under
+[Conventional Commits](https://www.conventionalcommits.org/), and say in the
+commit body where a changed wash setting came from. Care advice is sourced, not
+guessed.
 
 ## Where the current advice comes from
 
@@ -456,53 +337,6 @@ on raw selvedge,
 for the thermostat markings, and
 [Dirty Labs](https://dirtylabs.com/blogs/the-dirt/how-to-wash-your-activewear)
 on synthetic activewear.
-
-## Releasing
-
-Nobody picks a version. When a pull request lands on `main` and the checks pass,
-semantic-release reads the Conventional Commits that arrived with it, tags,
-writes `CHANGELOG.md` and publishes the notes. `feat:` takes the minor, `fix:`
-the patch, a `BREAKING CHANGE:` footer the major, and a branch of nothing but
-`docs:` and `chore:` releases nothing at all.
-
-It needs one secret, `RELEASE_TOKEN`: a fine-grained personal access token
-scoped to this repository with **contents: read and write**, saved under
-Settings → Secrets and variables → Actions. The job token that Actions hands out
-by default is not enough, and the reason is worth knowing. `main` requires status
-checks, a ruleset applies those to a direct push as well as to a pull request,
-and the changelog commit is a direct push from `github-actions[bot]` carrying no
-checks of its own — so it is rejected. A token belonging to someone the ruleset
-lets bypass is what gets it in.
-
-Until that secret exists the release job reports that it did nothing and stops.
-It does not fail: nothing is broken, there is just no token, and a release badge
-stuck on red would be saying otherwise.
-
-One wrinkle worth knowing if you touch that workflow. semantic-release checks
-the runtime version at startup and refuses anything outside `^22.14 || >=24.10`,
-and Bun answers `process.version` with the Node version it implements — 24.3.0 —
-so `bunx --bun semantic-release` dies on the version gate before doing anything
-at all. Bun installs it and Node runs it.
-
-A second wrinkle, from the same family of things that fail quietly. The notes
-are written by the `conventionalcommits` preset, which arrives as its own pinned
-package, and version 10 of it changed the shape of the config object it exports.
-`@semantic-release/release-notes-generator` 14 still reads the old shape, so it
-finds no template, writes a version heading with nothing under it, and reports
-success. That is what shipped as v1.0.0 and v1.1.0. The preset is held at 9.x,
-Dependabot is told not to carry it past that, and `test/release-notes.test.ts`
-checks that generated notes have sections in them — a version range would not
-have caught this, and neither did a green pipeline.
-
-`CHANGELOG.md` is written by that job, and Prettier, markdownlint and Vale are
-all told to leave it alone. Its bullets are the generator's; reformatting them by
-hand only lasts until the next release.
-
-That job pushes with `LEFTHOOK=0`. The hooks install themselves on `bun install`,
-so they land there too, and its push fired a `pre-push` that went looking for a
-Vale it had never downloaded — failing the release over the tooling rather than
-the prose. Whatever that hook would have checked already ran on that exact
-commit, and it is the green run that starts the release in the first place.
 
 ## Licence
 

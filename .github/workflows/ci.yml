@@ -92,7 +92,7 @@ jobs:
       # non-zero. The files are named rather than passing `.`: LTeX traverses
       # recursively and reads plain text as prose, so a bare dot lints the
       # committed Vale vocabulary as though it were a document.
-      - run: ./ltex-ls-plus-${LTEX_VERSION}/bin/ltex-cli-plus --client-configuration=.ltex.json README.md CLAUDE.md SECURITY.md
+      - run: ./ltex-ls-plus-${LTEX_VERSION}/bin/ltex-cli-plus --client-configuration=.ltex.json README.md CONTRIBUTING.md CLAUDE.md SECURITY.md
 
   # Style. House voice, weasel words, wordiness, undefined jargon. Advice
   # rather than a verdict: Vale exits non-zero only on error-severity alerts,
