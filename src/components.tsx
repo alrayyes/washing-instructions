@@ -1,6 +1,6 @@
 import { Circle, G, Line, Path, Svg, Text, View } from "@react-pdf/renderer";
 import { useMachine } from "./appliances";
-import { ironSetting, NO_IRON } from "./machine";
+import { ironSetting } from "./machine";
 import { theme } from "./theme";
 import type { Instruction } from "./types";
 
@@ -92,7 +92,16 @@ export function ProgramDial({ program, size = 76 }: { program: string; size?: nu
  * The iron's thermostat ring: MIN through MAX, with the shaded band marking
  * where the iron actually makes steam, and the pointer on the right setting.
  */
-export function IronDial({ setting, size = 76 }: { setting: string; size?: number }) {
+export function IronDial({
+  setting,
+  off = false,
+  size = 76,
+}: {
+  setting: string;
+  /** Draw the crossed-out ring instead of a pointer. */
+  off?: boolean;
+  size?: number;
+}) {
   const machine = useMachine();
   const settings = machine.iron.settings;
   const centre = size / 2;
@@ -106,7 +115,6 @@ export function IronDial({ setting, size = 76 }: { setting: string; size?: numbe
     0,
     settings.findIndex((entry) => entry.key === setting),
   );
-  const off = setting === NO_IRON;
   const angleOf = (position: number) => (first + position * step + 360) % 360;
   const pointer = polar(centre, centre, knob - 1.5, angleOf(index));
   const steamFrom = settings.findIndex((entry) => entry.steam);
@@ -304,7 +312,7 @@ export function ControlPanel({ item, dialSize = 76 }: { item: Instruction; dialS
 export function IronPanel({ items, dialSize = 62 }: { items: Instruction[]; dialSize?: number }) {
   const machine = useMachine();
   const item = items[0] as Instruction;
-  const setting = item.ironSetting === NO_IRON ? undefined : ironSetting(machine, item.ironSetting);
+  const setting = item.ironing ? ironSetting(machine, item.ironSetting) : undefined;
 
   return (
     <View
@@ -319,7 +327,7 @@ export function IronPanel({ items, dialSize = 62 }: { items: Instruction[]; dial
         gap: 8,
       }}
     >
-      <IronDial setting={item.ironSetting} size={dialSize} />
+      <IronDial setting={item.ironSetting} off={!item.ironing} size={dialSize} />
       <View style={{ flex: 1 }}>
         <Text style={{ fontFamily: font.bold, fontSize: 8.5, color: colour.ink }}>
           {setting ? `${setting.label} — ${setting.detail}` : "Do not iron"}
@@ -329,7 +337,11 @@ export function IronPanel({ items, dialSize = 62 }: { items: Instruction[]; dial
             {setting.steam ? "inside the steam zone" : "below the steam zone — dry iron only"}
           </Text>
         )}
-        <Prose items={items} pick={(entry) => entry.ironing} size={7.2} marginTop={2.5} />
+        {/*
+          Only the notes. The heading above has already said whether you iron
+          this, so a line under it reading "Don't." is a line of nothing.
+        */}
+        <Prose items={items} pick={(entry) => entry.ironingNotes} size={7.2} marginTop={2.5} />
       </View>
     </View>
   );
@@ -362,16 +374,23 @@ function Prose({
     marginTop,
   } as const;
 
+  // An empty Text still costs a line's height, which is a gap nobody asked for.
+  if (values.every((value) => value === "")) return null;
+
   if (values.every((value) => value === values[0])) {
     return <Text style={style}>{values[0]}</Text>;
   }
 
+  // A pile with nothing to say is left out rather than given its name and a
+  // blank — the names are already in the card's heading.
+  const speaking = items.filter((_, index) => values[index] !== "");
+
   return (
     <View style={{ marginTop }}>
-      {items.map((item, index) => (
+      {speaking.map((item, index) => (
         <Text key={item.clothingType} style={{ ...style, marginTop: index === 0 ? 0 : 1.5 }}>
           <Text style={{ fontFamily: font.bold, color: colour.ink }}>{item.clothingType}: </Text>
-          {values[index]}
+          {pick(item)}
         </Text>
       ))}
     </View>

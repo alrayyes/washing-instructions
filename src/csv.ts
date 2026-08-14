@@ -13,6 +13,7 @@ const COLUMNS = [
   "program",
   "options",
   "ironing",
+  "ironing_notes",
   "iron_setting",
   "drying",
   "colour_group",
@@ -93,6 +94,22 @@ export function parseInstructions(source: string, machine: Machine): Instruction
       oneOf<MixTag>(line, "mix_tags", tag, mixTags),
     );
 
+    // `ironing` decides whether there is a thermostat position at all, so the
+    // two are checked together: a pile you never iron has nowhere to point the
+    // dial, and a pile you do iron has to say where.
+    const ironing = boolean(line, "ironing", record.ironing ?? "");
+    const rawSetting = (record.iron_setting ?? "").trim();
+    if (!ironing && rawSetting !== "") {
+      throw new CsvError(
+        line,
+        "iron_setting",
+        `must be empty when ironing is no, found "${rawSetting}"`,
+      );
+    }
+    const ironSetting = ironing
+      ? oneOf(line, "iron_setting", rawSetting, ironSettingKeys(machine))
+      : "";
+
     return {
       clothingType,
       detergent: record.detergent ?? "",
@@ -102,8 +119,9 @@ export function parseInstructions(source: string, machine: Machine): Instruction
       duration: record.duration ?? "",
       program: oneOf(line, "program", record.program ?? "", washer.programs),
       options,
-      ironing: record.ironing ?? "",
-      ironSetting: oneOf(line, "iron_setting", record.iron_setting ?? "", ironSettingKeys(machine)),
+      ironing,
+      ironingNotes: record.ironing_notes ?? "",
+      ironSetting,
       drying: record.drying ?? "",
       colourGroup: oneOf<ColourGroup>(
         line,

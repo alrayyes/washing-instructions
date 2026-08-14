@@ -26,8 +26,15 @@ export interface Instruction {
   duration: string;
   program: string;
   options: string[];
-  ironing: string;
-  /** `"none"` means do not iron this at all. */
+  /** Whether this pile gets ironed at all. */
+  ironing: boolean;
+  /**
+   * How to iron it, or why you don't. Free prose and often empty, because most
+   * of what there is to say about a pile nobody irons is already said by
+   * `ironing` being false.
+   */
+  ironingNotes: string;
+  /** Thermostat position. Empty when `ironing` is false. */
   ironSetting: string;
   drying: string;
   colourGroup: ColourGroup;
@@ -51,21 +58,6 @@ export function durationsOf(group: Instruction[]): string {
   return [...new Set(group.map((item) => item.duration).filter((value) => value !== ""))].join(
     " / ",
   );
-}
-
-/**
- * What an ironing line says once "do not iron" has already been said.
- *
- * The no-iron card leads with the refusal, so a pile whose whole line is
- * "Don't." earns a blank rather than a row repeating it — you already know you
- * do not iron socks, and the eye still has to stop on every one of them. A pile
- * that says *why* keeps the why, which is the part you did not know.
- *
- * Only a leading refusal goes. "Steam, don't press hard" is advice about
- * ironing something, and survives untouched.
- */
-export function beyondDoNotIron(ironing: string): string {
-  return ironing.replace(/^\s*(don'?t|do not iron|never)\b[.!]*\s*/i, "").trim();
 }
 
 /**

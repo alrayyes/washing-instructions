@@ -51,17 +51,20 @@ describe("parseMachine", () => {
     expect(() => parseMachine("not a machine at all")).toThrow();
   });
 
-  // "none" is how a row says do not iron this, so a setting called "none"
-  // would be unreachable and quietly ignored.
-  test("refuses an iron setting that collides with do-not-iron", () => {
-    const clash = {
+  /**
+   * There used to be a reserved key here: a setting called "none" was refused,
+   * because "none" was how a row said do not iron this. The `ironing` boolean
+   * carries that now, so every key a fascia might print is available again.
+   */
+  test("allows a thermostat position called none", () => {
+    const named = {
       ...MINIMAL,
       iron: {
         ...MINIMAL.iron,
         settings: [...MINIMAL.iron.settings, { key: "none", label: "x", detail: "", steam: false }],
       },
     };
-    expect(() => parseMachine(clash)).toThrow(/none/);
+    expect(parseMachine(named).iron.settings.map((setting) => setting.key)).toContain("none");
   });
 });
 

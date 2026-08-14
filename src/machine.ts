@@ -53,9 +53,6 @@ export const DEFAULT_MACHINE = "data/machine.json";
  */
 export const DIST_MACHINE = `${DEFAULT_MACHINE}.dist`;
 
-/** How a row says "do not iron this", so no thermostat position may claim it. */
-export const NO_IRON = "none";
-
 function fail(what: string): never {
   throw new Error(`machine: ${what}`);
 }
@@ -82,9 +79,6 @@ function parseIronSetting(value: unknown, index: number): IronSetting {
     fail(`iron.settings[${index}] must be an object`);
   const raw = value as Record<string, unknown>;
   const key = text(raw.key, `iron.settings[${index}].key`);
-  if (key === NO_IRON) {
-    fail(`iron.settings[${index}].key cannot be "${NO_IRON}" — that is how a row says do not iron`);
-  }
   return {
     key,
     dots: typeof raw.dots === "string" ? raw.dots : "",
@@ -164,9 +158,14 @@ export function ironSetting(machine: Machine, key: string): IronSetting | undefi
   return machine.iron.settings.find((setting) => setting.key === key);
 }
 
-/** The keys a row may write in `iron_setting`, `none` included. */
+/**
+ * The keys a row may write in `iron_setting`, coolest first.
+ *
+ * There is no key for "do not iron". That is the `ironing` column's job, and
+ * two places to say the same thing is two places to disagree.
+ */
 export function ironSettingKeys(machine: Machine): string[] {
-  return [...machine.iron.settings.map((setting) => setting.key), NO_IRON];
+  return machine.iron.settings.map((setting) => setting.key);
 }
 
 /**

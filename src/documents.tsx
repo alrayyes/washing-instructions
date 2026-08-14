@@ -10,7 +10,7 @@ import {
   SplitField,
 } from "./components";
 import type { Machine } from "./machine";
-import { formatTemperature, ironSetting, ironSettingKeys, NO_IRON } from "./machine";
+import { formatTemperature, ironSetting, ironSettingKeys } from "./machine";
 import {
   type Blocker,
   blockerCode,
@@ -23,7 +23,7 @@ import {
   washGroups,
 } from "./mixing";
 import { theme } from "./theme";
-import { beyondDoNotIron, durationsOf, type ResolvedInstruction, type Variant } from "./types";
+import { durationsOf, type ResolvedInstruction, type Variant } from "./types";
 
 const { colour, font } = theme;
 
@@ -31,8 +31,16 @@ const A4 = { width: 595.28, height: 841.89 };
 const PHONE_WIDTH = 244;
 
 function ironLabel(machine: Machine, item: ResolvedInstruction): string {
-  if (item.ironSetting === NO_IRON) return "do not iron";
+  if (!item.ironing) return "do not iron";
   return ironSetting(machine, item.ironSetting)?.label ?? item.ironSetting;
+}
+
+/**
+ * What makes an ironing card unique. A pile you never iron has no thermostat
+ * position, so every no-iron group would otherwise share the empty key.
+ */
+function ironCardKey(item: ResolvedInstruction): string {
+  return item.ironing ? item.ironSetting : "do-not-iron";
 }
 
 /**
@@ -210,7 +218,7 @@ function IronCard({
 }) {
   const machine = useMachine();
   const item = group[0] as ResolvedInstruction;
-  const setting = item.ironSetting === NO_IRON ? undefined : ironSetting(machine, item.ironSetting);
+  const setting = item.ironing ? ironSetting(machine, item.ironSetting) : undefined;
 
   return (
     <View
@@ -262,7 +270,7 @@ function IronCard({
           gap: 8,
         }}
       >
-        <IronDial setting={item.ironSetting} size={compact ? 54 : 62} />
+        <IronDial setting={item.ironSetting} off={!item.ironing} size={compact ? 54 : 62} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: font.bold, fontSize: 8.5, color: colour.ink }}>
             {setting ? `Thermostat on ${setting.label}` : "Leave the iron off"}
@@ -282,7 +290,7 @@ function IronCard({
         {group.map((member) => {
           // On the no-iron card the heading has said it already, so only a
           // reason earns the second column. Elsewhere the line is the point.
-          const note = setting ? member.ironing : beyondDoNotIron(member.ironing);
+          const note = member.ironingNotes;
           return (
             <View
               key={member.clothingType}
@@ -418,7 +426,7 @@ function Legend({ last = false, variant = "full" }: { last?: boolean; variant?: 
   const off = washer.programs[0] ?? "";
   const example = washer.programs[1] ?? off;
   // The hottest position the iron offers, so the drawing shows a full ring.
-  const hottest = machine.iron.settings[machine.iron.settings.length - 1]?.key ?? NO_IRON;
+  const hottest = machine.iron.settings[machine.iron.settings.length - 1]?.key ?? "";
 
   return (
     <View
@@ -511,7 +519,7 @@ export function PhoneDocument({
           {groups.map((group, index) =>
             variant === "iron" ? (
               <IronCard
-                key={(group[0] as ResolvedInstruction).ironSetting}
+                key={ironCardKey(group[0] as ResolvedInstruction)}
                 group={group}
                 index={index + 1}
                 compact
@@ -571,14 +579,14 @@ function summaryColumns(machine: Machine, variant: Variant): Column[] {
       {
         label: "Steam",
         width: 34,
-        value: (i) => (ironSetting(machine, i.ironSetting)?.steam ? "yes" : "—"),
+        value: (i) => (i.ironing && ironSetting(machine, i.ironSetting)?.steam ? "yes" : "—"),
       },
       {
         label: "Why not / how",
         width: 295,
         // Same rule as the card: the Thermostat column beside this one already
         // reads "do not iron", so a cell repeating it is a cell of noise.
-        value: (i) => gist(i.ironSetting === NO_IRON ? beyondDoNotIron(i.ironing) : i.ironing),
+        value: (i) => gist(i.ironingNotes),
       },
     ];
   }
@@ -863,7 +871,7 @@ export function PrintDocument({
           {groups.map((group, index) =>
             variant === "iron" ? (
               <IronCard
-                key={(group[0] as ResolvedInstruction).ironSetting}
+                key={ironCardKey(group[0] as ResolvedInstruction)}
                 group={group}
                 index={index + 1}
               />

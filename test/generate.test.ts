@@ -197,20 +197,25 @@ describe("bun run generate", () => {
     });
 
     /**
-     * The card heading already says do not iron, so a pile whose whole ironing
-     * line is "Don't." earns a blank rather than a row that repeats it. A pile
-     * that says why keeps the why.
+     * The card has already said whether you iron the thing, so a pile whose
+     * ironing notes are empty earns a blank rather than a line repeating the
+     * refusal. A pile that says why keeps the why. True of every sheet that
+     * draws an iron, not only the ironing ones.
      */
-    test("leaves the no-iron rows blank unless they add something", async () => {
+    test("never repeats the refusal under a card that has made it", async () => {
+      for (const name of EXAMPLES) {
+        const text = await words(await readFile(join(out, name)));
+        // Capitalised: "don't press hard" mid-sentence is advice and stays.
+        expect(text, name).not.toContain("Don't");
+      }
+    });
+
+    test("keeps the piles and their reasons on the ironing sheets", async () => {
       for (const name of ["-phone-ironing.pdf", "-print-ironing.pdf"]) {
         const text = await words(await readFile(join(out, `washing-instructions${name}`)));
-        // The piles are still listed — it is the empty second column that changed.
+        // The piles are still listed — it is the second column that emptied.
         expect(text).toContain("White Socks");
         expect(text).toContain("Gym Socks");
-        // Nothing on the sheet just refuses any more. Capitalised, because
-        // "don't press hard" mid-sentence is advice and stays.
-        expect(text).not.toContain("Don't");
-        // The ones carrying a reason keep it, minus the refusal that led it.
         expect(text).toContain("Ironing crushes the pile flat");
         expect(text).toContain("Elastane starts degrading");
       }
@@ -324,9 +329,9 @@ describe("bun run generate --machine", () => {
     await writeFile(
       chart,
       "clothing_type,detergent,fabric_softener,temperature,spin,duration,program,options," +
-        "ironing,iron_setting,drying,colour_group,mix_tags,notes\n" +
-        "Linge blanc,Lessive,no,40,1000,~2:00,Coton,Prélavage,Fer chaud,2,Étendre,white,,\n" +
-        "Pulls,Lessive laine,no,30,0,~0:40,Laine,,Ne pas repasser,1,À plat,any,,\n",
+        "ironing,ironing_notes,iron_setting,drying,colour_group,mix_tags,notes\n" +
+        "Linge blanc,Lessive,no,40,1000,~2:00,Coton,Prélavage,yes,Fer chaud,2,Étendre,white,,\n" +
+        "Pulls,Lessive laine,no,30,0,~0:40,Laine,,no,,,À plat,any,,\n",
     );
 
     const result = Bun.spawnSync({
