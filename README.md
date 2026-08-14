@@ -53,10 +53,12 @@ themselves are here too, so you can read the whole thing rather than a picture
 of the top of it, all drawn for the generic appliances in
 `data/machine.json.dist`:
 
-|           | Everything                                   | Washing only                                                  | Ironing only                                                  |
-| --------- | -------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
-| Phone     | [phone](docs/washing-instructions-phone.pdf) | [phone, washing](docs/washing-instructions-phone-washing.pdf) | [phone, ironing](docs/washing-instructions-phone-ironing.pdf) |
-| Printable | [print](docs/washing-instructions-print.pdf) | [print, washing](docs/washing-instructions-print-washing.pdf) | [print, ironing](docs/washing-instructions-print-ironing.pdf) |
+- The phone sheet: [the lot](docs/washing-instructions-phone.pdf),
+  [washing](docs/washing-instructions-phone-washing.pdf),
+  [ironing](docs/washing-instructions-phone-ironing.pdf).
+- The printable set: [the lot](docs/washing-instructions-print.pdf),
+  [washing](docs/washing-instructions-print-washing.pdf),
+  [ironing](docs/washing-instructions-print-ironing.pdf).
 
 A test redraws all six and compares them page by page against what is
 committed, so the one you open is what the current chart draws, not what it
@@ -129,8 +131,7 @@ Washing and ironing are the same chart read at two different moments. You stand
 at the machine on a Sunday morning wanting a programme, a temperature and a
 spin speed; you stand at the board on a Wednesday evening wanting a thermostat
 position. Carrying the other half of the advice to either place is what makes a
-card too long to read, so each run writes both halves as well as the whole
-thing.
+card too long to read, so each run writes both halves and the whole thing.
 
 **`-washing`** drops the iron block from every card and the iron column from the
 reference sheet. It also merges harder. Dark, Black Socks and Denim each need
