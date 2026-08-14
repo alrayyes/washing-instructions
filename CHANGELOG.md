@@ -1,3 +1,9 @@
+## [2.1.0](https://github.com/alrayyes/washing-instructions/compare/v2.0.0...v2.1.0) (2026-08-14)
+
+### Features
+
+* shoot a screenshot of every sheet, and catch a stale one ([#30](https://github.com/alrayyes/washing-instructions/issues/30)) ([15766d7](https://github.com/alrayyes/washing-instructions/commit/15766d75d254a05564f49568ad870a4ba0d26c1a)), closes [#29](https://github.com/alrayyes/washing-instructions/issues/29)
+
 ## [2.0.0](https://github.com/alrayyes/washing-instructions/compare/v1.2.1...v2.0.0) (2026-08-14)
 
 ### ⚠ BREAKING CHANGES
