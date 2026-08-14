@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/alrayyes/washing-instructions/compare/v1.2.0...v1.2.1) (2026-08-14)
+
+### Bug Fixes
+
+* stop the no-iron card repeating itself down the page ([#27](https://github.com/alrayyes/washing-instructions/issues/27)) ([da99fef](https://github.com/alrayyes/washing-instructions/commit/da99fefe13a107ca301994af04eb87a4afdb42f9))
+
 ## [1.2.0](https://github.com/alrayyes/washing-instructions/compare/v1.1.1...v1.2.0) (2026-08-13)
 
 ### Features
