@@ -23,7 +23,7 @@ import {
   washGroups,
 } from "./mixing";
 import { theme } from "./theme";
-import { durationsOf, type ResolvedInstruction, type Variant } from "./types";
+import { beyondDoNotIron, durationsOf, type ResolvedInstruction, type Variant } from "./types";
 
 const { colour, font } = theme;
 
@@ -278,37 +278,42 @@ function IronCard({
       </View>
 
       <View style={{ marginTop: 4 }}>
-        <SectionHeading>How</SectionHeading>
-        {group.map((member) => (
-          <View
-            key={member.clothingType}
-            style={{ flexDirection: "row", alignItems: "flex-start", marginTop: 1.5 }}
-          >
-            <Text
-              style={{
-                fontFamily: font.bold,
-                fontSize: 7.4,
-                lineHeight: 1.35,
-                color: colour.ink,
-                width: compact ? 74 : 112,
-                paddingRight: 4,
-              }}
+        <SectionHeading>{setting ? "How" : "Never these"}</SectionHeading>
+        {group.map((member) => {
+          // On the no-iron card the heading has said it already, so only a
+          // reason earns the second column. Elsewhere the line is the point.
+          const note = setting ? member.ironing : beyondDoNotIron(member.ironing);
+          return (
+            <View
+              key={member.clothingType}
+              style={{ flexDirection: "row", alignItems: "flex-start", marginTop: 1.5 }}
             >
-              {member.clothingType}
-            </Text>
-            <Text
-              style={{
-                fontFamily: font.sans,
-                fontSize: 7.4,
-                lineHeight: 1.35,
-                color: colour.body,
-                flex: 1,
-              }}
-            >
-              {member.ironing === "" ? "—" : member.ironing}
-            </Text>
-          </View>
-        ))}
+              <Text
+                style={{
+                  fontFamily: font.bold,
+                  fontSize: 7.4,
+                  lineHeight: 1.35,
+                  color: colour.ink,
+                  width: compact ? 74 : 112,
+                  paddingRight: 4,
+                }}
+              >
+                {member.clothingType}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: font.sans,
+                  fontSize: 7.4,
+                  lineHeight: 1.35,
+                  color: colour.body,
+                  flex: 1,
+                }}
+              >
+                {note}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -568,7 +573,13 @@ function summaryColumns(machine: Machine, variant: Variant): Column[] {
         width: 34,
         value: (i) => (ironSetting(machine, i.ironSetting)?.steam ? "yes" : "—"),
       },
-      { label: "How", width: 295, value: (i) => gist(i.ironing) },
+      {
+        label: "Why not / how",
+        width: 295,
+        // Same rule as the card: the Thermostat column beside this one already
+        // reads "do not iron", so a cell repeating it is a cell of noise.
+        value: (i) => gist(i.ironSetting === NO_IRON ? beyondDoNotIron(i.ironing) : i.ironing),
+      },
     ];
   }
 
