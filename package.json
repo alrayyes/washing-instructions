@@ -9,6 +9,7 @@
     "prepare": "lefthook install",
     "generate": "bun run src/cli.ts",
     "examples": "bun run src/cli.ts data/washing-instructions.csv.dist --machine data/machine.json.dist --out docs",
+    "screenshots": "bun run scripts/screenshots.ts",
     "test": "bun test",
     "schema": "bun run scripts/csv-schema.ts",
     "lint:data": "bun run scripts/validate-csv.ts",

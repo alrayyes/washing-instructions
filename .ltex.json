@@ -5,14 +5,14 @@
       "AIRism",
       "Biome",
       "Bosch",
+      "Dependabot",
       "Easygliss",
       "Fijn",
-      "Dependabot",
       "GitHub",
       "Hiut",
       "Icebreaker",
-      "LTeX",
       "LanguageTool",
+      "LTeX",
       "Serie",
       "Tefal",
       "VarioPerfect",
@@ -26,8 +26,12 @@
       "linted",
       "markdownlint",
       "npm",
+      "pdftoppm",
+      "poppler",
       "postinstall",
       "proselint",
+      "rasterise",
+      "rasteriser",
       "selvedge",
       "typecheck",
       "typechecks"
@@ -38,7 +42,8 @@
       "PASSIVE_VOICE",
       "UPPERCASE_SENTENCE_START",
       "THIS_NNS",
-      "LICENCE_LICENSE_NOUN_SINGULAR"
+      "LICENCE_LICENSE_NOUN_SINGULAR",
+      "OXFORD_SPELLING_Z_NOT_S"
     ]
   }
 }
