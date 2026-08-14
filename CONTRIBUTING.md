@@ -137,6 +137,34 @@ pull request lands to decide the next version. `feat:` takes the minor, `fix:`
 the patch, a `BREAKING CHANGE:` footer the major, and a branch of nothing but
 `docs:` and `chore:` releases nothing at all.
 
+**The pull request title matters as much as the commits.** Merges here are
+squashes, so the title is what lands on `main` and the branch commits become
+the body. Give it the same Conventional Commit subject you would give the
+commit, or semantic-release reads a subject with no type, finds nothing
+releasable and skips the version without failing. That is not hypothetical:
+it is how the split sheets reached `main` with no release behind them.
+
+One change per pull request. If the title needs an "and", it is two.
+
+### Labels
+
+Every issue and pull request takes two, so the list is still searchable in six
+months. What it is:
+
+- `bug`, `enhancement`, `documentation`, `chore` — the same split the commit
+  types make.
+
+And where it lands:
+
+- `topic/pdf` — rendering, layout and page fitting
+- `topic/chart` — the instruction CSV and the mixing rules
+- `topic/appliances` — the machine file and what it validates
+- `topic/release` — CI, hooks, semantic-release and the image
+- `topic/docs` — this file, the README and the prose linters
+
+Reach for an existing one before inventing a label. A taxonomy grown a ticket
+at a time is a filter nobody can use.
+
 ## Releasing
 
 Nobody picks a version. When a pull request lands on `main` and the checks pass,
