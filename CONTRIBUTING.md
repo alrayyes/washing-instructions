@@ -89,7 +89,10 @@ or end-to-end layer:
 - **Acceptance** (`test/generate.test.ts`) — runs the CLI the way you would and
   checks the PDFs that come out: the phone sheet is a single continuous page of
   the right width, the printed one is A4 with the reference sheet first, and the
-  shared-load summary says what it should.
+  shared-load summary says what it should. It reads the ink too. The split
+  sheets are defined by what they leave out, and the only honest way to check
+  that the washing sheet has stopped drawing the iron is to inflate its content
+  streams and find no iron words in them.
 - **Unit** (`test/csv.test.ts`, `test/mixing.test.ts`) — the validation errors
   and the mixing rules, including that the rules are symmetric and that a group
   only forms when every member is compatible with every other.

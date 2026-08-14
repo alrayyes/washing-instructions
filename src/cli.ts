@@ -4,9 +4,23 @@ import { parseInstructions } from "./csv";
 import { DEFAULT_MACHINE, loadMachine } from "./machine";
 import { cardGroups, loadGroups, resolve } from "./mixing";
 import { renderPhone, renderPrint } from "./render";
+import { durationsOf, type ResolvedInstruction, type Variant } from "./types";
 
 const DEFAULT_CSV = "data/washing-instructions.csv";
 const DEFAULT_OUT = "out";
+
+/**
+ * The three cuts of the chart, and what each adds to a filename.
+ *
+ * Six files out of one run rather than a flag to pick between them: the two
+ * halves are pinned in different rooms, so wanting one is not wanting the
+ * other instead.
+ */
+const SHEETS: { variant: Variant; suffix: string }[] = [
+  { variant: "full", suffix: "" },
+  { variant: "wash", suffix: "-washing" },
+  { variant: "iron", suffix: "-ironing" },
+];
 
 function usage(): string {
   return [
@@ -14,7 +28,7 @@ function usage(): string {
     "",
     `  csv               instruction CSV to read (default: ${DEFAULT_CSV},`,
     "                    falling back to the committed .dist)",
-    `  --out <dir>       where the PDFs go (default: ${DEFAULT_OUT})`,
+    `  --out <dir>       where the six PDFs go (default: ${DEFAULT_OUT})`,
     `  --machine <file>  the appliances to draw (default: ${DEFAULT_MACHINE},`,
     "                    falling back to the committed .dist)",
   ].join("\n");
@@ -87,36 +101,42 @@ async function main(argv: string[]): Promise<void> {
 
   await mkdir(out, { recursive: true });
   const stem = outputStem(csv);
-  const phonePath = join(out, `${stem}-phone.pdf`);
-  const printPath = join(out, `${stem}-print.pdf`);
 
-  const [phone, print] = await Promise.all([
-    renderPhone(items, machine),
-    renderPrint(items, machine),
-  ]);
-  await Promise.all([writeFile(phonePath, phone.pdf), writeFile(printPath, print)]);
+  const written = await Promise.all(
+    SHEETS.flatMap(({ variant, suffix }) => [
+      (async () => {
+        const path = join(out, `${stem}-phone${suffix}.pdf`);
+        const phone = await renderPhone(items, machine, variant);
+        await writeFile(path, phone.pdf);
+        return `${path}  one page, ${Math.round(phone.height)} pt tall (${phone.attempts} layout passes)`;
+      })(),
+      (async () => {
+        const path = join(out, `${stem}-print${suffix}.pdf`);
+        await writeFile(path, await renderPrint(items, machine, variant));
+        return path;
+      })(),
+    ]),
+  );
 
   const groups = loadGroups(items).filter((group) => group.length > 1);
   const merged = cardGroups(items).filter((group) => group.length > 1);
+  const names = (group: ResolvedInstruction[]) =>
+    group.map((item) => item.clothingType).join(" + ");
 
   console.log(`Read ${items.length} piles from ${resolvePath(csv)}`);
   console.log(`  drawn for ${machine.washer.name} · ${machine.iron.name}`);
-  console.log(
-    `  ${phonePath}  one page, ${Math.round(phone.height)} pt tall ` +
-      `(${phone.attempts} layout passes)`,
-  );
-  console.log(`  ${printPath}`);
+  for (const line of written) console.log(`  ${line}`);
   if (groups.length > 0) {
     console.log("\nPiles that can share a drum:");
+    // Padded so the run times line up, which is the column you read down.
+    const width = Math.max(...groups.map((group) => names(group).length));
     for (const group of groups) {
-      console.log(`  ${group.map((item) => item.clothingType).join(" + ")}`);
+      console.log(`  ${names(group).padEnd(width)}  ${durationsOf(group)}`);
     }
   }
   if (merged.length > 0) {
     console.log("\nSet up identically on both appliances, so sharing one card:");
-    for (const group of merged) {
-      console.log(`  ${group.map((item) => item.clothingType).join(" + ")}`);
-    }
+    for (const group of merged) console.log(`  ${names(group)}`);
   }
 }
 

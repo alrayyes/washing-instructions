@@ -1,21 +1,34 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { PDFDocument } from "pdf-lib";
 import { PhoneDocument, PrintDocument, ReferenceDocument } from "./documents";
-import type { Machine } from "./machine";
-import type { ResolvedInstruction } from "./types";
+import { ironSettingKeys, type Machine } from "./machine";
+import { ironGroups, washGroups } from "./mixing";
+import type { ResolvedInstruction, Variant } from "./types";
 
 async function pageCount(pdf: Uint8Array): Promise<number> {
   return (await PDFDocument.load(pdf)).getPageCount();
 }
 
-/** Rough first guess at the phone sheet's height, refined by measurement. */
-function guessHeight(items: ResolvedInstruction[]): number {
-  const prose = items.reduce(
-    (total, item) =>
-      total + item.detergent.length + item.ironing.length + item.drying.length + item.notes.length,
-    0,
-  );
-  return 260 + items.length * 250 + prose * 0.35;
+/**
+ * Rough first guess at the phone sheet's height, refined by measurement.
+ *
+ * Only a starting point for the search below, so it is allowed to be wrong —
+ * but a guess that is wrong by a factor costs passes at both ends, and the
+ * split sheets carry a fraction of what the full one does.
+ */
+function guessHeight(items: ResolvedInstruction[], machine: Machine, variant: Variant): number {
+  const length = (pick: (item: ResolvedInstruction) => string) =>
+    items.reduce((total, item) => total + pick(item).length, 0);
+
+  if (variant === "iron") {
+    const cards = ironGroups(items, ironSettingKeys(machine)).length;
+    return 200 + cards * 110 + items.length * 12 + length((item) => item.ironing) * 0.35;
+  }
+
+  const prose =
+    length((item) => item.detergent) + length((item) => item.drying) + length((item) => item.notes);
+  if (variant === "wash") return 260 + washGroups(items).length * 190 + prose * 0.35;
+  return 260 + items.length * 250 + (prose + length((item) => item.ironing)) * 0.35;
 }
 
 export interface PhoneRender {
@@ -35,9 +48,11 @@ export interface PhoneRender {
 export async function renderPhone(
   items: ResolvedInstruction[],
   machine: Machine,
+  variant: Variant = "full",
   tolerance = 8,
 ): Promise<PhoneRender> {
-  const render = (height: number) => renderToBuffer(PhoneDocument({ items, height, machine }));
+  const render = (height: number) =>
+    renderToBuffer(PhoneDocument({ items, height, machine, variant }));
   let attempts = 0;
 
   const fits = async (height: number) => {
@@ -47,7 +62,7 @@ export async function renderPhone(
   };
 
   let tooShort = 0;
-  let height = Math.ceil(guessHeight(items));
+  let height = Math.ceil(guessHeight(items, machine, variant));
   let best: { pdf: Uint8Array; height: number } | null = null;
 
   for (let step = 0; step < 12 && best === null; step += 1) {
@@ -93,10 +108,11 @@ const TIGHTEST = 0.7;
 async function fittingDensity(
   items: ResolvedInstruction[],
   machine: Machine,
+  variant: Variant,
   tolerance = 0.02,
 ): Promise<number> {
   const fits = async (density: number) => {
-    const pdf = await renderToBuffer(ReferenceDocument({ items, machine, density }));
+    const pdf = await renderToBuffer(ReferenceDocument({ items, machine, density, variant }));
     return (await pageCount(pdf)) === 1;
   };
 
@@ -119,8 +135,14 @@ async function fittingDensity(
 export async function renderPrint(
   items: ResolvedInstruction[],
   machine: Machine,
+  variant: Variant = "full",
 ): Promise<Uint8Array> {
   return renderToBuffer(
-    PrintDocument({ items, machine, density: await fittingDensity(items, machine) }),
+    PrintDocument({
+      items,
+      machine,
+      variant,
+      density: await fittingDensity(items, machine, variant),
+    }),
   );
 }

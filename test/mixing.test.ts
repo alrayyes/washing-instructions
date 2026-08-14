@@ -1,5 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { canMix, cardGroups, loadGroups, mixBlocker, resolve } from "../src/mixing";
+import {
+  canMix,
+  cardGroups,
+  ironGroups,
+  loadGroups,
+  mixBlocker,
+  resolve,
+  washGroups,
+} from "../src/mixing";
 import type { Instruction } from "../src/types";
 
 function pile(overrides: Partial<Instruction> = {}): Instruction {
@@ -137,6 +145,69 @@ describe("cardGroups", () => {
       pile({ clothingType: "C", temperature: "60" }),
     ];
     expect(cardGroups(items).flat()).toHaveLength(items.length);
+  });
+});
+
+describe("washGroups", () => {
+  test("merges piles the iron would have split", () => {
+    const groups = washGroups([
+      pile({ clothingType: "Dark", ironSetting: "2" }),
+      pile({ clothingType: "Black Socks", ironSetting: "none" }),
+      pile({ clothingType: "Denim", ironSetting: "3" }),
+    ]);
+    expect(groups).toHaveLength(1);
+  });
+
+  test("still splits on anything you set on the machine", () => {
+    const groups = washGroups([
+      pile({ clothingType: "A" }),
+      pile({ clothingType: "B", fabricSoftener: true }),
+    ]);
+    expect(groups).toHaveLength(2);
+  });
+});
+
+describe("ironGroups", () => {
+  const order = ["min", "1", "2", "3", "none"];
+
+  test("gathers the piles that go at one thermostat position", () => {
+    const groups = ironGroups(
+      [
+        pile({ clothingType: "Socks", ironSetting: "none" }),
+        pile({ clothingType: "Merino", ironSetting: "2", temperature: "30" }),
+        pile({ clothingType: "Cashmere", ironSetting: "2", program: "Wol" }),
+      ],
+      order,
+    );
+    expect(groups.map((group) => group.map((item) => item.clothingType))).toEqual([
+      ["Merino", "Cashmere"],
+      ["Socks"],
+    ]);
+  });
+
+  test("runs coolest first and leaves do-not-iron until last", () => {
+    const groups = ironGroups(
+      [
+        pile({ clothingType: "Never", ironSetting: "none" }),
+        pile({ clothingType: "Hot", ironSetting: "3" }),
+        pile({ clothingType: "Cool", ironSetting: "1" }),
+      ],
+      order,
+    );
+    expect(groups.map((group) => (group[0] as Instruction).ironSetting)).toEqual([
+      "1",
+      "3",
+      "none",
+    ]);
+  });
+
+  test("keeps every pile exactly once", () => {
+    const items = [
+      pile({ clothingType: "A", ironSetting: "1" }),
+      pile({ clothingType: "B", ironSetting: "none" }),
+      pile({ clothingType: "C", ironSetting: "1" }),
+    ];
+    expect(ironGroups(items, order).flat()).toHaveLength(items.length);
   });
 });
 
