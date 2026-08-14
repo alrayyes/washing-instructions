@@ -28,6 +28,7 @@ bun run format             # let Prettier lay the Markdown and YAML out
 bun run lint:prose:advice  # Vale's style advice, warnings and all
 bun test                   # just the tests
 bun run examples           # redraw the PDFs the README links
+bun run screenshots        # re-shoot the PNGs of them (needs poppler)
 ```
 
 `out/` is generated and nothing in it is ever committed. The set under `docs/` is
@@ -36,6 +37,34 @@ the chart, the machine file or anything that draws, and `bun test` fails until
 `bun run examples` has run. That command names both `.dist` files rather than
 letting the CLI pick, because the defaults prefer your own appliances and an
 example in the repository is the last place they should turn up.
+
+### The screenshots
+
+`bun run screenshots` re-shoots the seven PNGs the README shows, from the PDFs
+under `docs/`. Run it after `bun run examples` whenever what they show changes:
+
+```sh
+bun run examples      # redraw the PDFs
+bun run screenshots   # then re-shoot the pictures of them
+```
+
+It needs **poppler** for `pdftoppm`, which is a system package rather than a Bun
+one — `pacman -S poppler`, `apt install poppler-utils`, `brew install poppler`.
+ImageMagick is deliberately not involved: `pdftoppm` crops on its own, and one
+dependency beats two.
+
+CI cannot rasterise a PDF, so it cannot run that command. It checks the result
+instead. Every shot records a hash of the PDF page it was taken from in
+`docs/screenshots.json`, and `test/screenshots.test.ts` compares those against
+the PDFs as they stand. Change the chart and the test goes red until the
+screenshots are re-shot. That is a hash rather than a file timestamp on purpose:
+git does not preserve modification times, so a timestamp check means nothing
+on a fresh clone.
+
+`scripts/screenshots.ts` holds the shot list, and the dpi in it is load-bearing.
+150 dpi over the 244 pt phone page gives the 509 px width the README's `width=`
+attributes are set against, and 110 dpi over an A4 gives 910×1287. Change one
+and the picture renders at a different scale.
 
 Two formatters, split by file type and never overlapping. Biome owns everything
 it supports; Markdown and YAML are what it does not format, so those go to
@@ -96,6 +125,10 @@ or end-to-end layer:
 - **Unit** (`test/csv.test.ts`, `test/mixing.test.ts`) — the validation errors
   and the mixing rules, including that the rules are symmetric and that a group
   only forms when every member is compatible with every other.
+- **Staleness** (`test/screenshots.test.ts`) — that the committed PNGs were shot
+  from the PDFs as they currently stand. It compares recorded hashes rather than
+  pixels, so it needs nothing extra installed and runs wherever the rest of the
+  suite does.
 
 ## The git hooks
 

@@ -44,21 +44,33 @@ It also answers the question that actually causes arguments: what can go in
 together. Piles are grouped into loads, each card names its bedfellows, and the
 printed sheet carries a full compatibility matrix with the reason for every no.
 
-| The phone sheet, from the top                                                                                                                 | A card from the printable set                                                                                                                                                            |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/phone.png" alt="The top of the phone PDF: a loads table, a note explaining the dial drawings, and the first card" width="260"> | <img src="docs/print-card.png" alt="An A4 page of the printable PDF showing two cards, each with a programme dial, temperature and spin chips, and an iron thermostat ring" width="420"> |
+| The phone sheet, from the top                                                                                                                                                   | A card from the printable set                                                                                                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/phone.png" alt="The top of the phone PDF: a loads table with a run time against each load, a note explaining the dial drawings, and the first card" width="260"> | <img src="docs/print-card.png" alt="An A4 page of the printable PDF showing two cards, each with a programme dial and temperature and spin chips, one pointing the iron's thermostat at a setting and one crossing the ring out" width="420"> |
 
-Both are the committed example chart, not anyone's real laundry. The PDFs
-themselves are here too, so you can read the whole thing rather than a picture
-of the top of it, all drawn for the generic appliances in
-`data/machine.json.dist`:
+That is the committed example chart, not anyone's real laundry. Every sheet it
+draws is here to open, so you can read the whole thing rather than a picture of
+the top of it. All six come from the generic appliances in
+`data/machine.json.dist`.
 
-- The phone sheet: [the lot](docs/washing-instructions-phone.pdf),
-  [washing](docs/washing-instructions-phone-washing.pdf),
-  [ironing](docs/washing-instructions-phone-ironing.pdf).
-- The printable set: [the lot](docs/washing-instructions-print.pdf),
-  [washing](docs/washing-instructions-print-washing.pdf),
-  [ironing](docs/washing-instructions-print-ironing.pdf).
+**On the phone**, top of each sheet:
+
+<p>
+  <a href="docs/washing-instructions-phone.pdf"><img src="docs/phone.png" alt="The phone sheet: loads, the dial legend and the first card" width="150"></a>
+  <a href="docs/washing-instructions-phone-washing.pdf"><img src="docs/phone-washing.png" alt="The washing-only phone sheet, with no iron on the cards" width="150"></a>
+  <a href="docs/washing-instructions-phone-ironing.pdf"><img src="docs/phone-ironing.png" alt="The ironing-only phone sheet, one card per thermostat position" width="150"></a>
+</p>
+
+**Printable**, the reference sheet each one opens with:
+
+<p>
+  <a href="docs/washing-instructions-print.pdf"><img src="docs/print.png" alt="The reference sheet: loads, an at-a-glance table and the compatibility matrix" width="200"></a>
+  <a href="docs/washing-instructions-print-washing.pdf"><img src="docs/print-washing.png" alt="The washing-only reference sheet, with no iron column" width="200"></a>
+  <a href="docs/washing-instructions-print-ironing.pdf"><img src="docs/print-ironing.png" alt="The ironing-only reference sheet, every pile against its thermostat position" width="200"></a>
+</p>
+
+Every picture is a link to the PDF it came out of. The printable ones open on
+the reference sheet; the detail cards follow it.
 
 A test redraws all six and compares them page by page against what is
 committed, so the one you open is what the current chart draws, not what it
