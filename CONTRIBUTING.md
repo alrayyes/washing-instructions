@@ -177,6 +177,11 @@ commit, or semantic-release reads a subject with no type, finds nothing
 releasable and skips the version without failing. That is not hypothetical:
 it is how the split sheets reached `main` with no release behind them.
 
+The `pr-title` job holds you to it, running the same commitlint and the same
+config the `commits` job uses. It has a workflow of its own because it re-runs
+on `edited`, so retitling rechecks the pull request — putting that trigger on
+`ci.yml` would rebuild the container image every time a typo got fixed.
+
 One change per pull request. If the title needs an "and", it is two.
 
 ### Labels
