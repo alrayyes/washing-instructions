@@ -268,30 +268,40 @@ disagrees with the parser.
 
 Filling in fifteen rows of care advice from scratch is the tedious part, and it
 is the part a language model is genuinely good at. Paste it the dist file as the
-format, the list of programmes and settings out of `src/machine.ts` as the only
-values it may use, and a description of what you actually own — a flat share
-with two sets of bed linen and a lot of running kit is a different chart from a
-household with school uniforms.
+format, your `data/machine.json` as the only values it may use, and a
+description of what you actually own — a flat share with two sets of bed linen
+and a lot of running kit is a different chart from a household with school
+uniforms.
+
+Give it the machine file whole rather than retyping the lists out of it. Every
+value it is allowed to write is in there, and it is the same file the validator
+will judge the answer against.
 
 Something like this works:
 
 ```text
-Here is a CSV format and an example row. Write me one row per pile for the
-laundry I describe. Only use these programmes: <paste washer.programs>. Only
-these temperatures: <paste>. Only these spin speeds: <paste>. Only these option
-buttons: <paste>. iron_setting must be one of none, min, 1, 2, 3, max.
+Here is a CSV format with an example row, and the JSON file describing my
+appliances. Write me one row per pile for the laundry I describe.
+
+Every machine-facing value has to come out of that file: program from
+washer.programs, temperature from washer.temperatures, spin from washer.spins,
+options from washer.options, and iron_setting from an iron.settings key or the
+word none. Spell them exactly as they appear there.
+
+duration is roughly how long that programme runs on my machine, as ~H:MM.
 
 My laundry: <describe it — fabrics, colours, what you own a lot of, what you
 line dry, anything with a care label you actually follow>.
 ```
 
 Two things to do with the answer. Run it: the CSV validator checks every
-machine-facing value against `src/machine.ts`, so an invented programme name
-fails the run rather than reaching a PDF. Then read it: a model will state a
-wash temperature with total confidence and be wrong, so check anything that
-would ruin a garment — wool, silk, anything with elastane — against the care
-label or the maker's own guidance before you trust the chart taped to your
-machine.
+machine-facing value against the machine file you load, so an invented
+programme name fails the run rather than reaching a PDF. Then read it: a model
+will state a wash temperature with total confidence and be wrong, so check
+anything that would ruin a garment — wool, silk, anything with elastane —
+against the care label or the maker's own guidance before you trust the chart
+taped to your machine. The durations are guesses too, and yours are on the
+display.
 
 ### How "can these wash together" is decided
 
@@ -359,6 +369,49 @@ machine is refused by another rather than silently drawn wrong:
 ```text
 row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
 ```
+
+### Let a chatbot read your machine off a photo
+
+Typing out sixteen dial labels in a language you may not read is the tedious
+part, and you do not have to. Take a photo of the fascia and a photo of the
+iron's thermostat ring, paste them to a chatbot along with
+[`data/machine.schema.json`](data/machine.schema.json) and the `.dist` file as
+the format, and ask for the same file for your appliances.
+
+A photo beats describing it here, and for a reason specific to this tool. The
+order of `programs` is load-bearing — every tick's angle comes from where it
+sits in the list — and a photo has that order in it. Describe the same dial in
+words, and you will almost certainly list the programmes in an order that makes
+sense rather than the order they go round.
+
+Something like this works:
+
+```text
+Attached is a photo of my washing machine's fascia and one of my iron's
+thermostat, plus a JSON schema and an example file. Write me the same file for
+these appliances.
+
+Copy every label exactly as printed, in whatever language it is in. Do not
+translate any of them into English, and do not tidy up the spelling or the
+punctuation.
+
+washer.programs is the dial, listed in the order the positions go round it,
+starting at the off position. Read that order off the dial rather than
+grouping the programmes sensibly.
+```
+
+Then check it against the machine before you run it, because two things go
+wrong. Small or angled text gets misread, so the labels are worth reading back
+one by one. And nothing in a photo says which position is off — the model has
+to guess, and if it guesses wrong every dial in every PDF is rotated. Start at
+the off position and go clockwise yourself.
+
+After that, run it. `parseMachine` refuses a file that is missing a field or
+repeats a programme, and the CSV validator then refuses a chart written for
+your old machine, naming the first row that no longer fits. That second one is
+the useful failure when you replace an appliance: the chart does not silently
+draw the wrong dial, it stops and tells you which rows need new programme
+names.
 
 ## Contributing
 
