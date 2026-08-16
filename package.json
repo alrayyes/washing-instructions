@@ -13,6 +13,7 @@
     "test": "bun test",
     "schema": "bun run scripts/csv-schema.ts",
     "lint:data": "bun run scripts/validate-csv.ts",
+    "lint:machine": "bun run scripts/validate-machine.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -22,7 +23,7 @@
     "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
     "lint:prose": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' --minAlertLevel=error .",
     "lint:prose:advice": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' .",
-    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run typecheck && bun test"
+    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run lint:machine && bun run typecheck && bun test"
   },
   "trustedDependencies": [
     "lefthook"
