@@ -25,6 +25,7 @@ read the `.dist`; never point them at the other one.
   touching `src/machine.ts` or a test fails on the stale copy
 - `bun run check` — every linter, `tsc --noEmit` and the tests, in that order
 - `bun run lint:data` — check the dummy chart against the generated schema
+- `bun run lint:machine` — check the dummy machine against `data/machine.schema.json`
 - `bun run format` — Prettier over the Markdown and YAML; it owns those and nothing else
 - `bun run prose:sync` — fetch Vale's style packages; needed once before `check` works
 - `bun test test/csv.test.ts` — one file, when iterating

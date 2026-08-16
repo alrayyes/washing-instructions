@@ -377,9 +377,12 @@ display says `cold` or `koud` needs no special case anywhere in the code.
 
 [`data/machine.schema.json`](data/machine.schema.json) describes the file, and
 the `$schema` line at the top of the `.dist` points at it, so an editor will
-complete the fields and complain before the tool does. The CSV validator takes
-its allowed values from whichever machine you load, so a chart written for one
-machine is refused by another rather than silently drawn wrong:
+complete the fields and complain before the tool does. `bun run lint:machine`
+checks the committed `.dist` against it too, so a schema that drifts from the
+file it documents fails the pipeline rather than only misleading an editor. The
+CSV validator takes its allowed values from whichever machine you load, so a
+chart written for one machine is refused by another rather than silently drawn
+wrong:
 
 ```text
 row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
