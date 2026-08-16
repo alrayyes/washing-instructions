@@ -1,3 +1,9 @@
+## [2.2.0](https://github.com/alrayyes/washing-instructions/compare/v2.1.0...v2.2.0) (2026-08-16)
+
+### Features
+
+* validate the machine file against its JSON Schema ([#33](https://github.com/alrayyes/washing-instructions/issues/33)) ([f37993f](https://github.com/alrayyes/washing-instructions/commit/f37993f6914282f513daac6328dc798bc8f2071e)), closes [#32](https://github.com/alrayyes/washing-instructions/issues/32)
+
 ## [2.1.0](https://github.com/alrayyes/washing-instructions/compare/v2.0.0...v2.1.0) (2026-08-14)
 
 ### Features
