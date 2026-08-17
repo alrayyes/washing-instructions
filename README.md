@@ -5,6 +5,7 @@ something real — do not add one that reads "unknown".
 -->
 
 [![check](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml)
+[![Codecov](https://codecov.io/gh/alrayyes/washing-instructions/graph/badge.svg)](https://codecov.io/gh/alrayyes/washing-instructions)
 [![release](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml)
 [![latest release](https://img.shields.io/github/v/release/alrayyes/washing-instructions?sort=semver)](https://github.com/alrayyes/washing-instructions/releases/latest)
 [![licence: GPL v3+](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](LICENSE)
