@@ -44,14 +44,18 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Changes the pipeline, not the artifact - releasing for this is noise.
     commit-message:
-      prefix: chore
+      prefix: ci
       include: scope
 
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly
+    # The base image ships in publish-image.yml's built image, so a bump here
+    # changes what ships whether or not it's security-relevant - same
+    # reasoning as bun's production dependencies above.
     commit-message:
-      prefix: chore
+      prefix: fix
       include: scope
