@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/alrayyes/washing-instructions/compare/v2.2.0...v2.2.1) (2026-08-17)
+
+### Bug Fixes
+
+* **deps:** commit-message prefix for the shipped ecosystem(s) ([#35](https://github.com/alrayyes/washing-instructions/issues/35)) ([4a1d3d9](https://github.com/alrayyes/washing-instructions/commit/4a1d3d9c973ef7ec4de902a6aeee8e90240ffa25))
+
 ## [2.2.0](https://github.com/alrayyes/washing-instructions/compare/v2.1.0...v2.2.0) (2026-08-16)
 
 ### Features
