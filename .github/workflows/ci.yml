@@ -36,7 +36,14 @@ jobs:
       - run: bun run lint:data
       - run: bun run lint:machine
       - run: bun run typecheck
-      - run: bun test
+      # Coverage instrumentation slows the suite down, which is why the
+      # pre-push hook runs plain `bun test` and only CI pays for this.
+      - run: bun test --coverage --coverage-reporter=lcov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          files: coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   # The commit-msg hook already reads every message, but a hook is skippable and
   # these messages are load-bearing: semantic-release reads the Conventional

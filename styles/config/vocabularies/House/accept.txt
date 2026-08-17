@@ -3,6 +3,7 @@ Biome
 Bosch
 Bun
 Cloudflare
+Codecov
 Easygliss
 Dependabot
 GitHub
