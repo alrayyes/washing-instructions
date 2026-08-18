@@ -16,6 +16,7 @@
       "Serie",
       "Tefal",
       "VarioPerfect",
+      "Washy",
       "WinAnsi",
       "Zijde",
       "activewear",
@@ -34,7 +35,8 @@
       "rasteriser",
       "selvedge",
       "typecheck",
-      "typechecks"
+      "typechecks",
+      "washy"
     ]
   },
   "disabledRules": {
@@ -43,7 +45,8 @@
       "UPPERCASE_SENTENCE_START",
       "THIS_NNS",
       "LICENCE_LICENSE_NOUN_SINGULAR",
-      "OXFORD_SPELLING_Z_NOT_S"
+      "OXFORD_SPELLING_Z_NOT_S",
+      "ENGLISH_WORD_REPEAT_RULE"
     ]
   }
 }

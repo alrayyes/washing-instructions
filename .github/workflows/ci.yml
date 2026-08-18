@@ -128,7 +128,7 @@ jobs:
           context: .
           push: false
           load: true
-          tags: washing-instructions:ci
+          tags: washy-washy:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
       # The build proving it compiles is worth less than the run proving it
@@ -144,7 +144,7 @@ jobs:
       - name: Generate from the bundled chart
         run: |
           mkdir -p out
-          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/out:/out" washing-instructions:ci
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/out:/out" washy-washy:ci
           test -s out/washing-instructions-phone.pdf
           test -s out/washing-instructions-print.pdf
 
@@ -161,6 +161,6 @@ jobs:
       - run: bun run generate
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: washing-instructions-pdfs
+          name: washy-washy-pdfs
           path: out/
           retention-days: 30

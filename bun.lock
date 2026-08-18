@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "washing-instructions",
+      "name": "washy-washy",
       "dependencies": {
         "@react-pdf/renderer": "4.6.0",
         "csv-parse": "7.0.2",
