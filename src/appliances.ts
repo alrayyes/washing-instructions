@@ -1,5 +1,5 @@
+import type { Machine } from "@washy-washy/core";
 import { createContext, useContext } from "react";
-import type { Machine } from "./machine";
 
 /**
  * The machine every drawing is measured against, handed down the tree rather

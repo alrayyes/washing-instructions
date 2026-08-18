@@ -11,6 +11,7 @@ FROM oven/bun:1.3.14-alpine@sha256:5acc90a93e91ff07bf72aa90a7c9f0fa189765aec90b4
 
 WORKDIR /app
 COPY package.json bun.lock ./
+COPY packages/core/package.json ./packages/core/package.json
 RUN bun install --frozen-lockfile --production --ignore-scripts
 
 FROM oven/bun:1.3.14-alpine@sha256:5acc90a93e91ff07bf72aa90a7c9f0fa189765aec90b47bdbf2152d2196383c0 AS runtime
@@ -20,6 +21,7 @@ WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
 COPY src ./src
+COPY packages ./packages
 # The committed dummy chart and the committed example appliances, so
 # `docker run` with nothing mounted still produces something to look at. Your
 # own versions of both are gitignored and never in the image; mount them over

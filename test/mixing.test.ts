@@ -2,13 +2,13 @@ import { describe, expect, test } from "bun:test";
 import {
   canMix,
   cardGroups,
+  type Instruction,
   ironGroups,
   loadGroups,
   mixBlocker,
   resolve,
   washGroups,
-} from "../src/mixing";
-import type { Instruction } from "../src/types";
+} from "@washy-washy/core";
 
 function pile(overrides: Partial<Instruction> = {}): Instruction {
   return {

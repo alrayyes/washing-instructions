@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { DIST_MACHINE } from "@washy-washy/core";
 import { SCHEMA_PATH, tableSchema } from "../scripts/csv-schema";
-import { DIST_MACHINE, loadMachine } from "../src/machine";
+import { loadMachine } from "../src/machine";
 
 const machine = await loadMachine(DIST_MACHINE);
 const { washer } = machine;

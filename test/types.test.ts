@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { Instruction } from "../src/types";
-import { durationsOf } from "../src/types";
+import { durationsOf, type Instruction } from "@washy-washy/core";
 
 function pile(overrides: Partial<Instruction> = {}): Instruction {
   return {

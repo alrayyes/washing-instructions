@@ -5,6 +5,9 @@
   "type": "module",
   "private": true,
   "license": "GPL-3.0-or-later",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "prepare": "lefthook install",
     "generate": "bun run src/cli.ts",
@@ -30,6 +33,7 @@
   ],
   "dependencies": {
     "@react-pdf/renderer": "4.6.1",
+    "@washy-washy/core": "workspace:*",
     "csv-parse": "7.0.2",
     "generate": "^0.14.0",
     "pdf-lib": "1.17.1",

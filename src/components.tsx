@@ -1,8 +1,7 @@
 import { Circle, G, Line, Path, Svg, Text, View } from "@react-pdf/renderer";
+import { type Instruction, ironSetting } from "@washy-washy/core";
 import { useMachine } from "./appliances";
-import { ironSetting } from "./machine";
 import { theme } from "./theme";
-import type { Instruction } from "./types";
 
 const { colour, font } = theme;
 

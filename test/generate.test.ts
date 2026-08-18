@@ -3,10 +3,9 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { inflateSync } from "node:zlib";
+import { cardGroups, DIST_MACHINE, parseInstructions } from "@washy-washy/core";
 import { PDFDocument, PDFName, PDFRawStream } from "pdf-lib";
-import { parseInstructions } from "../src/csv";
-import { DIST_MACHINE, loadMachine } from "../src/machine";
-import { cardGroups } from "../src/mixing";
+import { loadMachine } from "../src/machine";
 
 // The committed dummy chart, not `data/washing-instructions.csv` — that one is
 // gitignored, so on a fresh clone and in CI it is not there to read.
