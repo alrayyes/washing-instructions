@@ -1,4 +1,22 @@
 import { Document, Page, Text, View } from "@react-pdf/renderer";
+import {
+  type Blocker,
+  blockerCode,
+  blockerLegend,
+  canMix,
+  cardGroups,
+  durationsOf,
+  formatTemperature,
+  ironGroups,
+  ironSetting,
+  ironSettingKeys,
+  loadGroups,
+  type Machine,
+  mixBlocker,
+  type ResolvedInstruction,
+  type Variant,
+  washGroups,
+} from "@washy-washy/core";
 import { ApplianceContext, useMachine } from "./appliances";
 import {
   ControlPanel,
@@ -9,21 +27,7 @@ import {
   SoftenerBadge,
   SplitField,
 } from "./components";
-import type { Machine } from "./machine";
-import { formatTemperature, ironSetting, ironSettingKeys } from "./machine";
-import {
-  type Blocker,
-  blockerCode,
-  blockerLegend,
-  canMix,
-  cardGroups,
-  ironGroups,
-  loadGroups,
-  mixBlocker,
-  washGroups,
-} from "./mixing";
 import { theme } from "./theme";
-import { durationsOf, type ResolvedInstruction, type Variant } from "./types";
 
 const { colour, font } = theme;
 

@@ -1,9 +1,14 @@
 import { renderToBuffer } from "@react-pdf/renderer";
+import {
+  ironGroups,
+  ironSettingKeys,
+  type Machine,
+  type ResolvedInstruction,
+  type Variant,
+  washGroups,
+} from "@washy-washy/core";
 import { PDFDocument } from "pdf-lib";
 import { PhoneDocument, PrintDocument, ReferenceDocument } from "./documents";
-import { ironSettingKeys, type Machine } from "./machine";
-import { ironGroups, washGroups } from "./mixing";
-import type { ResolvedInstruction, Variant } from "./types";
 
 async function pageCount(pdf: Uint8Array): Promise<number> {
   return (await PDFDocument.load(pdf)).getPageCount();

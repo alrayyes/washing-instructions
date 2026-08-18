@@ -1,9 +1,8 @@
 import { describe, expect, test } from "bun:test";
+import { DIST_MACHINE, type Instruction, resolve } from "@washy-washy/core";
 import { PDFDocument, PDFName, PDFRawStream } from "pdf-lib";
-import { DIST_MACHINE, loadMachine } from "../src/machine";
-import { resolve } from "../src/mixing";
+import { loadMachine } from "../src/machine";
 import { renderPrint } from "../src/render";
-import type { Instruction } from "../src/types";
 
 function pile(index: number): Instruction {
   return {

@@ -16,8 +16,14 @@
  * constraints, is a plain JSON object an editor can read, and has validators
  * that take a CSV and the schema and tell you which row is wrong.
  */
-import { DIST_MACHINE, ironSettingKeys, loadMachine, type Machine } from "../src/machine";
-import { colourGroups, mixTags } from "../src/types";
+import {
+  colourGroups,
+  DIST_MACHINE,
+  ironSettingKeys,
+  type Machine,
+  mixTags,
+} from "@washy-washy/core";
+import { loadMachine } from "../src/machine";
 
 export const SCHEMA_PATH = "data/washing-instructions.schema.json";
 

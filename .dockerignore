@@ -1,9 +1,11 @@
-# The build needs the manifest, the lockfile, src/ and the dummy chart. Keeping
-# everything else out means a docs edit does not invalidate the dependency layer.
+# The build needs the manifest, the lockfile, src/, the packages/ workspace
+# and the dummy chart. Keeping everything else out means a docs edit does not
+# invalidate the dependency layer.
 *
 
 !package.json
 !bun.lock
 !src
+!packages
 !data/washing-instructions.csv.dist
 !data/machine.json.dist

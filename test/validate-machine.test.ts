@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { DIST_MACHINE } from "@washy-washy/core";
 import { type JsonSchemaShape, SCHEMA_PATH, validateMachine } from "../scripts/validate-machine";
-import { DIST_MACHINE } from "../src/machine";
 
 const schema = (await Bun.file(SCHEMA_PATH).json()) as JsonSchemaShape;
 const machine = (await Bun.file(DIST_MACHINE).json()) as Record<string, unknown>;

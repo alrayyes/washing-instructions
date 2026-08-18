@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { DIST_MACHINE } from "@washy-washy/core";
 import { SCHEMA_PATH } from "../scripts/csv-schema";
 import { type TableSchemaShape, validateCsv } from "../scripts/validate-csv";
-import { DIST_MACHINE } from "../src/machine";
 
 const CHART = "data/washing-instructions.csv.dist";
 

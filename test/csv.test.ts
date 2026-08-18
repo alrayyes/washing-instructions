@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { parseInstructions } from "../src/csv";
-import { DIST_MACHINE, loadMachine } from "../src/machine";
+import { chartFromJson, chartToJson, DIST_MACHINE, parseInstructions } from "@washy-washy/core";
+import { SCHEMA_PATH } from "../scripts/csv-schema";
+import type { TableSchemaShape } from "../scripts/validate-csv";
+import { loadMachine } from "../src/machine";
 
 const machine = await loadMachine(DIST_MACHINE);
 
@@ -149,5 +151,33 @@ describe("parseInstructions", () => {
         parseInstructions(csv(ROW.replace(",yes,Inside out,2", ",maybe,Inside out,2")), machine),
       ).toThrow(/column "ironing".*yes\/no/);
     });
+  });
+});
+
+describe("the JSON chart format", () => {
+  test("round-trips a chart without losing or changing anything", () => {
+    const original = parseInstructions(csv(), machine);
+    const roundTripped = chartFromJson(chartToJson(original), machine);
+    expect(roundTripped).toEqual(original);
+  });
+
+  test("writes rows shaped like the committed schema", async () => {
+    const schema = (await Bun.file(SCHEMA_PATH).json()) as TableSchemaShape;
+    const [row] = JSON.parse(chartToJson(parseInstructions(csv(), machine)));
+    expect(Object.keys(row).sort()).toEqual(schema.fields.map((field) => field.name).sort());
+  });
+
+  test("rejects a JSON chart that is not an array", () => {
+    expect(() => chartFromJson("{}", machine)).toThrow(/must be a JSON array/);
+  });
+
+  test("rejects a JSON chart that is not valid JSON", () => {
+    expect(() => chartFromJson("not json", machine)).toThrow(/not valid JSON/);
+  });
+
+  test("applies the same machine-facing validation as the CSV parser", () => {
+    const [row] = JSON.parse(chartToJson(parseInstructions(csv(), machine)));
+    row.program = "Turbo Wash";
+    expect(() => chartFromJson(JSON.stringify([row]), machine)).toThrow(/column "program"/);
   });
 });

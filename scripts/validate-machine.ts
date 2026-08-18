@@ -15,7 +15,7 @@
  * small enough to read in a minute, and a full validator would check drafts
  * and keywords this file never writes.
  */
-import { DIST_MACHINE } from "../src/machine";
+import { DIST_MACHINE } from "@washy-washy/core";
 
 export const SCHEMA_PATH = "data/machine.schema.json";
 

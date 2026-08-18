@@ -1,10 +1,17 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { basename, join, resolve as resolvePath } from "node:path";
-import { parseInstructions } from "./csv";
-import { DEFAULT_MACHINE, loadMachine } from "./machine";
-import { cardGroups, loadGroups, resolve } from "./mixing";
+import {
+  cardGroups,
+  DEFAULT_MACHINE,
+  durationsOf,
+  loadGroups,
+  parseInstructions,
+  type ResolvedInstruction,
+  resolve,
+  type Variant,
+} from "@washy-washy/core";
+import { loadMachine } from "./machine";
 import { renderPhone, renderPrint } from "./render";
-import { durationsOf, type ResolvedInstruction, type Variant } from "./types";
 
 const DEFAULT_CSV = "data/washing-instructions.csv";
 const DEFAULT_OUT = "out";

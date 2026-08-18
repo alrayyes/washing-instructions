@@ -2,7 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DIST_MACHINE, ironSetting, loadMachine, parseMachine } from "../src/machine";
+import { DIST_MACHINE, ironSetting, parseMachine } from "@washy-washy/core";
+import { loadMachine } from "../src/machine";
 
 const MINIMAL = {
   washer: {

@@ -1,0 +1,14 @@
+{
+  "name": "@washy-washy/core",
+  "version": "0.0.0",
+  "description": "Chart parsing, mixing rules and machine validation, shared by the CLI and the web app.",
+  "type": "module",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "csv-parse": "7.0.2"
+  }
+}

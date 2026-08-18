@@ -266,12 +266,12 @@ type, and the values it accepts. Point a validator at the pair and it tells you
 which row is wrong; point an editor at it and you get the programme names in an
 autocomplete rather than in another window.
 
-It is generated, never edited — `src/machine.ts` stays the one authority on the
-appliances, and a second copy of those lists would drift the first time a
-programme is renamed:
+It is generated, never edited — `packages/core/src/machine.ts` stays the one
+authority on the appliances, and a second copy of those lists would drift the
+first time a programme is renamed:
 
 ```sh
-bun run schema   # after changing src/machine.ts
+bun run schema   # after changing packages/core/src/machine.ts
 ```
 
 A test compares the committed file against what the generator produces, so
