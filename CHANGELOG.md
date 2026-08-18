@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/alrayyes/washy-washy/compare/v2.2.2...v2.3.0) (2026-08-18)
+
+### Features
+
+* **web:** scaffold apps/web on Astro with Cloudflare Pages deploy ([#49](https://github.com/alrayyes/washy-washy/issues/49)) ([e9882ab](https://github.com/alrayyes/washy-washy/commit/e9882ab929bc5efc60bedbb00c79fb26165ff4cb))
+
 ## [2.2.2](https://github.com/alrayyes/washy-washy/compare/v2.2.1...v2.2.2) (2026-08-18)
 
 ### Bug Fixes
