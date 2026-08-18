@@ -168,8 +168,19 @@ an image, so there is nothing to build — mount a directory on `/out` and the
 PDFs land there:
 
 ```sh
-docker run --rm -v "$PWD/out:/out" ghcr.io/alrayyes/washy-washy
+docker run --rm \
+  --cap-drop=ALL --security-opt=no-new-privileges --read-only \
+  --memory=256m --cpus=1 \
+  -v "$PWD/out:/out" \
+  ghcr.io/alrayyes/washy-washy
 ```
+
+Nothing in here needs a Linux capability or a writable root filesystem, so it
+costs nothing to ask for none: `--cap-drop=ALL` and `--read-only` need no
+matching `--cap-add` or `tmpfs` mount anywhere in this image, and the memory
+and CPU limits are generous for a job this small. The rest of this section
+drops those flags for readability — they carry through every example below
+unchanged.
 
 `latest` follows the newest release, and every release also answers to its full
 version and to the loose ends of it — `:1.0.0`, `:1.0`, `:1` — so a compose file
