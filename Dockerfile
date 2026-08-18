@@ -12,7 +12,12 @@ FROM oven/bun:1.3.14-alpine@sha256:5acc90a93e91ff07bf72aa90a7c9f0fa189765aec90b4
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY packages/core/package.json ./packages/core/package.json
-RUN bun install --frozen-lockfile --production --ignore-scripts
+# apps/web has to be here too — bun checks every workspace manifest against
+# the lockfile before it will honour --frozen-lockfile, even one this image
+# never uses. --filter is what keeps its dependencies (Astro, its language
+# server) out of the image itself.
+COPY apps/web/package.json ./apps/web/package.json
+RUN bun install --frozen-lockfile --production --ignore-scripts --filter='!@washy-washy/web'
 
 FROM oven/bun:1.3.14-alpine@sha256:5acc90a93e91ff07bf72aa90a7c9f0fa189765aec90b47bdbf2152d2196383c0 AS runtime
 

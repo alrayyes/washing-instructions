@@ -35,7 +35,10 @@ globs:
   - "**/*.md"
 
 ignores:
-  - "node_modules/**"
+  # Not just node_modules/** — that only matches the root's, and a workspace
+  # member with a dependency version the others don't share (apps/web's own
+  # TypeScript, pinned older for astro check) gets its own nested copy.
+  - "**/node_modules/**"
   - "out/**"
   # Vendored by `vale sync`. Generated text belongs to nobody.
   - "styles/Google/**"

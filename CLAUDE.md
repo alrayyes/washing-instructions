@@ -63,6 +63,24 @@ read the `.dist`; never point them at the other one.
 - **A sheet is defined by what it leaves out**, so `test/generate.test.ts`
   inflates the content streams and reads the words back. Adding an iron word to
   the washing sheet fails there, not in review.
+- **`apps/web` pins TypeScript 6.x, not the 7.x the rest of the repo uses.**
+  `astro check` (via `@astrojs/check`) needs the classic Language Service API,
+  which TypeScript's native 7.x compiler doesn't expose yet. Bumping
+  `apps/web`'s `typescript` to match root breaks `bun run check` there with an
+  opaque "does not expose the programmatic API" error.
+- **`biome.json` is strict JSON, not JSONC** — despite `tsconfig.json` and
+  `.releaserc.json` tolerating comments elsewhere in this repo, a `//` in
+  `biome.json` fails to parse and silently falls back to defaults, which then
+  reformats every file in the repo (tabs instead of the configured spaces).
+  Explain a rule choice in this file instead of inline there.
+- **The CLI's `Dockerfile` still needs `apps/web/package.json` copied in**,
+  even though the image never runs the web app — `bun install
+--frozen-lockfile` checks every workspace manifest against the lockfile
+  before it will honour the flag. Adding `--filter='!@washy-washy/web'` to
+  that same command is what actually keeps Astro and its language server out
+  of the image; dropping either half reintroduces the problem it fixes (a
+  failed build, or a CLI image carrying a whole second tool chain it never
+  uses).
 
 ## Conventions
 

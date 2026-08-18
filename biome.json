@@ -1,7 +1,14 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**", "!node_modules", "!out", "!styles/Google", "!styles/proselint"]
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!out",
+      "!styles/Google",
+      "!styles/proselint",
+      "!**/.astro"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -28,5 +35,18 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ]
 }
