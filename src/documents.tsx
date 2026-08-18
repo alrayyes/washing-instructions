@@ -508,7 +508,7 @@ export function PhoneDocument({
 
   return (
     <ApplianceContext.Provider value={machine}>
-      <Document title={`${sheet[variant].title} — phone`} author="washing-instructions">
+      <Document title={`${sheet[variant].title} — phone`} author="washy-washy">
         <Page
           size={{ width: PHONE_WIDTH, height }}
           style={{ padding: 12, backgroundColor: "#fff" }}
@@ -837,7 +837,7 @@ export function ReferenceDocument({
 }) {
   return (
     <ApplianceContext.Provider value={machine}>
-      <Document title={`${sheet[variant].title} — reference`} author="washing-instructions">
+      <Document title={`${sheet[variant].title} — reference`} author="washy-washy">
         <ReferenceSheet items={items} density={density} variant={variant} />
       </Document>
     </ApplianceContext.Provider>
@@ -860,7 +860,7 @@ export function PrintDocument({
 
   return (
     <ApplianceContext.Provider value={machine}>
-      <Document title={`${sheet[variant].title} — print`} author="washing-instructions">
+      <Document title={`${sheet[variant].title} — print`} author="washy-washy">
         <ReferenceSheet items={items} density={density} variant={variant} />
         {/*
         The cards flow onto as many A4 sheets as they need. Each card is

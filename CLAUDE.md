@@ -4,7 +4,7 @@ Keep this short and only about what the code cannot say for itself. The README
 is where the prose explanation lives; this file is the set of traps.
 -->
 
-# washing-instructions
+# washy-washy
 
 Reads `data/washing-instructions.csv` and renders six PDFs: a single tall page
 for the phone and an A4 reference sheet plus detail cards for printing, each in
@@ -18,7 +18,7 @@ read the `.dist`; never point them at the other one.
 - `bun run generate` — write all six PDFs to `out/`
 - `bun run examples` — redraw the six PDFs under `docs/` that the README links,
   from the `.dist` chart and the `.dist` machine
-- `docker build -t washing-instructions . && docker run --rm -v "$PWD/out:/out" washing-instructions`
+- `docker build -t washy-washy . && docker run --rm -v "$PWD/out:/out" washy-washy`
   — the same thing without Bun on the host. CI builds and runs it too, so a
   `Dockerfile` that lints and does not work fails there; releases push it to GHCR
 - `bun run schema` — regenerate `data/washing-instructions.schema.json`; run it after

@@ -1,5 +1,5 @@
 {
-  "name": "washing-instructions",
+  "name": "washy-washy",
   "version": "0.0.0",
   "description": "Turns a CSV of laundry piles into a phone PDF and a printable PDF, drawn for one specific washing machine and iron.",
   "type": "module",

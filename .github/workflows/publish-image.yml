@@ -66,7 +66,7 @@ jobs:
             type=semver,pattern={{major}},value=${{ github.event.release.tag_name || inputs.ref }}
             type=raw,value=latest
           labels: |
-            org.opencontainers.image.title=washing-instructions
+            org.opencontainers.image.title=washy-washy
             org.opencontainers.image.description=Turns a CSV of laundry piles into a phone PDF and a printable PDF, drawn for your own washing machine and iron.
             org.opencontainers.image.licenses=GPL-3.0-or-later
 
