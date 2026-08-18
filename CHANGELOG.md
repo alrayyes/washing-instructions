@@ -1,3 +1,9 @@
+## [2.2.2](https://github.com/alrayyes/washy-washy/compare/v2.2.1...v2.2.2) (2026-08-18)
+
+### Bug Fixes
+
+* **deps:** bump @react-pdf/renderer from 4.6.0 to 4.6.1 ([a1f208d](https://github.com/alrayyes/washy-washy/commit/a1f208d6429991ba2713b5c1c136fa57d050157a))
+
 ## [2.2.1](https://github.com/alrayyes/washing-instructions/compare/v2.2.0...v2.2.1) (2026-08-17)
 
 ### Bug Fixes
