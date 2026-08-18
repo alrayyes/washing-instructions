@@ -7,5 +7,8 @@
 !bun.lock
 !src
 !packages
+# Just the manifest — bun's frozen-lockfile check needs every workspace to be
+# present, but this image never runs apps/web, so nothing else from it goes in.
+!apps/web/package.json
 !data/washing-instructions.csv.dist
 !data/machine.json.dist

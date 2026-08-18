@@ -432,6 +432,26 @@ the useful failure when you replace an appliance: the chart does not silently
 draw the wrong dial, it stops and tells you which rows need new programme
 names.
 
+## The web app
+
+`apps/web` is a static [Astro](https://astro.build) site — a bookmarkable,
+Android-installable page reading the same `.dist` chart, with filters and the
+same six sheets rendered in the browser. It's early: right now it's an empty
+shell the deployment pipeline builds and previews, with the real rendering
+landing in a later change.
+
+```sh
+cd apps/web
+bun run dev      # local dev server
+bun run build    # static output in apps/web/dist
+bun run check    # astro check — this app's own typecheck, separate from the
+                  # CLI's, since .astro files need Astro's own TS plugin
+```
+
+It shares `packages/core` — the chart parsing, mixing rules and machine
+validation — with the CLI, so a rule change lands in both at once. Deploys to
+Cloudflare Pages: production on `main`, a preview on every pull request.
+
 ## Contributing
 
 Everything about working on this — the commands, the linters, the tests, the git
