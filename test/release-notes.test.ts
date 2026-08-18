@@ -18,7 +18,7 @@ function pluginOptions(name: string): Record<string, unknown> {
   throw new Error(`.releaserc.json does not configure ${name}`);
 }
 
-const REPO = "https://github.com/alrayyes/washing-instructions";
+const REPO = "https://github.com/alrayyes/washy-washy";
 
 const notes = await generateNotes(pluginOptions("@semantic-release/release-notes-generator"), {
   commits: [

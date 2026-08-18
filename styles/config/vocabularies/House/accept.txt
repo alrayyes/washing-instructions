@@ -27,6 +27,7 @@ WinAnsi
 [Ss]elvedge
 [Ss]emantic-release
 [Tt]ypecheck
+[Ww]ashy[ -]washy
 bunx
 markdownlint-cli2
 npm

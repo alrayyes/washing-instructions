@@ -4,14 +4,14 @@ published to a registry that could be read for it. Every other badge measures
 something real — do not add one that reads "unknown".
 -->
 
-[![check](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alrayyes/washing-instructions/actions/workflows/ci.yml)
-[![Codecov](https://codecov.io/gh/alrayyes/washing-instructions/graph/badge.svg)](https://codecov.io/gh/alrayyes/washing-instructions)
-[![release](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/alrayyes/washing-instructions/actions/workflows/release.yml)
-[![latest release](https://img.shields.io/github/v/release/alrayyes/washing-instructions?sort=semver)](https://github.com/alrayyes/washing-instructions/releases/latest)
+[![check](https://github.com/alrayyes/washy-washy/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alrayyes/washy-washy/actions/workflows/ci.yml)
+[![Codecov](https://codecov.io/gh/alrayyes/washy-washy/graph/badge.svg)](https://codecov.io/gh/alrayyes/washy-washy)
+[![release](https://github.com/alrayyes/washy-washy/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/alrayyes/washy-washy/actions/workflows/release.yml)
+[![latest release](https://img.shields.io/github/v/release/alrayyes/washy-washy?sort=semver)](https://github.com/alrayyes/washy-washy/releases/latest)
 [![licence: GPL v3+](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](LICENSE)
-[![container image](https://img.shields.io/badge/ghcr.io-washing--instructions-blue?logo=docker&logoColor=white)](https://github.com/alrayyes/washing-instructions/pkgs/container/washing-instructions)
+[![container image](https://img.shields.io/badge/ghcr.io-washy--washy-blue?logo=docker&logoColor=white)](https://github.com/alrayyes/washy-washy/pkgs/container/washy-washy)
 
-# Washing instructions
+# Washy washy
 
 Nobody remembers whether the towels go in at 40 or 60, which button stops the
 black t-shirts coming out streaky, or where on the dial "Fijn/Zijde" actually
@@ -108,7 +108,7 @@ bun run generate
 ```
 
 ```text
-Read 16 piles from /home/you/washing-instructions/data/washing-instructions.csv.dist
+Read 16 piles from /home/you/washy-washy/data/washing-instructions.csv.dist
   drawn for Generic front loader · Generic steam iron
   out/washing-instructions-phone.pdf  one page, 6225 pt tall (11 layout passes)
   out/washing-instructions-print.pdf
@@ -168,7 +168,7 @@ an image, so there is nothing to build — mount a directory on `/out` and the
 PDFs land there:
 
 ```sh
-docker run --rm -v "$PWD/out:/out" ghcr.io/alrayyes/washing-instructions
+docker run --rm -v "$PWD/out:/out" ghcr.io/alrayyes/washy-washy
 ```
 
 `latest` follows the newest release, and every release also answers to its full
@@ -178,15 +178,15 @@ can say how much drift it is willing to take. Images are built for `amd64` and
 workflow run and commit that produced it:
 
 ```sh
-gh attestation verify oci://ghcr.io/alrayyes/washing-instructions:latest \
-  --repo alrayyes/washing-instructions
+gh attestation verify oci://ghcr.io/alrayyes/washy-washy:latest \
+  --repo alrayyes/washy-washy
 ```
 
 Building it yourself works the same way:
 
 ```sh
-docker build -t washing-instructions .
-docker run --rm -v "$PWD/out:/out" washing-instructions
+docker build -t washy-washy .
+docker run --rm -v "$PWD/out:/out" washy-washy
 ```
 
 That uses the dummy chart baked into the image. To chart your own laundry,
@@ -197,7 +197,7 @@ straight to the CLI:
 docker run --rm \
   -v "$PWD/out:/out" \
   -v "$PWD/data/washing-instructions.csv:/app/data/mine.csv:ro" \
-  ghcr.io/alrayyes/washing-instructions data/mine.csv
+  ghcr.io/alrayyes/washy-washy data/mine.csv
 ```
 
 Your appliances go in the same way, since the image carries only the example
@@ -208,7 +208,7 @@ docker run --rm \
   -v "$PWD/out:/out" \
   -v "$PWD/data/machine.json:/app/data/machine.json:ro" \
   -v "$PWD/data/washing-instructions.csv:/app/data/washing-instructions.csv:ro" \
-  ghcr.io/alrayyes/washing-instructions
+  ghcr.io/alrayyes/washy-washy
 ```
 
 The container runs as an unprivileged user, so the PDFs come out owned by
