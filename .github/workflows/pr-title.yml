@@ -24,7 +24,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Dependabot is exempt for the same reason the commits job in ci.yml is:
+  # its title is always "Bump x from a to b", and config-conventional's
+  # subject-case rule refuses the capital B. What lands on main is
+  # normalised by the auto-merge workflow's squash subject instead, so main
+  # stays conventional without this job failing on every dependency bump.
   pr-title:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
