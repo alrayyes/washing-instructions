@@ -25,6 +25,7 @@
       "bookmarkable",
       "bunx",
       "commitlint",
+      "filesystem",
       "gitignored",
       "lefthook",
       "linted",
@@ -40,7 +41,8 @@
       "selvedge",
       "typecheck",
       "typechecks",
-      "washy"
+      "washy",
+      "writable"
     ]
   },
   "disabledRules": {
