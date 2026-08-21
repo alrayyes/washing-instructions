@@ -1,8 +1,9 @@
 ---
 // The committed chart, never the gitignored one a household keeps for
-// itself — the site has no per-visitor upload yet (that is #46). Vite
-// resolves both statically at build time, unlike a path built from
-// import.meta.url, which breaks once Rollup relocates this page's chunk.
+// itself — this is only the starting point a visitor can replace with
+// their own upload (SheetViewer, customChart.ts). Vite resolves both
+// statically at build time, unlike a path built from import.meta.url,
+// which breaks once Rollup relocates this page's chunk.
 import machineSource from "../../../../data/machine.json.dist?raw";
 import csvSource from "../../../../data/washing-instructions.csv.dist?raw";
 import Logo from "../components/Logo.astro";

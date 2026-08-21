@@ -32,6 +32,11 @@ const { title, description } = Astro.props;
     >
       <p>
         <a
+          href="/config"
+          class="underline decoration-hairline underline-offset-2 hover:text-accent hover:decoration-accent"
+        >
+          View the full config
+        </a>{" · "}<a
           href="https://github.com/alrayyes/washy-washy"
           class="underline decoration-hairline underline-offset-2 hover:text-accent hover:decoration-accent"
         >
@@ -39,16 +44,14 @@ const { title, description } = Astro.props;
         </a>
       </p>
       <p class="text-xs text-muted">
-        © 2026 Ryan Kes. Licensed under the
-        <a
+        {"© 2026 Ryan Kes. Licensed under the "}<a
           href="https://github.com/alrayyes/washy-washy/blob/main/LICENSE"
           class="underline decoration-hairline underline-offset-2 hover:text-accent hover:decoration-accent"
         >
           GPL-3.0-or-later
-        </a>
-        — provided as-is, with no warranty of any kind (see the licence, sections 15–16). Always
-        check a garment's own care label; this chart reflects one household's settings, not a
-        manufacturer's guarantee.
+        </a>{
+          " — provided as-is, with no warranty of any kind (see the licence, sections 15–16). Always check a garment's own care label; this chart reflects one household's settings, not a manufacturer's guarantee."
+        }
       </p>
     </footer>
   </body>

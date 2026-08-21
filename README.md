@@ -479,6 +479,13 @@ there's no server or account behind it, storage-permitting; clearing it (or
 using a private/storage-restricted browser) falls back to the bundled chart
 rather than showing nothing.
 
+The [`/config`](https://washy-washy.ryankes.eu/config) page shows the whole
+loaded config in one place — every washer programme, temperature, spin and
+button, the iron's thermostat positions, and every pile in the chart — for
+checking or troubleshooting what the site is actually working from. It's
+read-only and reflects whichever chart is active, bundled or uploaded, the
+same way the main page does.
+
 ```sh
 cd apps/web
 bun run dev              # local dev server
