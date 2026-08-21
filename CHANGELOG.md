@@ -1,3 +1,9 @@
+## [2.7.0](https://github.com/alrayyes/washy-washy/compare/v2.6.0...v2.7.0) (2026-08-21)
+
+### Features
+
+* **web:** a read-only page showing the full loaded config ([#81](https://github.com/alrayyes/washy-washy/issues/81)) ([dc4ae3b](https://github.com/alrayyes/washy-washy/commit/dc4ae3bb3a892dfc7a461fb3eb0aeb95dd124c74))
+
 ## [2.6.0](https://github.com/alrayyes/washy-washy/compare/v2.5.0...v2.6.0) (2026-08-21)
 
 ### Features
