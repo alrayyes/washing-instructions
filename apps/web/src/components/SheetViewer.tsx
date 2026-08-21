@@ -4,8 +4,9 @@ import {
   type Variant,
   variants,
 } from "@washy-washy/core/browser";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { filterByPile } from "../lib/filter";
+import { readFilters, writeFilters } from "../lib/storage";
 import Sheet from "./Sheet";
 
 const CUT_LABEL: Record<Variant, string> = {
@@ -31,6 +32,29 @@ export default function SheetViewer({ items, machine }: Props) {
   const [pileQuery, setPileQuery] = useState("");
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  // Restored client-side, after the first render: matching the server-
+  // rendered default on that first pass avoids a hydration mismatch, and a
+  // page that starts on the last-used filters instead of flashing the
+  // default first would ask for a slower first paint (blocking on
+  // localStorage/a prop from the server) for a page with no server to ask.
+  const restored = useRef(false);
+  useEffect(() => {
+    const saved = readFilters();
+    if (saved) {
+      setCut(saved.cut);
+      setPileQuery(saved.pileQuery);
+    }
+    restored.current = true;
+  }, []);
+
+  useEffect(() => {
+    // Skipped on the mount render: without this, restoring a saved filter
+    // above would immediately be overwritten by writing back the still-
+    // default state from this same effect.
+    if (!restored.current) return;
+    writeFilters({ cut, pileQuery });
+  }, [cut, pileQuery]);
 
   const filtered = useMemo(() => filterByPile(items, pileQuery), [items, pileQuery]);
 

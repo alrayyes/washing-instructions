@@ -453,9 +453,17 @@ cut (everything, washing only, ironing only) and by pile (a search over the
 clothing type). The PDF itself, drawn through the same `@react-pdf/renderer`
 components and height-bisection pass the CLI's phone PDF uses, is only
 generated when you click "Download this sheet as a PDF" — not on every
-filter change. Filter and navigation state does not persist across visits
-yet, and there is no upload/download of a custom chart yet either — both
-are still open.
+filter change. There is no upload/download of a custom chart yet — that's
+still open.
+
+Your last cut and pile filter are saved in the browser's `localStorage`, under
+the key `washy-washy:filters`, so reopening the page (or the installed
+home-screen icon) picks up where you left off. That's the only thing the site
+stores, it never leaves the device, and there's no account or server it could
+sync to — clear it the way you'd clear any site's data, or just use the
+filters and it saves itself. Where storage isn't available at all (private
+browsing, a full quota), the page still works; it just starts back at the
+default view every time.
 
 ```sh
 cd apps/web
