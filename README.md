@@ -459,15 +459,20 @@ are still open.
 
 ```sh
 cd apps/web
-bun run dev      # local dev server
-bun run build    # static output in apps/web/dist
-bun run check    # astro check — this app's own typecheck, separate from the
-                  # CLI's, since .astro files need Astro's own TS plugin
+bun run dev              # local dev server
+bun run build            # static output in apps/web/dist
+bun run check            # astro check — this app's own typecheck, separate
+                          # from the CLI's, since .astro files need Astro's
+                          # own TS plugin
+bun run deploy           # ship apps/web/dist to production
+bun run deploy:version   # upload a preview version without promoting it
 ```
 
 It shares `packages/core` — the chart parsing, mixing rules and machine
-validation — with the CLI, so a rule change lands in both at once. Deploys to
-Cloudflare Pages: production on `main`, a preview on every pull request.
+validation — with the CLI, so a rule change lands in both at once. Deploys as
+a Cloudflare Worker serving static assets (`apps/web/wrangler.jsonc`), built
+and shipped by Cloudflare's own Git integration — a build on `main` deploys
+straight to production, a pull request uploads a preview version instead.
 
 ## Contributing
 
