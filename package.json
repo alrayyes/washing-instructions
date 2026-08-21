@@ -1,43 +1,39 @@
 {
   "name": "washy-washy",
   "version": "0.0.0",
-  "description": "Turns a CSV of laundry piles into a phone PDF and a printable PDF, drawn for one specific washing machine and iron.",
-  "type": "module",
   "private": true,
+  "description": "Turns a CSV of laundry piles into a phone PDF and a printable PDF, drawn for one specific washing machine and iron.",
   "license": "GPL-3.0-or-later",
+  "type": "module",
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "scripts": {
-    "prepare": "lefthook install",
-    "generate": "bun run src/cli.ts",
+    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run lint:machine && bun run typecheck && bun test",
     "examples": "bun run src/cli.ts data/washing-instructions.csv.dist --machine data/machine.json.dist --out docs",
-    "screenshots": "bun run scripts/screenshots.ts",
-    "test": "bun test",
-    "schema": "bun run scripts/csv-schema.ts",
-    "lint:data": "bun run scripts/validate-csv.ts",
-    "lint:machine": "bun run scripts/validate-machine.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
     "format": "prettier --write .",
+    "generate": "bun run src/cli.ts",
+    "lint": "biome check .",
+    "lint:data": "bun run scripts/validate-csv.ts",
+    "lint:fix": "biome check --write .",
+    "lint:machine": "bun run scripts/validate-machine.ts",
     "lint:md": "prettier --check \"**/*.md\" && markdownlint-cli2 \"**/*.md\"",
-    "lint:yaml": "prettier --check \"**/*.{yml,yaml}\"",
-    "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
     "lint:prose": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' --minAlertLevel=error .",
     "lint:prose:advice": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' .",
-    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run lint:machine && bun run typecheck && bun test"
+    "lint:yaml": "prettier --check \"**/*.{yml,yaml}\"",
+    "prepare": "lefthook install",
+    "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
+    "schema": "bun run scripts/csv-schema.ts",
+    "screenshots": "bun run scripts/screenshots.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
   },
-  "trustedDependencies": [
-    "lefthook"
-  ],
   "dependencies": {
-    "@react-pdf/renderer": "4.6.1",
     "@washy-washy/core": "workspace:*",
+    "@washy-washy/pdf": "workspace:*",
     "csv-parse": "7.0.2",
-    "pdf-lib": "1.17.1",
-    "react": "19.2.8"
+    "pdf-lib": "1.17.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.9",
@@ -55,5 +51,8 @@
     "prettier": "3.9.6",
     "semantic-release": "25.0.9",
     "typescript": "7.0.2"
-  }
+  },
+  "trustedDependencies": [
+    "lefthook"
+  ]
 }

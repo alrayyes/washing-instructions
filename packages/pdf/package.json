@@ -1,0 +1,17 @@
+{
+  "name": "@washy-washy/pdf",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The React/@react-pdf/renderer components that draw a chart into a PDF, shared by the CLI and the web app.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@react-pdf/renderer": "4.6.1",
+    "@washy-washy/core": "workspace:*",
+    "pdf-lib": "1.17.1",
+    "react": "19.2.8"
+  }
+}

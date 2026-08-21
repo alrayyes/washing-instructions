@@ -12,6 +12,7 @@ FROM oven/bun:1.3.14-alpine@sha256:5acc90a93e91ff07bf72aa90a7c9f0fa189765aec90b4
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY packages/core/package.json ./packages/core/package.json
+COPY packages/pdf/package.json ./packages/pdf/package.json
 # apps/web has to be here too — bun checks every workspace manifest against
 # the lockfile before it will honour --frozen-lockfile, even one this image
 # never uses. --filter is what keeps its dependencies (Astro, its language
@@ -23,10 +24,19 @@ FROM oven/bun:1.3.14-alpine@sha256:5acc90a93e91ff07bf72aa90a7c9f0fa189765aec90b4
 
 WORKDIR /app
 
-COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
 COPY src ./src
 COPY packages ./packages
+# bun nests a workspace member's own dependencies under its own node_modules
+# rather than always hoisting them to the root — @react-pdf/renderer and react
+# live under packages/pdf/node_modules, not here, now that nothing outside
+# packages/pdf depends on them directly. Copying only the root node_modules
+# left render.ts unable to find either at runtime. The actual package
+# contents still live in the root node_modules/.bun store either way, so this
+# is copying symlinks, not doubling the image.
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/packages/core/node_modules ./packages/core/node_modules
+COPY --from=dependencies /app/packages/pdf/node_modules ./packages/pdf/node_modules
 # The committed dummy chart and the committed example appliances, so
 # `docker run` with nothing mounted still produces something to look at. Your
 # own versions of both are gitignored and never in the image; mount them over
