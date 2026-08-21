@@ -6,8 +6,12 @@
 // `site` is unset until the Cloudflare Pages project exists and its real
 // URL (or a custom domain) is known — it only affects canonical links and
 // the sitemap, not the build itself.
+import react from "@astrojs/react";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
   output: "static",
+  // The sheet viewer (#44) is a React island — the same @react-pdf/renderer
+  // components src/documents.tsx uses, running client-side.
+  integrations: [react()],
 });
