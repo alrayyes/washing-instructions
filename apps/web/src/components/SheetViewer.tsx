@@ -4,7 +4,6 @@ import {
   type Variant,
   variants,
 } from "@washy-washy/core/browser";
-import { renderPhone } from "@washy-washy/pdf";
 import { useMemo, useState } from "react";
 import { filterByPile } from "../lib/filter";
 import Sheet from "./Sheet";
@@ -39,6 +38,10 @@ export default function SheetViewer({ items, machine }: Props) {
     setDownloading(true);
     setDownloadError(null);
     try {
+      // Dynamic, not static: @washy-washy/pdf pulls in @react-pdf/renderer
+      // and pdf-lib, which nothing needs until this click — a static import
+      // would ship both in the page's main chunk regardless.
+      const { renderPhone } = await import("@washy-washy/pdf");
       const { pdf } = await renderPhone(filtered, machine, cut);
       // TS's DOM lib types BlobPart as ArrayBuffer-backed only, while
       // Uint8Array is typed over the wider ArrayBufferLike (which also
