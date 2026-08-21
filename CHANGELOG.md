@@ -1,3 +1,9 @@
+## [2.12.0](https://github.com/alrayyes/washy-washy/compare/v2.11.0...v2.12.0) (2026-08-21)
+
+### Features
+
+* **web:** make the edit cards look like the read-only sheet's cards ([#93](https://github.com/alrayyes/washy-washy/issues/93)) ([5ceed9b](https://github.com/alrayyes/washy-washy/commit/5ceed9b1908d274c39bc7894300de98cb3e5d529)), closes [86/#89](https://github.com/86/washy-washy/issues/89)
+
 ## [2.11.0](https://github.com/alrayyes/washy-washy/compare/v2.10.0...v2.11.0) (2026-08-21)
 
 ### Features
