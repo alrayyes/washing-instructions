@@ -108,6 +108,32 @@ test("uploading a chart, downloading it back out, and clearing it round-trip", a
   await expect(page.getByText("Showing the bundled example chart.")).toBeVisible();
 });
 
+test("an uploaded chart with a value the machine doesn't have names the row and column", async ({
+  page,
+}) => {
+  await goto(page);
+
+  // Valid JSON, but a temperature the bundled machine can't be set to — the
+  // kind of typo a household member editing the chart by hand would make.
+  // #72: this should name exactly what's wrong, not just "invalid chart".
+  const href = await page.locator('a[download="washing-instructions.json"]').getAttribute("href");
+  const rows = JSON.parse(
+    decodeURIComponent(href?.replace("data:application/json;charset=utf-8,", "") ?? ""),
+  );
+  rows[0].temperature = "99";
+
+  await page.setInputFiles('input[type="file"]', {
+    name: "chart.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(rows, null, 2)),
+  });
+
+  await expect(page.getByRole("alert")).toContainText(/row \d+, column "temperature"/);
+  await expect(page.getByRole("alert")).toContainText("99");
+  // The bad upload never took: still the bundled chart, not a half-applied one.
+  await expect(page.getByText("Showing the bundled example chart.")).toBeVisible();
+});
+
 test("filters and an uploaded chart both survive a reload", async ({ page }) => {
   await goto(page);
 
