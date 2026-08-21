@@ -223,7 +223,12 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
         <p className="text-sm text-body">
           {customInstructions
             ? "Showing your uploaded chart."
-            : "Showing the bundled example chart."}
+            : "Showing the bundled example chart. It's a generic laundry chart, not your own."}
+        </p>
+        <p className="mt-1 text-xs text-muted">
+          To use your own: download the chart below as JSON, edit the rows in a text editor, and
+          upload it back. Each row is checked against your machine — an unknown programme,
+          temperature or spin is called out by row and column, not silently accepted.
         </p>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <label className="flex-1 sm:flex-none">
