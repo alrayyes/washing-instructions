@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 /**
  * The real user journeys `test/web-*.test.ts` can't reach: those exercise
@@ -7,8 +7,21 @@ import { expect, test } from "@playwright/test";
  * end-to-end layer that was missing — see #67.
  */
 
-test("shows the bundled chart as a real page, not an embedded PDF", async ({ page }) => {
+/**
+ * `SheetViewer` is a client:load island: the server-rendered HTML is on the
+ * page before React attaches to it. An interaction fired in that gap still
+ * "succeeds" — Playwright mutates the real DOM node — but nothing is
+ * listening yet, so the change never reaches React state. Racy without this:
+ * passed most of the time, since hydration is normally fast, and failed
+ * outright once it wasn't.
+ */
+async function goto(page: Page) {
   await page.goto("/");
+  await page.waitForSelector('[data-hydrated="true"]');
+}
+
+test("shows the bundled chart as a real page, not an embedded PDF", async ({ page }) => {
+  await goto(page);
 
   await expect(page.locator("iframe")).toHaveCount(0);
   await expect(page.locator("article")).not.toHaveCount(0);
@@ -16,7 +29,7 @@ test("shows the bundled chart as a real page, not an embedded PDF", async ({ pag
 });
 
 test("cut filter switches which sheet renders", async ({ page }) => {
-  await page.goto("/");
+  await goto(page);
   const cards = page.locator("article");
   const fullCount = await cards.count();
 
@@ -29,7 +42,7 @@ test("cut filter switches which sheet renders", async ({ page }) => {
 });
 
 test("pile search narrows the cards, and a non-match says so", async ({ page }) => {
-  await page.goto("/");
+  await goto(page);
   const cards = page.locator("article");
   const allCount = await cards.count();
 
@@ -47,7 +60,7 @@ test("pile search narrows the cards, and a non-match says so", async ({ page }) 
 });
 
 test("the download button generates a PDF only when clicked, not before", async ({ page }) => {
-  await page.goto("/");
+  await goto(page);
 
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: /Download this sheet as a PDF/ }).click();
@@ -59,7 +72,7 @@ test("the download button generates a PDF only when clicked, not before", async 
 });
 
 test("uploading a chart, downloading it back out, and clearing it round-trip", async ({ page }) => {
-  await page.goto("/");
+  await goto(page);
 
   // Download the active (bundled) chart, edit one pile's name, and
   // re-upload it — the same round trip a household member editing their
@@ -96,7 +109,7 @@ test("uploading a chart, downloading it back out, and clearing it round-trip", a
 });
 
 test("filters and an uploaded chart both survive a reload", async ({ page }) => {
-  await page.goto("/");
+  await goto(page);
 
   await page.locator("fieldset select").selectOption("wash");
   const href = await page.locator('a[download="washing-instructions.json"]').getAttribute("href");
@@ -113,6 +126,7 @@ test("filters and an uploaded chart both survive a reload", async ({ page }) => 
   await expect(page.locator("article")).toHaveCount(1);
 
   await page.reload();
+  await page.waitForSelector('[data-hydrated="true"]');
 
   await expect(page.locator("fieldset select")).toHaveValue("wash");
   await expect(page.locator('input[type="search"]')).toHaveValue("Persisted E2E Pile");

@@ -20,9 +20,3 @@ export const colour = {
   yes: "#15803d",
   no: "#b91c1c",
 } as const;
-
-/** Helvetica is what the PDF embeds; this is the closest a browser gets. */
-export const font = {
-  sans: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-  bold: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-} as const;
