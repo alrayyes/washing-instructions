@@ -1,3 +1,9 @@
+## [2.6.0](https://github.com/alrayyes/washy-washy/compare/v2.5.0...v2.6.0) (2026-08-21)
+
+### Features
+
+* **web:** upload and download a custom chart as JSON ([#62](https://github.com/alrayyes/washy-washy/issues/62)) ([8c2a379](https://github.com/alrayyes/washy-washy/commit/8c2a3799b1fbcac9fae713e2a247d5b1f3217472)), closes [#59](https://github.com/alrayyes/washy-washy/issues/59) [#61](https://github.com/alrayyes/washy-washy/issues/61) [#45](https://github.com/alrayyes/washy-washy/issues/45) [#43](https://github.com/alrayyes/washy-washy/issues/43) [#61](https://github.com/alrayyes/washy-washy/issues/61)
+
 ## [2.5.0](https://github.com/alrayyes/washy-washy/compare/v2.4.1...v2.5.0) (2026-08-21)
 
 ### Features
