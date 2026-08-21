@@ -1,3 +1,9 @@
+## [2.4.0](https://github.com/alrayyes/washy-washy/compare/v2.3.0...v2.4.0) (2026-08-21)
+
+### Features
+
+* **web:** render the six sheets in-browser with filters ([#59](https://github.com/alrayyes/washy-washy/issues/59)) ([2d6ffe6](https://github.com/alrayyes/washy-washy/commit/2d6ffe69c78f6330f8cf925aa7a2fadc9b42138a))
+
 ## [2.3.0](https://github.com/alrayyes/washy-washy/compare/v2.2.2...v2.3.0) (2026-08-18)
 
 ### Features
