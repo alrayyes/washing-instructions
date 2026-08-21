@@ -445,6 +445,8 @@ names.
 
 ## The web app
 
+Live at [washy-washy.ryankes.eu](https://washy-washy.ryankes.eu).
+
 `apps/web` is a static [Astro](https://astro.build) site — a bookmarkable,
 Android-installable page reading the same `.dist` chart. It shows the phone
 sheet as a real page — the same cards, dial illustrations and colours the
