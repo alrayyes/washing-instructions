@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "deploy": "wrangler deploy",
-    "deploy:version": "wrangler versions upload"
+    "deploy:version": "wrangler versions upload",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@astrojs/react": "6.0.4",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@playwright/test": "1.62.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "typescript": "6.0.3",

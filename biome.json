@@ -8,7 +8,9 @@
       "!**/dist",
       "!styles/Google",
       "!styles/proselint",
-      "!**/.astro"
+      "!**/.astro",
+      "!**/test-results",
+      "!**/playwright-report"
     ]
   },
   "formatter": {

@@ -484,6 +484,9 @@ bun run build            # static output in apps/web/dist
 bun run check            # astro check — this app's own typecheck, separate
                           # from the CLI's, since .astro files need Astro's
                           # own TS plugin
+bun run test:e2e         # Playwright, against a real build — see apps/web/
+                          # e2e/ and playwright.config.ts. First run needs
+                          # `bunx playwright install --with-deps chromium`.
 bun run deploy           # ship apps/web/dist to production
 bun run deploy:version   # upload a preview version without promoting it
 ```
