@@ -29,6 +29,9 @@ read the `.dist`; never point them at the other one.
 - `bun run format` — Prettier over the Markdown and YAML; it owns those and nothing else
 - `bun run prose:sync` — fetch Vale's style packages; needed once before `check` works
 - `bun test test/csv.test.ts` — one file, when iterating
+- `bun run lighthouse` (from `apps/web`) — build, serve, and run Lighthouse 3
+  times against the real static site, gated on category scores
+  (`apps/web/lighthouserc.cjs`)
 
 ## Gotchas
 
@@ -72,7 +75,10 @@ read the `.dist`; never point them at the other one.
   `.releaserc.json` tolerating comments elsewhere in this repo, a `//` in
   `biome.json` fails to parse and silently falls back to defaults, which then
   reformats every file in the repo (tabs instead of the configured spaces).
-  Explain a rule choice in this file instead of inline there.
+  Explain a rule choice in this file instead of inline there. One example:
+  `overrides` turns `a11y/noSvgWithoutTitle` off for `apps/web/public/*.svg`,
+  since a favicon is browser chrome, not accessible page content — a `<title>`
+  in it would do nothing a real page `<svg>` needs one for.
 - **The CLI's `Dockerfile` still needs `apps/web/package.json` copied in**,
   even though the image never runs the web app — `bun install
 --frozen-lockfile` checks every workspace manifest against the lockfile

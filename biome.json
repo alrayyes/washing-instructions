@@ -10,7 +10,8 @@
       "!styles/proselint",
       "!**/.astro",
       "!**/test-results",
-      "!**/playwright-report"
+      "!**/playwright-report",
+      "!**/.lighthouseci"
     ]
   },
   "formatter": {
@@ -52,6 +53,16 @@
           "correctness": {
             "noUnusedVariables": "off",
             "noUnusedImports": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/web/public/**/*.svg"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noSvgWithoutTitle": "off"
           }
         }
       }

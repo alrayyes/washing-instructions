@@ -20,7 +20,9 @@ const CUT_LABEL: Record<Variant, string> = {
   iron: "Ironing only",
 };
 
-const FIELD_LABEL = "block text-xs font-semibold tracking-wide text-muted uppercase";
+// text-body, not text-muted: muted-on-panel is 4.39:1, just under WCAG AA's
+// 4.5:1 for this text's size and weight.
+const FIELD_LABEL = "block text-xs font-semibold tracking-wide text-body uppercase";
 const FIELD_INPUT =
   "mt-1 block w-full min-w-0 rounded-md border border-line bg-white px-3 py-2 text-sm text-ink shadow-sm focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none";
 const BUTTON_PRIMARY =
@@ -28,6 +30,44 @@ const BUTTON_PRIMARY =
 const BUTTON_SECONDARY =
   "inline-flex min-h-11 items-center justify-center rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-ink shadow-sm hover:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
 const ALERT = "rounded-md border border-no/30 bg-no/5 px-3 py-2 text-sm text-no";
+
+/**
+ * A tap-to-open "?" next to a field label — `title` alone is a hover-only
+ * tooltip, which a phone (this site's main device) can't reach. Closes on
+ * blur so it doesn't linger once the visitor's moved on.
+ */
+function HelpBubble({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <span className="relative inline-block normal-case">
+      <button
+        type="button"
+        className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-line text-[0.6rem] font-bold text-body hover:bg-accent hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        aria-label="What does this do?"
+        aria-expanded={open}
+        onClick={(event) => {
+          // Inside a <label>: without this, the click also activates the
+          // field the label wraps (opening the select, focusing the input).
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen((value) => !value);
+        }}
+        onBlur={() => setOpen(false)}
+      >
+        ?
+      </button>
+      {open && (
+        <span
+          role="tooltip"
+          className="absolute top-full left-0 z-10 mt-1 w-48 max-w-[80vw] rounded-md border border-line bg-white p-2 text-xs font-normal text-body shadow-md"
+        >
+          {text}
+        </span>
+      )}
+    </span>
+  );
+}
 
 interface Props {
   items: ResolvedInstruction[];
@@ -49,6 +89,12 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [customInstructions, setCustomInstructions] = useState<Instruction[] | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // Read by the E2E suite (`[data-hydrated="true"]`), which otherwise has no
+  // way to tell that React has attached its listeners: a `selectOption` or
+  // `fill` fired at the plain server-rendered HTML still "succeeds" — it
+  // mutates the DOM directly — but the change never reaches this
+  // component's state, since nothing is listening yet.
+  const [hydrated, setHydrated] = useState(false);
 
   // Restored client-side, after the first render — matching the server-
   // rendered default (the bundled chart, no filters) on that first pass
@@ -62,6 +108,7 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
     }
     setCustomInstructions(readCustomChart(machine));
     restored.current = true;
+    setHydrated(true);
   }, [machine]);
 
   useEffect(() => {
@@ -132,12 +179,15 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" data-hydrated={hydrated}>
       <fieldset className="rounded-lg border border-hairline bg-panel p-4">
         <legend className="px-1 text-sm font-semibold text-ink">Filter the chart</legend>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <label className="flex-1">
-            <span className={FIELD_LABEL}>Cut</span>
+            <span className={FIELD_LABEL}>
+              Cut
+              <HelpBubble text="Which parts of the chart to show: everything, washing only, or ironing only." />
+            </span>
             <select
               className={FIELD_INPUT}
               value={cut}
@@ -151,7 +201,12 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
             </select>
           </label>
           <label className="flex-1">
-            <span className={FIELD_LABEL}>Pile</span>
+            <span className={FIELD_LABEL}>
+              Pile
+              <HelpBubble
+                text={'Type part of a pile’s name, like "towels", to show just that card.'}
+              />
+            </span>
             <input
               className={FIELD_INPUT}
               type="search"
@@ -172,7 +227,10 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
         </p>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <label className="flex-1 sm:flex-none">
-            <span className={FIELD_LABEL}>Upload a chart (JSON)</span>
+            <span className={FIELD_LABEL}>
+              Upload a chart (JSON)
+              <HelpBubble text="Replace the bundled example with your own chart, downloaded from here and edited as JSON." />
+            </span>
             <input
               className="mt-1 block w-full text-sm text-body file:mr-3 file:min-h-11 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-accent/90"
               type="file"
@@ -197,7 +255,7 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
       </fieldset>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-hairline bg-panel p-6 text-center text-sm text-muted">
+        <p className="rounded-lg border border-hairline bg-panel p-6 text-center text-sm text-body">
           No pile matches “{pileQuery}”. Try a different search.
         </p>
       ) : (

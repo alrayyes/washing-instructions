@@ -106,7 +106,7 @@ function Legend({ machine, variant }: { machine: Machine; variant: Variant }) {
         ) : (
           <ProgramDial program={example} washer={washer} size={54} />
         )}
-        <p className="mt-1 text-[0.65rem] text-muted">
+        <p className="mt-1 text-[0.65rem] text-body">
           {variant === "iron" ? "thermostat" : "programme"}
         </p>
       </div>
@@ -141,7 +141,7 @@ function ChipRow({
 }) {
   return (
     <div className="mb-1 flex items-start gap-2">
-      <span className="w-14 shrink-0 pt-0.5 text-xs text-muted">{label}</span>
+      <span className="w-14 shrink-0 pt-0.5 text-xs text-body">{label}</span>
       <div className="flex flex-wrap gap-1">
         {values.map((value) => {
           const on = selected.includes(value);
@@ -151,7 +151,7 @@ function ChipRow({
               className={`rounded border px-1.5 py-0.5 text-xs ${
                 on
                   ? "border-accent bg-accent font-bold text-white"
-                  : "border-hairline bg-white text-faint"
+                  : "border-hairline bg-white text-muted"
               }`}
             >
               {value}
@@ -173,7 +173,7 @@ function ControlPanel({ item, machine }: { item: ResolvedInstruction; machine: M
       <div className="w-20 shrink-0 text-center">
         <ProgramDial program={item.program} washer={washer} size={78} />
         <p className="mt-1 text-xs font-bold text-ink">{item.program}</p>
-        <p className="text-[0.6rem] text-muted">
+        <p className="text-[0.6rem] text-body">
           {position} clockwise from {off}
         </p>
       </div>
@@ -203,7 +203,7 @@ function IronPanel({ items, machine }: { items: ResolvedInstruction[]; machine: 
           {setting ? `${setting.label} — ${setting.detail}` : "Do not iron"}
         </p>
         {setting && (
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-body">
             {setting.steam ? "inside the steam zone" : "below the steam zone — dry iron only"}
           </p>
         )}
@@ -401,7 +401,7 @@ function IronCard({
           <p className="text-sm font-bold text-ink">
             {setting ? `Thermostat on ${setting.label}` : "Leave the iron off"}
           </p>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-body">
             {setting
               ? setting.steam
                 ? "inside the steam zone"
@@ -469,7 +469,7 @@ export default function Sheet({ items, machine, variant }: Props) {
         )}
       </div>
       {variant !== "iron" && (
-        <p className="mt-3 text-center text-xs text-faint italic">
+        <p className="mt-3 text-center text-xs text-muted italic">
           Durations are the machine's own estimates and vary with load.
         </p>
       )}
