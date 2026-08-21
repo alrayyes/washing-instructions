@@ -12,8 +12,7 @@ import {
   type Variant,
   washGroups,
 } from "@washy-washy/core/browser";
-import type { CSSProperties } from "react";
-import { colour, font } from "../lib/theme";
+import { colour } from "../lib/theme";
 import { IronDial, ProgramDial } from "./dials";
 
 const SUBTITLE: Record<Variant, string> = {
@@ -39,16 +38,7 @@ function sheetGroups(
 
 function SectionHeading({ children }: { children: string }) {
   return (
-    <p
-      style={{
-        fontFamily: font.bold,
-        fontWeight: 700,
-        fontSize: "0.7rem",
-        letterSpacing: "0.05em",
-        color: colour.muted,
-        margin: "0 0 0.3rem",
-      }}
-    >
+    <p className="mb-1 text-[0.7rem] font-bold tracking-wide text-muted">
       {children.toUpperCase()}
     </p>
   );
@@ -56,29 +46,10 @@ function SectionHeading({ children }: { children: string }) {
 
 function Masthead({ machine, subtitle }: { machine: Machine; subtitle: string }) {
   return (
-    <header style={{ marginBottom: "1rem" }}>
-      <h2
-        style={{
-          fontFamily: font.bold,
-          fontWeight: 700,
-          fontSize: "1.3rem",
-          color: colour.ink,
-          margin: 0,
-        }}
-      >
-        Washing instructions
-      </h2>
-      <p
-        style={{
-          fontFamily: font.sans,
-          fontSize: "0.8rem",
-          color: colour.muted,
-          margin: "0.2rem 0 0",
-        }}
-      >
-        {subtitle}
-      </p>
-      <p style={{ fontFamily: font.sans, fontSize: "0.8rem", color: colour.muted, margin: 0 }}>
+    <header className="mb-4">
+      <h2 className="text-xl font-bold text-ink sm:text-2xl">Washing instructions</h2>
+      <p className="mt-1 text-sm text-muted">{subtitle}</p>
+      <p className="text-sm text-muted">
         {machine.washer.name}, {machine.washer.capacity} · {machine.iron.name}
       </p>
     </header>
@@ -89,62 +60,30 @@ function Loads({ items }: { items: ResolvedInstruction[] }) {
   const groups = loadGroups(items);
 
   return (
-    <section style={{ marginBottom: "1rem" }}>
+    <section className="mb-4">
       <SectionHeading>Loads — one line, one wash</SectionHeading>
-      <div
-        style={{
-          border: `1px solid ${colour.hairline}`,
-          borderRadius: "0.3rem",
-          padding: "0 0.6rem",
-        }}
-      >
+      <div className="rounded-md border border-hairline px-3">
         {groups.map((group, index) => {
           const first = group[0] as ResolvedInstruction;
           return (
             <div
               key={first.clothingType}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "0.5rem",
-                padding: "0.4rem 0",
-                borderBottom: index === groups.length - 1 ? "none" : `1px solid ${colour.hairline}`,
-              }}
+              className={`flex items-start gap-2 py-2 ${
+                index === groups.length - 1 ? "" : "border-b border-hairline"
+              }`}
             >
-              <span
-                style={{
-                  fontFamily: font.bold,
-                  fontWeight: 700,
-                  fontSize: "0.75rem",
-                  color: colour.accent,
-                  width: "4.5rem",
-                  flexShrink: 0,
-                }}
-              >
+              <span className="w-18 shrink-0 text-xs font-bold text-accent">
                 {first.program} {formatTemperature(first.temperature)}
               </span>
               <span
-                style={{
-                  fontFamily: group.length > 1 ? font.bold : font.sans,
-                  fontWeight: group.length > 1 ? 700 : 400,
-                  fontSize: "0.8rem",
-                  color: group.length > 1 ? colour.ink : colour.body,
-                  flex: 1,
-                }}
+                className={`flex-1 text-sm ${
+                  group.length > 1 ? "font-bold text-ink" : "text-body"
+                }`}
               >
                 {group.map((item) => item.clothingType).join("  +  ")}
                 {group.length === 1 ? "   (on its own)" : ""}
               </span>
-              <span
-                style={{
-                  fontFamily: font.sans,
-                  fontSize: "0.7rem",
-                  color: colour.muted,
-                  flexShrink: 0,
-                }}
-              >
-                {durationsOf(group)}
-              </span>
+              <span className="shrink-0 text-xs text-muted">{durationsOf(group)}</span>
             </div>
           );
         })}
@@ -160,43 +99,18 @@ function Legend({ machine, variant }: { machine: Machine; variant: Variant }) {
   const hottest = machine.iron.settings[machine.iron.settings.length - 1]?.key ?? "";
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "0.7rem",
-        alignItems: "center",
-        backgroundColor: colour.panel,
-        borderRadius: "0.3rem",
-        padding: "0.6rem",
-        marginBottom: "1rem",
-      }}
-    >
-      <div style={{ width: "4.5rem", textAlign: "center", flexShrink: 0 }}>
+    <div className="mb-4 flex items-center gap-3 rounded-md bg-panel p-3">
+      <div className="w-18 shrink-0 text-center">
         {variant === "iron" ? (
           <IronDial setting={hottest} settings={machine.iron.settings} size={54} />
         ) : (
           <ProgramDial program={example} washer={washer} size={54} />
         )}
-        <p
-          style={{
-            fontFamily: font.sans,
-            fontSize: "0.65rem",
-            color: colour.muted,
-            margin: "0.2rem 0 0",
-          }}
-        >
+        <p className="mt-1 text-[0.65rem] text-muted">
           {variant === "iron" ? "thermostat" : "programme"}
         </p>
       </div>
-      <p
-        style={{
-          fontFamily: font.sans,
-          fontSize: "0.75rem",
-          color: colour.body,
-          lineHeight: 1.4,
-          margin: 0,
-        }}
-      >
+      <p className="text-sm leading-relaxed text-body">
         {variant === "iron" ? (
           <>
             The ring is the iron's thermostat as it sits on the dial, and the red pointer is where
@@ -226,37 +140,19 @@ function ChipRow({
   selected: readonly string[];
 }) {
   return (
-    <div
-      style={{ display: "flex", alignItems: "flex-start", gap: "0.4rem", marginBottom: "0.3rem" }}
-    >
-      <span
-        style={{
-          fontFamily: font.sans,
-          fontSize: "0.65rem",
-          color: colour.muted,
-          width: "3.6rem",
-          flexShrink: 0,
-          paddingTop: "0.15rem",
-        }}
-      >
-        {label}
-      </span>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+    <div className="mb-1 flex items-start gap-2">
+      <span className="w-14 shrink-0 pt-0.5 text-xs text-muted">{label}</span>
+      <div className="flex flex-wrap gap-1">
         {values.map((value) => {
           const on = selected.includes(value);
           return (
             <span
               key={value}
-              style={{
-                fontFamily: on ? font.bold : font.sans,
-                fontWeight: on ? 700 : 400,
-                fontSize: "0.7rem",
-                color: on ? "#ffffff" : colour.faint,
-                backgroundColor: on ? colour.accent : "#ffffff",
-                border: `1px solid ${on ? colour.accent : colour.hairline}`,
-                borderRadius: "0.2rem",
-                padding: "0.1rem 0.35rem",
-              }}
+              className={`rounded border px-1.5 py-0.5 text-xs ${
+                on
+                  ? "border-accent bg-accent font-bold text-white"
+                  : "border-hairline bg-white text-faint"
+              }`}
             >
               {value}
             </span>
@@ -273,34 +169,15 @@ function ControlPanel({ item, machine }: { item: ResolvedInstruction; machine: M
   const off = washer.programs[0] ?? "";
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "0.6rem",
-        backgroundColor: colour.panel,
-        border: `1px solid ${colour.hairline}`,
-        borderRadius: "0.3rem",
-        padding: "0.5rem",
-      }}
-    >
-      <div style={{ width: "4.9rem", flexShrink: 0, textAlign: "center" }}>
+    <div className="flex gap-3 rounded-md border border-hairline bg-panel p-3">
+      <div className="w-20 shrink-0 text-center">
         <ProgramDial program={item.program} washer={washer} size={78} />
-        <p
-          style={{
-            fontFamily: font.bold,
-            fontWeight: 700,
-            fontSize: "0.72rem",
-            color: colour.ink,
-            margin: "0.15rem 0 0",
-          }}
-        >
-          {item.program}
-        </p>
-        <p style={{ fontFamily: font.sans, fontSize: "0.6rem", color: colour.muted, margin: 0 }}>
+        <p className="mt-1 text-xs font-bold text-ink">{item.program}</p>
+        <p className="text-[0.6rem] text-muted">
           {position} clockwise from {off}
         </p>
       </div>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div className="flex flex-1 flex-col justify-center">
         <ChipRow label="Temp" values={washer.temperatures} selected={[item.temperature]} />
         <ChipRow label="Spin rpm" values={washer.spins} selected={[item.spin]} />
         <ChipRow label="Buttons" values={washer.options} selected={item.options} />
@@ -314,52 +191,23 @@ function IronPanel({ items, machine }: { items: ResolvedInstruction[]; machine: 
   const setting = item.ironing ? ironSetting(machine, item.ironSetting) : undefined;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.6rem",
-        backgroundColor: colour.panel,
-        border: `1px solid ${colour.hairline}`,
-        borderRadius: "0.3rem",
-        padding: "0.5rem",
-      }}
-    >
+    <div className="flex items-center gap-3 rounded-md border border-hairline bg-panel p-3">
       <IronDial
         setting={item.ironSetting}
         settings={machine.iron.settings}
         off={!item.ironing}
         size={62}
       />
-      <div style={{ flex: 1 }}>
-        <p
-          style={{
-            fontFamily: font.bold,
-            fontWeight: 700,
-            fontSize: "0.8rem",
-            color: colour.ink,
-            margin: 0,
-          }}
-        >
+      <div className="flex-1">
+        <p className="text-sm font-bold text-ink">
           {setting ? `${setting.label} — ${setting.detail}` : "Do not iron"}
         </p>
         {setting && (
-          <p
-            style={{
-              fontFamily: font.sans,
-              fontSize: "0.65rem",
-              color: colour.muted,
-              margin: "0.1rem 0 0",
-            }}
-          >
+          <p className="mt-0.5 text-xs text-muted">
             {setting.steam ? "inside the steam zone" : "below the steam zone — dry iron only"}
           </p>
         )}
-        <Prose
-          items={items}
-          pick={(entry) => entry.ironingNotes}
-          style={{ marginTop: "0.25rem" }}
-        />
+        <Prose items={items} pick={(entry) => entry.ironingNotes} className="mt-1" />
       </div>
     </div>
   );
@@ -369,42 +217,29 @@ function Prose({
   items,
   pick,
   emphasis = false,
-  style,
+  className = "",
 }: {
   items: ResolvedInstruction[];
   pick: (item: ResolvedInstruction) => string;
   emphasis?: boolean;
-  style?: CSSProperties;
+  className?: string;
 }) {
   const values = items.map(pick);
-  const textStyle: CSSProperties = {
-    fontFamily: emphasis ? font.bold : font.sans,
-    fontWeight: emphasis ? 700 : 400,
-    fontSize: "0.75rem",
-    lineHeight: 1.4,
-    color: emphasis ? colour.ink : colour.body,
-    margin: 0,
-    ...style,
-  };
+  const textClass = `text-sm leading-relaxed ${emphasis ? "font-bold text-ink" : "text-body"}`;
 
   if (values.every((value) => value === "")) return null;
 
   if (values.every((value) => value === values[0])) {
-    return <p style={textStyle}>{values[0]}</p>;
+    return <p className={`${textClass} ${className}`}>{values[0]}</p>;
   }
 
   const speaking = items.filter((_, index) => values[index] !== "");
 
   return (
-    <div style={style}>
+    <div className={className}>
       {speaking.map((item, index) => (
-        <p
-          key={item.clothingType}
-          style={{ ...textStyle, margin: index === 0 ? 0 : "0.15rem 0 0" }}
-        >
-          <span style={{ fontFamily: font.bold, fontWeight: 700, color: colour.ink }}>
-            {item.clothingType}:{" "}
-          </span>
+        <p key={item.clothingType} className={`${textClass} ${index === 0 ? "" : "mt-0.5"}`}>
+          <span className="font-bold text-ink">{item.clothingType}: </span>
           {pick(item)}
         </p>
       ))}
@@ -426,19 +261,8 @@ function SplitField({
   if (items.every((item) => pick(item) === "")) return null;
 
   return (
-    <div style={{ marginTop: "0.4rem" }}>
-      <p
-        style={{
-          fontFamily: font.bold,
-          fontWeight: 700,
-          fontSize: "0.6rem",
-          letterSpacing: "0.05em",
-          color: colour.muted,
-          margin: 0,
-        }}
-      >
-        {label.toUpperCase()}
-      </p>
+    <div className="mt-2">
+      <p className="text-[0.6rem] font-bold tracking-wide text-muted">{label.toUpperCase()}</p>
       <Prose items={items} pick={pick} emphasis={emphasis} />
     </div>
   );
@@ -454,29 +278,9 @@ function Field({
   emphasis?: boolean;
 }) {
   return (
-    <div style={{ marginTop: "0.4rem" }}>
-      <p
-        style={{
-          fontFamily: font.bold,
-          fontWeight: 700,
-          fontSize: "0.6rem",
-          letterSpacing: "0.05em",
-          color: colour.muted,
-          margin: 0,
-        }}
-      >
-        {label.toUpperCase()}
-      </p>
-      <p
-        style={{
-          fontFamily: emphasis ? font.bold : font.sans,
-          fontWeight: emphasis ? 700 : 400,
-          fontSize: "0.75rem",
-          lineHeight: 1.4,
-          color: emphasis ? colour.ink : colour.body,
-          margin: 0,
-        }}
-      >
+    <div className="mt-2">
+      <p className="text-[0.6rem] font-bold tracking-wide text-muted">{label.toUpperCase()}</p>
+      <p className={`text-sm leading-relaxed ${emphasis ? "font-bold text-ink" : "text-body"}`}>
         {value}
       </p>
     </div>
@@ -486,20 +290,16 @@ function Field({
 function SoftenerBadge({ on }: { on: boolean }) {
   return (
     <span
-      style={{
-        fontFamily: font.bold,
-        fontWeight: 700,
-        fontSize: "0.7rem",
-        color: "#ffffff",
-        backgroundColor: on ? colour.yes : colour.no,
-        borderRadius: "0.2rem",
-        padding: "0.1rem 0.4rem",
-      }}
+      className="rounded px-1.5 py-0.5 text-xs font-bold text-white"
+      style={{ backgroundColor: on ? colour.yes : colour.no }}
     >
       {on ? "SOFTENER OK" : "NO SOFTENER"}
     </span>
   );
 }
+
+const CARD_CLASS = "rounded-lg border border-line p-4";
+const CARD_HEADER_CLASS = "mb-3 flex items-center justify-between gap-2 border-b border-ink pb-1.5";
 
 function Card({
   group,
@@ -521,52 +321,17 @@ function Card({
   );
 
   return (
-    <article
-      style={{
-        border: `1px solid ${colour.line}`,
-        borderRadius: "0.4rem",
-        padding: "0.8rem",
-        marginBottom: "0.8rem",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderBottom: `1px solid ${colour.ink}`,
-          paddingBottom: "0.3rem",
-          marginBottom: "0.5rem",
-        }}
-      >
-        <h3
-          style={{
-            fontFamily: font.bold,
-            fontWeight: 700,
-            fontSize: "1rem",
-            color: colour.ink,
-            margin: 0,
-          }}
-        >
+    <article className={CARD_CLASS}>
+      <div className={CARD_HEADER_CLASS}>
+        <h3 className="text-base font-bold text-ink">
           {index}. {heading}
         </h3>
-        <span
-          style={{
-            fontFamily: font.bold,
-            fontWeight: 700,
-            fontSize: "0.75rem",
-            color: colour.accent,
-          }}
-        >
-          {durationsOf(group)}
-        </span>
+        <span className="shrink-0 text-xs font-bold text-accent">{durationsOf(group)}</span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.5rem" }}>
+      <div className="mb-3 flex items-center gap-2">
         <SoftenerBadge on={item.fabricSoftener} />
-        <span
-          style={{ fontFamily: font.bold, fontWeight: 700, fontSize: "0.75rem", color: colour.ink }}
-        >
+        <span className="text-xs font-bold text-ink">
           {item.program} {item.temperature === "koud" ? "koud" : `${item.temperature} °C`} ·{" "}
           {item.spin === "0" ? "no spin" : `${item.spin} rpm`}
         </span>
@@ -577,7 +342,7 @@ function Card({
       <SplitField label="Detergent" items={group} pick={(member) => member.detergent} />
 
       {variant !== "wash" && (
-        <div style={{ marginTop: "0.5rem" }}>
+        <div className="mt-3">
           <SectionHeading>Iron</SectionHeading>
           <IronPanel items={group} machine={machine} />
         </div>
@@ -615,77 +380,28 @@ function IronCard({
   const setting = item.ironing ? ironSetting(machine, item.ironSetting) : undefined;
 
   return (
-    <article
-      style={{
-        border: `1px solid ${colour.line}`,
-        borderRadius: "0.4rem",
-        padding: "0.8rem",
-        marginBottom: "0.8rem",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderBottom: `1px solid ${colour.ink}`,
-          paddingBottom: "0.3rem",
-          marginBottom: "0.5rem",
-        }}
-      >
-        <h3
-          style={{
-            fontFamily: font.bold,
-            fontWeight: 700,
-            fontSize: "1rem",
-            color: colour.ink,
-            margin: 0,
-          }}
-        >
+    <article className={CARD_CLASS}>
+      <div className={CARD_HEADER_CLASS}>
+        <h3 className="text-base font-bold text-ink">
           {index}. {setting ? `${setting.label} — ${setting.detail}` : "Do not iron"}
         </h3>
-        <span style={{ fontFamily: font.sans, fontSize: "0.7rem", color: colour.muted }}>
+        <span className="shrink-0 text-xs text-muted">
           {group.length} {group.length === 1 ? "pile" : "piles"}
         </span>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.6rem",
-          backgroundColor: colour.panel,
-          border: `1px solid ${colour.hairline}`,
-          borderRadius: "0.3rem",
-          padding: "0.5rem",
-        }}
-      >
+      <div className="flex items-center gap-3 rounded-md border border-hairline bg-panel p-3">
         <IronDial
           setting={item.ironSetting}
           settings={machine.iron.settings}
           off={!item.ironing}
           size={62}
         />
-        <div style={{ flex: 1 }}>
-          <p
-            style={{
-              fontFamily: font.bold,
-              fontWeight: 700,
-              fontSize: "0.85rem",
-              color: colour.ink,
-              margin: 0,
-            }}
-          >
+        <div className="flex-1">
+          <p className="text-sm font-bold text-ink">
             {setting ? `Thermostat on ${setting.label}` : "Leave the iron off"}
           </p>
-          <p
-            style={{
-              fontFamily: font.sans,
-              fontSize: "0.65rem",
-              color: colour.muted,
-              margin: "0.1rem 0 0",
-            }}
-          >
+          <p className="mt-0.5 text-xs text-muted">
             {setting
               ? setting.steam
                 ? "inside the steam zone"
@@ -695,41 +411,12 @@ function IronCard({
         </div>
       </div>
 
-      <div style={{ marginTop: "0.4rem" }}>
+      <div className="mt-3">
         <SectionHeading>{setting ? "How" : "Never these"}</SectionHeading>
         {group.map((member) => (
-          <div
-            key={member.clothingType}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "0.4rem",
-              marginTop: "0.15rem",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: font.bold,
-                fontWeight: 700,
-                fontSize: "0.72rem",
-                lineHeight: 1.4,
-                color: colour.ink,
-                width: "6.5rem",
-                flexShrink: 0,
-              }}
-            >
-              {member.clothingType}
-            </span>
-            <span
-              style={{
-                fontFamily: font.sans,
-                fontSize: "0.72rem",
-                lineHeight: 1.4,
-                color: colour.body,
-              }}
-            >
-              {member.ironingNotes}
-            </span>
+          <div key={member.clothingType} className="mt-1 flex items-start gap-2">
+            <span className="w-26 shrink-0 text-xs font-bold text-ink">{member.clothingType}</span>
+            <span className="text-xs text-body">{member.ironingNotes}</span>
           </div>
         ))}
       </div>
@@ -748,44 +435,41 @@ interface Props {
  * loads, the dial legend, one card per pile grouping — as real HTML, so it
  * reads and scrolls like a page instead of an embedded PDF viewer. The PDF
  * is only ever generated on demand, by the download button.
+ *
+ * Mobile-first: one column by default, since this is meant to be read on a
+ * phone standing in front of the machine — a two-column grid only kicks in
+ * once there's room to actually read two cards side by side.
  */
 export default function Sheet({ items, machine, variant }: Props) {
   const groups = sheetGroups(items, machine, variant);
 
   return (
-    <div style={{ maxWidth: "34rem" }}>
+    <div>
       <Masthead machine={machine} subtitle={SUBTITLE[variant]} />
       {variant !== "iron" && <Loads items={items} />}
       <Legend machine={machine} variant={variant} />
-      {groups.map((group, index) =>
-        variant === "iron" ? (
-          <IronCard
-            key={ironCardKey(group[0] as ResolvedInstruction)}
-            group={group}
-            index={index + 1}
-            machine={machine}
-          />
-        ) : (
-          <Card
-            key={(group[0] as ResolvedInstruction).clothingType}
-            group={group}
-            index={index + 1}
-            variant={variant}
-            machine={machine}
-          />
-        ),
-      )}
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {groups.map((group, index) =>
+          variant === "iron" ? (
+            <IronCard
+              key={ironCardKey(group[0] as ResolvedInstruction)}
+              group={group}
+              index={index + 1}
+              machine={machine}
+            />
+          ) : (
+            <Card
+              key={(group[0] as ResolvedInstruction).clothingType}
+              group={group}
+              index={index + 1}
+              variant={variant}
+              machine={machine}
+            />
+          ),
+        )}
+      </div>
       {variant !== "iron" && (
-        <p
-          style={{
-            fontFamily: font.sans,
-            fontStyle: "italic",
-            fontSize: "0.65rem",
-            color: colour.faint,
-            textAlign: "center",
-            marginTop: "0.5rem",
-          }}
-        >
+        <p className="mt-3 text-center text-xs text-faint italic">
           Durations are the machine's own estimates and vary with load.
         </p>
       )}

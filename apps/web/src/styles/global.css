@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/**
+ * Same values as src/lib/theme.ts, kept in step by eye — that file feeds
+ * the SVG dial illustrations, which need per-tick, JS-computed colours
+ * (selected vs. not, on vs. off) that a static Tailwind class can't
+ * express, so it stays a plain object rather than becoming these tokens.
+ * Everything else in the page — layout, typography, cards — uses these
+ * as Tailwind utilities (bg-panel, text-ink, border-accent, …) instead.
+ */
+@theme {
+  /* Same family for --font-sans and Tailwind's default font-bold — the
+     PDF's "Helvetica-Bold" is a different font resource, but on the web
+     it's the same family at a heavier weight, not a second family. */
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --color-ink: #18181b;
+  --color-body: #3f3f46;
+  --color-muted: #71717a;
+  --color-faint: #a1a1aa;
+  --color-line: #d4d4d8;
+  --color-hairline: #e4e4e7;
+  --color-panel: #f4f4f5;
+  /* Bosch fascia red — the dial arc and the pointer. */
+  --color-accent: #d1132b;
+  --color-accent-soft: #fdeaed;
+  --color-steam: #9ec5e8;
+  --color-steam-soft: #eaf2fa;
+  --color-yes: #15803d;
+  --color-no: #b91c1c;
+}

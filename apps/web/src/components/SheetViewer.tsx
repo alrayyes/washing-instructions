@@ -20,6 +20,15 @@ const CUT_LABEL: Record<Variant, string> = {
   iron: "Ironing only",
 };
 
+const FIELD_LABEL = "block text-xs font-semibold tracking-wide text-muted uppercase";
+const FIELD_INPUT =
+  "mt-1 block w-full min-w-0 rounded-md border border-line bg-white px-3 py-2 text-sm text-ink shadow-sm focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none";
+const BUTTON_PRIMARY =
+  "inline-flex min-h-11 items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accent/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60";
+const BUTTON_SECONDARY =
+  "inline-flex min-h-11 items-center justify-center rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-ink shadow-sm hover:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
+const ALERT = "rounded-md border border-no/30 bg-no/5 px-3 py-2 text-sm text-no";
+
 interface Props {
   items: ResolvedInstruction[];
   machine: Machine;
@@ -123,65 +132,91 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
   }
 
   return (
-    <div>
-      <fieldset>
-        <legend>Filter the chart</legend>
-        <label>
-          Cut{" "}
-          <select value={cut} onChange={(event) => setCut(event.target.value as Variant)}>
-            {variants.map((variant) => (
-              <option key={variant} value={variant}>
-                {CUT_LABEL[variant]}
-              </option>
-            ))}
-          </select>
-        </label>{" "}
-        <label>
-          Pile{" "}
-          <input
-            type="search"
-            placeholder="Search by pile name…"
-            value={pileQuery}
-            onChange={(event) => setPileQuery(event.target.value)}
-          />
-        </label>
+    <div className="flex flex-col gap-6">
+      <fieldset className="rounded-lg border border-hairline bg-panel p-4">
+        <legend className="px-1 text-sm font-semibold text-ink">Filter the chart</legend>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <label className="flex-1">
+            <span className={FIELD_LABEL}>Cut</span>
+            <select
+              className={FIELD_INPUT}
+              value={cut}
+              onChange={(event) => setCut(event.target.value as Variant)}
+            >
+              {variants.map((variant) => (
+                <option key={variant} value={variant}>
+                  {CUT_LABEL[variant]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex-1">
+            <span className={FIELD_LABEL}>Pile</span>
+            <input
+              className={FIELD_INPUT}
+              type="search"
+              placeholder="Search by pile name…"
+              value={pileQuery}
+              onChange={(event) => setPileQuery(event.target.value)}
+            />
+          </label>
+        </div>
       </fieldset>
 
-      <fieldset>
-        <legend>Your own chart</legend>
-        <p>
+      <fieldset className="rounded-lg border border-hairline bg-panel p-4">
+        <legend className="px-1 text-sm font-semibold text-ink">Your own chart</legend>
+        <p className="text-sm text-body">
           {customInstructions
             ? "Showing your uploaded chart."
             : "Showing the bundled example chart."}
         </p>
-        <label>
-          Upload a chart (JSON){" "}
-          <input type="file" accept="application/json,.json" onChange={handleUpload} />
-        </label>{" "}
-        <a href={downloadHref} download="washing-instructions.json">
-          Download this chart as JSON
-        </a>
-        {customInstructions && (
-          <>
-            {" "}
-            <button type="button" onClick={handleClear}>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <label className="flex-1 sm:flex-none">
+            <span className={FIELD_LABEL}>Upload a chart (JSON)</span>
+            <input
+              className="mt-1 block w-full text-sm text-body file:mr-3 file:min-h-11 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-accent/90"
+              type="file"
+              accept="application/json,.json"
+              onChange={handleUpload}
+            />
+          </label>
+          <a className={BUTTON_SECONDARY} href={downloadHref} download="washing-instructions.json">
+            Download this chart as JSON
+          </a>
+          {customInstructions && (
+            <button className={BUTTON_SECONDARY} type="button" onClick={handleClear}>
               Use the bundled example instead
             </button>
-          </>
+          )}
+        </div>
+        {uploadError && (
+          <p className={`${ALERT} mt-3`} role="alert">
+            Could not use that file: {uploadError}
+          </p>
         )}
-        {uploadError && <p role="alert">Could not use that file: {uploadError}</p>}
       </fieldset>
 
       {filtered.length === 0 ? (
-        <p>No pile matches “{pileQuery}”. Try a different search.</p>
+        <p className="rounded-lg border border-hairline bg-panel p-6 text-center text-sm text-muted">
+          No pile matches “{pileQuery}”. Try a different search.
+        </p>
       ) : (
         <>
-          <p>
-            <button type="button" onClick={handleDownload} disabled={downloading}>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              className={BUTTON_PRIMARY}
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+            >
               {downloading ? "Preparing PDF…" : "Download this sheet as a PDF"}
             </button>
-          </p>
-          {downloadError && <p role="alert">Could not generate the PDF: {downloadError}</p>}
+          </div>
+          {downloadError && (
+            <p className={ALERT} role="alert">
+              Could not generate the PDF: {downloadError}
+            </p>
+          )}
           <Sheet items={filtered} machine={machine} variant={cut} />
         </>
       )}

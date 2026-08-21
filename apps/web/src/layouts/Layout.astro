@@ -1,4 +1,6 @@
 ---
+import "../styles/global.css";
+
 interface Props {
   title: string;
 }
@@ -13,12 +15,17 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
   </head>
-  <body>
-    <main>
+  <body class="bg-white text-body antialiased">
+    <main class="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
       <slot />
     </main>
-    <footer>
-      <a href="https://github.com/alrayyes/washy-washy">Washy washy on GitHub</a>
+    <footer class="mx-auto max-w-3xl px-4 pb-10 text-sm text-muted sm:px-6">
+      <a
+        href="https://github.com/alrayyes/washy-washy"
+        class="underline decoration-hairline underline-offset-2 hover:text-accent hover:decoration-accent"
+      >
+        Washy washy on GitHub
+      </a>
     </footer>
   </body>
 </html>
