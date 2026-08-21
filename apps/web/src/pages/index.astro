@@ -1,11 +1,18 @@
 ---
+// The committed chart, never the gitignored one a household keeps for
+// itself — the site has no per-visitor upload yet (that is #46). Vite
+// resolves both statically at build time, unlike a path built from
+// import.meta.url, which breaks once Rollup relocates this page's chunk.
+import machineSource from "../../../../data/machine.json.dist?raw";
+import csvSource from "../../../../data/washing-instructions.csv.dist?raw";
+import SheetViewer from "../components/SheetViewer";
 import Layout from "../layouts/Layout.astro";
+import { buildChart } from "../lib/chart";
+
+const { items, machine } = buildChart(csvSource, machineSource);
 ---
 
 <Layout title="Washy washy">
   <h1>Washy washy</h1>
-  <p>
-    The filtered, in-browser sheets land in a later ticket — this page is the
-    empty shell the deployment pipeline builds and previews.
-  </p>
+  <SheetViewer client:load items={items} machine={machine} />
 </Layout>
