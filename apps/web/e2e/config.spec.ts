@@ -22,7 +22,7 @@ test("shows the machine's washer and iron settings, not a raw JSON dump", async 
 test("shows every pile in the bundled chart", async ({ page }) => {
   await goto(page);
 
-  const rows = page.locator('[data-testid="chart-cards"] > div');
+  const rows = page.locator('[data-testid="chart-cards"] > article');
   await expect(rows).not.toHaveCount(0);
 });
 
@@ -49,7 +49,7 @@ test("reflects an uploaded chart, not the bundled example", async ({ page }) => 
   // can't see an input's value, so check the value directly.
   await expect(
     page
-      .locator('[data-testid="chart-cards"] > div')
+      .locator('[data-testid="chart-cards"] > article')
       .first()
       .locator('input[name="clothing_type"]'),
   ).toHaveValue("Config Page E2E Pile");
@@ -77,7 +77,7 @@ test("editing a chart field and saving applies it across the site", async ({ pag
   await goto(page);
 
   const detergentInput = page
-    .locator('[data-testid="chart-cards"] > div')
+    .locator('[data-testid="chart-cards"] > article')
     .first()
     .locator('textarea[name="detergent"]');
   await detergentInput.fill("E2E Custom Detergent Note");
@@ -96,12 +96,12 @@ test("editing a chart field and saving applies it across the site", async ({ pag
 test("an invalid edit names the row and column, and isn't applied", async ({ page }) => {
   await goto(page);
 
-  // Every constrained field (temperature, programme, …) is a select now —
-  // the UI can't produce an invalid value for those at all. Emptying the
-  // one genuinely free-text required field is the remaining way to reach
-  // instructionsFromRows's validation from this page.
+  // Every constrained field (temperature, programme, …) is a chip or a
+  // select now — the UI can't produce an invalid value for those at all.
+  // Emptying the one genuinely free-text required field is the remaining
+  // way to reach instructionsFromRows's validation from this page.
   const pileInput = page
-    .locator('[data-testid="chart-cards"] > div')
+    .locator('[data-testid="chart-cards"] > article')
     .first()
     .locator('input[name="clothing_type"]');
   await pileInput.fill("");
@@ -113,13 +113,17 @@ test("an invalid edit names the row and column, and isn't applied", async ({ pag
   await expect(page.getByText("Showing the bundled example chart.")).toBeVisible();
 });
 
-test("select, checkbox and checklist fields all apply and download correctly", async ({ page }) => {
+test("chips and pills all apply and download correctly", async ({ page }) => {
   await goto(page);
 
-  const card = page.locator('[data-testid="chart-cards"] > div').first();
-  await card.locator('select[name="temperature"]').selectOption("30");
-  await card.locator('input[name="fabric_softener"]').check();
-  await card.locator('input[name="options"][value="Speed"]').check();
+  // Every constrained field is a click, styled the same as the read-only
+  // sheet's chip rows (Sheet.tsx's ChipRow) — see the screenshot in #90.
+  const card = page.locator('[data-testid="chart-cards"] > article').first();
+  await card.locator('[data-testid="chip-temperature-30"]').click();
+  await card.locator('[data-testid="toggle-fabric_softener"]').click();
+  await card.locator('[data-testid="chip-options-Speed"]').click();
+  await card.locator('[data-testid="chip-colour_group-dark"]').click();
+  await card.locator('[data-testid="chip-mix_tags-solo"]').click();
   await page.getByRole("button", { name: /Save changes/ }).click();
 
   await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
@@ -131,20 +135,21 @@ test("select, checkbox and checklist fields all apply and download correctly", a
   expect(rows[0].temperature).toBe("30");
   expect(rows[0].fabric_softener).toBe("yes");
   expect(rows[0].options.split("|")).toContain("Speed");
+  expect(rows[0].colour_group).toBe("dark");
+  expect(rows[0].mix_tags.split("|")).toContain("solo");
 });
 
-test("unchecking ironing clears and disables the iron setting", async ({ page }) => {
+test("toggling ironing off hides the iron setting chips and clears the value", async ({ page }) => {
   await goto(page);
 
   // The first pile in the bundled chart is ironed — see data/washing-
-  // instructions.csv.dist — so its "Iron setting" select starts enabled.
-  const card = page.locator('[data-testid="chart-cards"] > div').first();
-  const ironSetting = card.locator('select[name="iron_setting"]');
-  await expect(ironSetting).toBeEnabled();
+  // instructions.csv.dist — so its iron-setting chips start visible.
+  const card = page.locator('[data-testid="chart-cards"] > article').first();
+  await expect(card.locator('[data-testid="chip-iron_setting-3"]')).toBeVisible();
 
-  await card.locator('input[name="ironing"]').uncheck();
+  await card.locator('[data-testid="toggle-ironing"]').click();
 
-  await expect(ironSetting).toBeDisabled();
+  await expect(card.locator('[data-testid="chip-iron_setting-3"]')).toHaveCount(0);
   await page.getByRole("button", { name: /Save changes/ }).click();
   await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
 
@@ -160,7 +165,7 @@ test("an edit survives a reload", async ({ page }) => {
   await goto(page);
 
   const notesInput = page
-    .locator('[data-testid="chart-cards"] > div')
+    .locator('[data-testid="chart-cards"] > article')
     .first()
     .locator('textarea[name="notes"]');
   await notesInput.fill("Persisted E2E note");
@@ -172,7 +177,7 @@ test("an edit survives a reload", async ({ page }) => {
 
   await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
   await expect(
-    page.locator('[data-testid="chart-cards"] > div').first().locator('textarea[name="notes"]'),
+    page.locator('[data-testid="chart-cards"] > article').first().locator('textarea[name="notes"]'),
   ).toHaveValue("Persisted E2E note");
 });
 
@@ -180,7 +185,7 @@ test("downloading the chart from the config page reflects an edit", async ({ pag
   await goto(page);
 
   const notesInput = page
-    .locator('[data-testid="chart-cards"] > div')
+    .locator('[data-testid="chart-cards"] > article')
     .first()
     .locator('textarea[name="notes"]');
   await notesInput.fill("Download E2E note");
