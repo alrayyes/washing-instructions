@@ -453,8 +453,7 @@ cut (everything, washing only, ironing only) and by pile (a search over the
 clothing type). The PDF itself, drawn through the same `@react-pdf/renderer`
 components and height-bisection pass the CLI's phone PDF uses, is only
 generated when you click "Download this sheet as a PDF" — not on every
-filter change. There is no upload/download of a custom chart yet — that's
-still open.
+filter change.
 
 Your last cut and pile filter are saved in the browser's `localStorage`, under
 the key `washy-washy:filters`, so reopening the page (or the installed
@@ -464,6 +463,19 @@ sync to — clear it the way you'd clear any site's data, or just use the
 filters and it saves itself. Where storage isn't available at all (private
 browsing, a full quota), the page still works; it just starts back at the
 default view every time.
+
+You can also upload your own chart instead of the bundled example: a JSON
+array of rows in the exact shape `data/washing-instructions.schema.json`
+describes — the same shape `packages/core`'s `chartToJson` writes and
+`chartFromJson` reads, and the same one a CSV parses into, just with the
+CSV's `|`-joined lists as real JSON arrays. "Download this chart as JSON" writes that
+shape out for whatever chart is currently active, bundled or your own, so
+editing a downloaded file and re-uploading it round-trips cleanly. A file
+that fails validation is rejected with the same row/column error the CLI's
+CSV validator gives, and the upload itself never leaves the browser —
+there's no server or account behind it, storage-permitting; clearing it (or
+using a private/storage-restricted browser) falls back to the bundled chart
+rather than showing nothing.
 
 ```sh
 cd apps/web
