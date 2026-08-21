@@ -12,6 +12,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { clearCustomChart, readCustomChart, writeCustomChart } from "../lib/customChart";
 import { filterByPile } from "../lib/filter";
 import { readFilters, writeFilters } from "../lib/storage";
+import { readUrlFilters } from "../lib/url";
+import { writeUrlFilters } from "../lib/urlHistory";
 import Sheet from "./Sheet";
 
 const CUT_LABEL: Record<Variant, string> = {
@@ -101,10 +103,20 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
   // avoids a hydration mismatch.
   const restored = useRef(false);
   useEffect(() => {
-    const saved = readFilters();
-    if (saved) {
-      setCut(saved.cut);
-      setPileQuery(saved.pileQuery);
+    // A URL carrying filter state wins outright over a previous visit's
+    // saved one — a shared link is meant to show what was shared, not
+    // silently blend with (or lose to) whatever's already in this
+    // browser's storage.
+    const fromUrl = readUrlFilters(window.location.search);
+    if (fromUrl.cut !== undefined || fromUrl.pileQuery !== undefined) {
+      setCut(fromUrl.cut ?? "full");
+      setPileQuery(fromUrl.pileQuery ?? "");
+    } else {
+      const saved = readFilters();
+      if (saved) {
+        setCut(saved.cut);
+        setPileQuery(saved.pileQuery);
+      }
     }
     setCustomInstructions(readCustomChart(machine));
     restored.current = true;
@@ -117,6 +129,7 @@ export default function SheetViewer({ items: bundledItems, machine }: Props) {
     // default state from this same effect.
     if (!restored.current) return;
     writeFilters({ cut, pileQuery });
+    writeUrlFilters({ cut, pileQuery });
   }, [cut, pileQuery]);
 
   const sourceItems = useMemo(
