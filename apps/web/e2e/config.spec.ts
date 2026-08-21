@@ -22,7 +22,7 @@ test("shows the machine's washer and iron settings, not a raw JSON dump", async 
 test("shows every pile in the bundled chart", async ({ page }) => {
   await goto(page);
 
-  const rows = page.locator("table tbody tr");
+  const rows = page.locator('[data-testid="chart-cards"] > div');
   await expect(rows).not.toHaveCount(0);
 });
 
@@ -45,7 +45,14 @@ test("reflects an uploaded chart, not the bundled example", async ({ page }) => 
 
   await goto(page);
 
-  await expect(page.getByText("Config Page E2E Pile")).toBeVisible();
+  // Chart cells are editable inputs, not plain text (#74) — getByText
+  // can't see an input's value, so check the value directly.
+  await expect(
+    page
+      .locator('[data-testid="chart-cards"] > div')
+      .first()
+      .locator('input[name="clothing_type"]'),
+  ).toHaveValue("Config Page E2E Pile");
 });
 
 test("the nav reaches both pages, in both directions", async ({ page }) => {
@@ -64,4 +71,78 @@ test("the nav reaches both pages, in both directions", async ({ page }) => {
 
   await nav.getByRole("link", { name: "Home" }).click();
   await expect(page).toHaveURL(/\/$/);
+});
+
+test("editing a chart field and saving applies it across the site", async ({ page }) => {
+  await goto(page);
+
+  const detergentInput = page
+    .locator('[data-testid="chart-cards"] > div')
+    .first()
+    .locator('textarea[name="detergent"]');
+  await detergentInput.fill("E2E Custom Detergent Note");
+  await page.getByRole("button", { name: /Save changes/ }).click();
+
+  await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
+  await expect(detergentInput).toHaveValue("E2E Custom Detergent Note");
+
+  // The same edit shows up on the main page — both read the same
+  // localStorage-backed chart (customChart.ts).
+  await page.goto("/");
+  await page.waitForSelector('[data-hydrated="true"]');
+  await expect(page.getByText("E2E Custom Detergent Note")).toBeVisible();
+});
+
+test("an invalid edit names the row and column, and isn't applied", async ({ page }) => {
+  await goto(page);
+
+  const temperatureInput = page
+    .locator('[data-testid="chart-cards"] > div')
+    .first()
+    .locator('input[name="temperature"]');
+  await temperatureInput.fill("99");
+  await page.getByRole("button", { name: /Save changes/ }).click();
+
+  await expect(page.getByRole("alert")).toContainText(/row \d+, column "temperature"/);
+  await expect(page.getByRole("alert")).toContainText("99");
+  // The bad edit never took: still the bundled chart, not a half-applied one.
+  await expect(page.getByText("Showing the bundled example chart.")).toBeVisible();
+});
+
+test("an edit survives a reload", async ({ page }) => {
+  await goto(page);
+
+  const notesInput = page
+    .locator('[data-testid="chart-cards"] > div')
+    .first()
+    .locator('textarea[name="notes"]');
+  await notesInput.fill("Persisted E2E note");
+  await page.getByRole("button", { name: /Save changes/ }).click();
+  await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
+
+  await page.reload();
+  await page.waitForSelector('[data-hydrated="true"]');
+
+  await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
+  await expect(
+    page.locator('[data-testid="chart-cards"] > div').first().locator('textarea[name="notes"]'),
+  ).toHaveValue("Persisted E2E note");
+});
+
+test("downloading the chart from the config page reflects an edit", async ({ page }) => {
+  await goto(page);
+
+  const notesInput = page
+    .locator('[data-testid="chart-cards"] > div')
+    .first()
+    .locator('textarea[name="notes"]');
+  await notesInput.fill("Download E2E note");
+  await page.getByRole("button", { name: /Save changes/ }).click();
+  await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
+
+  const href = await page.locator('a[download="washing-instructions.json"]').getAttribute("href");
+  const rows = JSON.parse(
+    decodeURIComponent(href?.replace("data:application/json;charset=utf-8,", "") ?? ""),
+  );
+  expect(rows[0].notes).toBe("Download E2E note");
 });
