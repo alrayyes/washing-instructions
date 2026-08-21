@@ -11,6 +11,8 @@ import {
 } from "@washy-washy/core/browser";
 import { useEffect, useMemo, useState } from "react";
 import { readCustomChart, writeCustomChart } from "../lib/customChart";
+import { colour } from "../lib/theme";
+import { IronDial, ProgramDial } from "./dials";
 
 const SECTION = "mb-6";
 const SECTION_HEADING = "mb-2 text-lg font-bold text-ink";
@@ -26,9 +28,29 @@ const BUTTON_SECONDARY =
   "inline-flex min-h-11 items-center justify-center rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-ink shadow-sm hover:bg-panel focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
 const ALERT = "rounded-md border border-no/30 bg-no/5 px-3 py-2 text-sm text-no";
 
+// Matches Sheet.tsx's read-only card exactly (CARD_CLASS/CARD_HEADER_CLASS
+// there) — white, not the gray `CARD` panel above, which is this page's own
+// machine-summary boxes, a different thing.
+const CHART_CARD = "rounded-lg border border-line p-4";
+const CHART_CARD_HEADER = "mb-3 flex items-center justify-between gap-2 border-b border-ink pb-1.5";
+const SUB_PANEL = "rounded-md border border-hairline bg-panel p-3";
+const CHIP_BUTTON = "rounded border px-1.5 py-0.5 text-xs";
+const CHIP_BUTTON_ON = "border-accent bg-accent font-bold text-white";
+const CHIP_BUTTON_OFF = "border-hairline bg-white text-muted hover:border-line";
+const PILL_BUTTON = "rounded px-1.5 py-0.5 text-xs font-bold text-white";
+
 interface Props {
   items: Instruction[];
   machine: Machine;
+}
+
+/** Matches Sheet.tsx's `SectionHeading` exactly. */
+function SectionHeading({ children }: { children: string }) {
+  return (
+    <p className="mb-1 text-[0.7rem] font-bold tracking-wide text-muted">
+      {children.toUpperCase()}
+    </p>
+  );
 }
 
 function Field({
@@ -135,8 +157,6 @@ function splitPipe(value: string): string[] {
 }
 
 const SELECT_INPUT = `${TEXT_INPUT} bg-white`;
-const CHECKBOX_INPUT = "size-4 accent-accent";
-const CHECKBOX_ROW = "flex items-center gap-1.5 text-sm text-body";
 
 function ProseField({
   value,
@@ -158,93 +178,105 @@ function ProseField({
   );
 }
 
-function BooleanField({
-  checked,
+/**
+ * The clickable version of Sheet.tsx's read-only `ChipRow` — same look
+ * (selected: filled accent, unselected: outlined), but every chip is a
+ * button that sets the field to its own value, single-select.
+ */
+function ChipSelectRow({
+  label,
   name,
-  onChange,
+  values,
+  selected,
+  onSelect,
 }: {
-  checked: boolean;
+  label: string;
   name: string;
-  onChange: (checked: boolean) => void;
+  values: readonly string[];
+  selected: string;
+  onSelect: (value: string) => void;
 }) {
   return (
-    <label className={CHECKBOX_ROW}>
-      <input
-        className={CHECKBOX_INPUT}
-        type="checkbox"
-        name={name}
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-      {checked ? "Yes" : "No"}
-    </label>
-  );
-}
-
-function SelectField({
-  value,
-  name,
-  options,
-  disabled,
-  onChange,
-}: {
-  value: string;
-  name: string;
-  options: readonly { value: string; label: string }[];
-  disabled?: boolean;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <select
-      className={SELECT_INPUT}
-      name={name}
-      value={value}
-      disabled={disabled}
-      onChange={(event) => onChange(event.target.value)}
-    >
-      {!disabled && value === "" && <option value="" />}
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  );
-}
-
-function ChecklistField({
-  value,
-  name,
-  options,
-  onChange,
-}: {
-  value: string;
-  name: string;
-  options: readonly string[];
-  onChange: (value: string) => void;
-}) {
-  const selected = new Set(splitPipe(value));
-  return (
-    <div className="flex flex-col gap-1">
-      {options.map((option) => (
-        <label key={option} className={CHECKBOX_ROW}>
-          <input
-            className={CHECKBOX_INPUT}
-            type="checkbox"
-            name={name}
-            value={option}
-            checked={selected.has(option)}
-            onChange={(event) => {
-              const next = new Set(selected);
-              if (event.target.checked) next.add(option);
-              else next.delete(option);
-              onChange([...next].join("|"));
-            }}
-          />
-          {option}
-        </label>
-      ))}
+    <div className="mb-1 flex items-start gap-2">
+      <span className="w-14 shrink-0 pt-0.5 text-xs text-body">{label}</span>
+      <div className="flex flex-wrap gap-1" role="radiogroup" aria-label={label}>
+        {values.map((value) => (
+          <button
+            key={value}
+            type="button"
+            data-testid={`chip-${name}-${value}`}
+            aria-pressed={value === selected}
+            className={`${CHIP_BUTTON} ${value === selected ? CHIP_BUTTON_ON : CHIP_BUTTON_OFF}`}
+            onClick={() => onSelect(value)}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
     </div>
+  );
+}
+
+/** The `|`-joined multi-value cousin of `ChipSelectRow` — each chip toggles independently. */
+function ChipMultiRow({
+  label,
+  name,
+  values,
+  selected,
+  onToggle,
+}: {
+  label: string;
+  name: string;
+  values: readonly string[];
+  selected: readonly string[];
+  onToggle: (value: string) => void;
+}) {
+  return (
+    <div className="mb-1 flex items-start gap-2">
+      <span className="w-14 shrink-0 pt-0.5 text-xs text-body">{label}</span>
+      <div className="flex flex-wrap gap-1">
+        {values.map((value) => (
+          <button
+            key={value}
+            type="button"
+            data-testid={`chip-${name}-${value}`}
+            aria-pressed={selected.includes(value)}
+            className={`${CHIP_BUTTON} ${selected.includes(value) ? CHIP_BUTTON_ON : CHIP_BUTTON_OFF}`}
+            onClick={() => onToggle(value)}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** The clickable version of Sheet.tsx's `SoftenerBadge` — same pill, toggles on click. */
+function PillToggle({
+  on,
+  onLabel,
+  offLabel,
+  name,
+  onClick,
+}: {
+  on: boolean;
+  onLabel: string;
+  offLabel: string;
+  name: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={`toggle-${name}`}
+      aria-pressed={on}
+      className={PILL_BUTTON}
+      style={{ backgroundColor: on ? colour.yes : colour.no }}
+      onClick={onClick}
+    >
+      {on ? onLabel : offLabel}
+    </button>
   );
 }
 
@@ -273,22 +305,39 @@ function TimeField({
   );
 }
 
+function EditableSplitField({
+  label,
+  value,
+  name,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  name: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="mt-2">
+      <p className="text-[0.6rem] font-bold tracking-wide text-muted">{label.toUpperCase()}</p>
+      <ProseField value={value} name={name} onChange={onChange} />
+    </div>
+  );
+}
+
 /**
- * One card per pile, matching `Sheet.tsx`'s read-only cards — fifteen
- * fields across as table columns needed either a fixed-width grid
- * nobody's screen was wide enough for, or a fully custom layout with no
- * precedent elsewhere in the app. Stacking fields inside a card already
- * has one: this is the same shape the main page's cards use, editable.
+ * One card per pile, drawn to look like — and, since this is the same
+ * data, double as an editor for — `Sheet.tsx`'s read-only card: the same
+ * dial, the same chip rows for the values the machine constrains, the
+ * same softener pill. A chip is a button here instead of a `<span>`, and
+ * clicking one sets the field to its value; the free-text fields
+ * (detergent, notes, …) are the same textarea the previous, plainer
+ * version of this page used.
  *
- * A widget per field's actual shape — checkbox for a yes/no, select for a
- * value the machine constrains, checklist for a `|`-joined multi-value
- * field — rather than a text input for everything. The constrained fields
- * can't produce an invalid value through this UI at all (the select only
- * ever offers valid ones), which is stricter than `instructionsFromRows`'s
- * own validation; that validation still runs on Save regardless, since a
- * chart edited on this page is the same string shape (`Row`) an upload
- * goes through, and it's the single source of truth for what's valid, not
- * duplicated here.
+ * The constrained fields (temperature, spin, programme, colour group,
+ * iron setting) can't produce an invalid value through this UI at all —
+ * the chips only ever offer valid ones. `instructionsFromRows` still
+ * validates on Save regardless; it's the single source of truth for
+ * what's valid, not duplicated here.
  */
 function ChartCards({
   rows,
@@ -299,144 +348,229 @@ function ChartCards({
   machine: Machine;
   onChange: (index: number, key: (typeof COLUMNS)[number], value: string) => void;
 }) {
-  const stringOptions = (values: readonly string[]) => values.map((v) => ({ value: v, label: v }));
-  const ironSettingOptions = machine.iron.settings.map((s) => ({ value: s.key, label: s.label }));
+  const { washer, iron } = machine;
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" data-testid="chart-cards">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2" data-testid="chart-cards">
       {rows.map((row, index) => {
         const set = (key: (typeof COLUMNS)[number], value: string) => onChange(index, key, value);
         const ironing = row.ironing === "yes";
+        const position = washer.programs.indexOf(row.program);
+        const off = washer.programs[0] ?? "";
+        const setting = iron.settings.find((s) => s.key === row.iron_setting);
+
         return (
-          <div
+          <article
             // biome-ignore lint/suspicious/noArrayIndexKey: a chart row has no id of its own, and clothing_type alone isn't guaranteed unique
             key={`${row.clothing_type}-${index}`}
-            className={CARD}
+            className={CHART_CARD}
           >
-            <input
-              className={`${TEXT_INPUT} text-base font-bold text-ink`}
-              type="text"
-              name="clothing_type"
-              aria-label="Pile"
-              value={row.clothing_type}
-              onChange={(event) => set("clothing_type", event.target.value)}
-            />
-            <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2">
-              <Field label="Detergent" span>
-                <ProseField
-                  value={row.detergent}
-                  name="detergent"
-                  onChange={(value) => set("detergent", value)}
-                />
-              </Field>
-              <Field label="Softener">
-                <BooleanField
-                  checked={row.fabric_softener === "yes"}
-                  name="fabric_softener"
-                  onChange={(checked) => set("fabric_softener", checked ? "yes" : "no")}
-                />
-              </Field>
-              <Field label="Temp">
-                <SelectField
-                  value={row.temperature}
-                  name="temperature"
-                  options={stringOptions(machine.washer.temperatures)}
-                  onChange={(value) => set("temperature", value)}
-                />
-              </Field>
-              <Field label="Spin">
-                <SelectField
-                  value={row.spin}
-                  name="spin"
-                  options={stringOptions(machine.washer.spins)}
-                  onChange={(value) => set("spin", value)}
-                />
-              </Field>
-              <Field label="Duration">
-                <TimeField
-                  value={row.duration}
-                  name="duration"
-                  onChange={(value) => set("duration", value)}
-                />
-              </Field>
-              <Field label="Programme">
-                <SelectField
-                  value={row.program}
+            <div className={CHART_CARD_HEADER}>
+              <input
+                className={`${TEXT_INPUT} min-w-0 text-base font-bold text-ink`}
+                type="text"
+                name="clothing_type"
+                aria-label="Pile"
+                value={row.clothing_type}
+                onChange={(event) => set("clothing_type", event.target.value)}
+              />
+              <TimeField
+                value={row.duration}
+                name="duration"
+                onChange={(value) => set("duration", value)}
+              />
+            </div>
+
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <PillToggle
+                on={row.fabric_softener === "yes"}
+                onLabel="SOFTENER OK"
+                offLabel="NO SOFTENER"
+                name="fabric_softener"
+                onClick={() => set("fabric_softener", row.fabric_softener === "yes" ? "no" : "yes")}
+              />
+              <span className="text-xs font-bold text-ink">
+                {row.program} {row.temperature === "koud" ? "koud" : `${row.temperature} °C`} ·{" "}
+                {row.spin === "0" ? "no spin" : `${row.spin} rpm`}
+              </span>
+            </div>
+
+            <div className={`flex gap-3 ${SUB_PANEL}`}>
+              <div className="w-20 shrink-0 text-center">
+                <ProgramDial program={row.program} washer={washer} size={78} />
+                <select
+                  className="mt-1 w-full rounded border border-transparent bg-transparent px-0 text-center text-xs font-bold text-ink hover:border-line focus:border-accent focus:bg-white focus:outline-none"
                   name="program"
-                  options={stringOptions(machine.washer.programs)}
-                  onChange={(value) => set("program", value)}
+                  aria-label="Programme"
+                  value={row.program}
+                  onChange={(event) => set("program", event.target.value)}
+                >
+                  {washer.programs.map((program) => (
+                    <option key={program} value={program}>
+                      {program}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[0.6rem] text-body">
+                  {position} clockwise from {off}
+                </p>
+              </div>
+              <div className="flex flex-1 flex-col justify-center">
+                <ChipSelectRow
+                  label="Temp"
+                  name="temperature"
+                  values={washer.temperatures}
+                  selected={row.temperature}
+                  onSelect={(value) => set("temperature", value)}
                 />
-              </Field>
-              <Field label="Buttons" span>
-                <ChecklistField
-                  value={row.options}
+                <ChipSelectRow
+                  label="Spin rpm"
+                  name="spin"
+                  values={washer.spins}
+                  selected={row.spin}
+                  onSelect={(value) => set("spin", value)}
+                />
+                <ChipMultiRow
+                  label="Buttons"
                   name="options"
-                  options={machine.washer.options}
-                  onChange={(value) => set("options", value)}
-                />
-              </Field>
-              <Field label="Ironing">
-                <BooleanField
-                  checked={ironing}
-                  name="ironing"
-                  onChange={(checked) => {
-                    set("ironing", checked ? "yes" : "no");
-                    if (checked && row.iron_setting === "") {
-                      set("iron_setting", machine.iron.settings[0]?.key ?? "");
-                    } else if (!checked) {
-                      set("iron_setting", "");
-                    }
+                  values={washer.options}
+                  selected={splitPipe(row.options)}
+                  onToggle={(value) => {
+                    const next = new Set(splitPipe(row.options));
+                    if (next.has(value)) next.delete(value);
+                    else next.add(value);
+                    set("options", [...next].join("|"));
                   }}
                 />
-              </Field>
-              <Field label="Iron setting">
-                <SelectField
-                  value={row.iron_setting}
-                  name="iron_setting"
-                  options={ironSettingOptions}
-                  disabled={!ironing}
-                  onChange={(value) => set("iron_setting", value)}
-                />
-              </Field>
-              <Field label="Iron notes" span>
-                <ProseField
-                  value={row.ironing_notes}
-                  name="ironing_notes"
-                  onChange={(value) => set("ironing_notes", value)}
-                />
-              </Field>
-              <Field label="Drying" span>
-                <ProseField
-                  value={row.drying}
-                  name="drying"
-                  onChange={(value) => set("drying", value)}
-                />
-              </Field>
-              <Field label="Colour group">
-                <SelectField
-                  value={row.colour_group}
-                  name="colour_group"
-                  options={stringOptions(colourGroups)}
-                  onChange={(value) => set("colour_group", value)}
-                />
-              </Field>
-              <Field label="Mix tags">
-                <ChecklistField
-                  value={row.mix_tags}
-                  name="mix_tags"
-                  options={mixTags}
-                  onChange={(value) => set("mix_tags", value)}
-                />
-              </Field>
-              <Field label="Notes" span>
-                <ProseField
-                  value={row.notes}
-                  name="notes"
-                  onChange={(value) => set("notes", value)}
-                />
-              </Field>
+              </div>
             </div>
-          </div>
+
+            <EditableSplitField
+              label="Detergent"
+              value={row.detergent}
+              name="detergent"
+              onChange={(value) => set("detergent", value)}
+            />
+
+            <div className="mt-3">
+              <SectionHeading>Iron</SectionHeading>
+              <div className={`flex items-center gap-3 ${SUB_PANEL}`}>
+                <IronDial
+                  setting={row.iron_setting}
+                  settings={iron.settings}
+                  off={!ironing}
+                  size={62}
+                />
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <PillToggle
+                      on={ironing}
+                      onLabel="IRONED"
+                      offLabel="DO NOT IRON"
+                      name="ironing"
+                      onClick={() => {
+                        set("ironing", ironing ? "no" : "yes");
+                        if (!ironing && row.iron_setting === "") {
+                          set("iron_setting", iron.settings[0]?.key ?? "");
+                        } else if (ironing) {
+                          set("iron_setting", "");
+                        }
+                      }}
+                    />
+                    {ironing && setting && (
+                      <span className="text-xs font-bold text-ink">
+                        {setting.label} — {setting.detail}
+                      </span>
+                    )}
+                  </div>
+                  {ironing && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {iron.settings.map((s) => (
+                        <button
+                          key={s.key}
+                          type="button"
+                          data-testid={`chip-iron_setting-${s.key}`}
+                          aria-pressed={s.key === row.iron_setting}
+                          className={`${CHIP_BUTTON} ${
+                            s.key === row.iron_setting ? CHIP_BUTTON_ON : CHIP_BUTTON_OFF
+                          }`}
+                          onClick={() => set("iron_setting", s.key)}
+                        >
+                          {s.dots || s.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <ProseField
+                    value={row.ironing_notes}
+                    name="ironing_notes"
+                    onChange={(value) => set("ironing_notes", value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <EditableSplitField
+              label="Drying"
+              value={row.drying}
+              name="drying"
+              onChange={(value) => set("drying", value)}
+            />
+
+            <div className="mt-2">
+              <p className="text-[0.6rem] font-bold tracking-wide text-muted">COLOUR GROUP</p>
+              <div className="mt-1 flex flex-wrap gap-1">
+                {colourGroups.map((group) => (
+                  <button
+                    key={group}
+                    type="button"
+                    data-testid={`chip-colour_group-${group}`}
+                    aria-pressed={group === row.colour_group}
+                    className={`${CHIP_BUTTON} ${
+                      group === row.colour_group ? CHIP_BUTTON_ON : CHIP_BUTTON_OFF
+                    }`}
+                    onClick={() => set("colour_group", group)}
+                  >
+                    {group}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-2">
+              <p className="text-[0.6rem] font-bold tracking-wide text-muted">MIX TAGS</p>
+              <div className="mt-1 flex flex-wrap gap-1">
+                {mixTags.map((tag) => {
+                  const selected = splitPipe(row.mix_tags);
+                  const on = selected.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      data-testid={`chip-mix_tags-${tag}`}
+                      aria-pressed={on}
+                      className={`${CHIP_BUTTON} ${on ? CHIP_BUTTON_ON : CHIP_BUTTON_OFF}`}
+                      onClick={() => {
+                        const next = new Set(selected);
+                        if (next.has(tag)) next.delete(tag);
+                        else next.add(tag);
+                        set("mix_tags", [...next].join("|"));
+                      }}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <EditableSplitField
+              label="Notes"
+              value={row.notes}
+              name="notes"
+              onChange={(value) => set("notes", value)}
+            />
+          </article>
         );
       })}
     </div>
