@@ -446,12 +446,16 @@ names.
 ## The web app
 
 `apps/web` is a static [Astro](https://astro.build) site — a bookmarkable,
-Android-installable page reading the same `.dist` chart. It renders the phone
-sheet through the same `@react-pdf/renderer` components and height-bisection
-pass the CLI's own phone PDF uses, filtered by cut (everything, washing only,
-ironing only) and by pile (a search over the clothing type). Filter and
-navigation state does not persist across visits yet, and there is no
-upload/download of a custom chart yet either — both are still open.
+Android-installable page reading the same `.dist` chart. It shows the phone
+sheet as a real page — the same cards, dial illustrations and colours the
+PDF draws, as HTML/CSS/SVG rather than an embedded PDF viewer — filtered by
+cut (everything, washing only, ironing only) and by pile (a search over the
+clothing type). The PDF itself, drawn through the same `@react-pdf/renderer`
+components and height-bisection pass the CLI's phone PDF uses, is only
+generated when you click "Download this sheet as a PDF" — not on every
+filter change. Filter and navigation state does not persist across visits
+yet, and there is no upload/download of a custom chart yet either — both
+are still open.
 
 ```sh
 cd apps/web
