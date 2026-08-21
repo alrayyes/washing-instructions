@@ -1,5 +1,5 @@
 import { Circle, G, Line, Path, Svg, Text, View } from "@react-pdf/renderer";
-import { type Instruction, ironSetting } from "@washy-washy/core";
+import { type Instruction, ironSetting } from "@washy-washy/core/browser";
 import { useMachine } from "./appliances";
 import { theme } from "./theme";
 

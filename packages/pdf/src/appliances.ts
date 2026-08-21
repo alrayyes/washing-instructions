@@ -1,4 +1,4 @@
-import type { Machine } from "@washy-washy/core";
+import type { Machine } from "@washy-washy/core/browser";
 import { createContext, useContext } from "react";
 
 /**

@@ -1,4 +1,4 @@
-import { renderToBuffer } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import {
   ironGroups,
   ironSettingKeys,
@@ -6,12 +6,28 @@ import {
   type ResolvedInstruction,
   type Variant,
   washGroups,
-} from "@washy-washy/core";
+} from "@washy-washy/core/browser";
 import { PDFDocument } from "pdf-lib";
+import type { ReactElement } from "react";
 import { PhoneDocument, PrintDocument, ReferenceDocument } from "./documents";
 
-async function pageCount(pdf: Uint8Array): Promise<number> {
-  return (await PDFDocument.load(pdf)).getPageCount();
+async function pageCount(bytes: Uint8Array): Promise<number> {
+  return (await PDFDocument.load(bytes)).getPageCount();
+}
+
+/**
+ * `renderToBuffer` is Node-only — it throws in a browser even from the
+ * browser build, since a `Buffer` is a Node type. `pdf(…).toBlob()` is the
+ * one render entry point react-pdf exposes on both platforms, so this is
+ * what makes `renderPhone`/`renderPrint` usable from `apps/web`'s island as
+ * well as the CLI. Every caller here actually passes a <Document> wrapped in
+ * <ApplianceContext.Provider>, not a bare Document, which is looser than
+ * what react-pdf's own types ask for.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: see above — matches react-pdf's own loosely typed `document` param
+async function renderToBytes(document: ReactElement<any>): Promise<Uint8Array> {
+  const blob = await pdf(document).toBlob();
+  return new Uint8Array(await blob.arrayBuffer());
 }
 
 /**
@@ -57,7 +73,7 @@ export async function renderPhone(
   tolerance = 8,
 ): Promise<PhoneRender> {
   const render = (height: number) =>
-    renderToBuffer(PhoneDocument({ items, height, machine, variant }));
+    renderToBytes(PhoneDocument({ items, height, machine, variant }));
   let attempts = 0;
 
   const fits = async (height: number) => {
@@ -117,8 +133,8 @@ async function fittingDensity(
   tolerance = 0.02,
 ): Promise<number> {
   const fits = async (density: number) => {
-    const pdf = await renderToBuffer(ReferenceDocument({ items, machine, density, variant }));
-    return (await pageCount(pdf)) === 1;
+    const bytes = await renderToBytes(ReferenceDocument({ items, machine, density, variant }));
+    return (await pageCount(bytes)) === 1;
   };
 
   if (await fits(LOOSEST)) return LOOSEST;
@@ -142,7 +158,7 @@ export async function renderPrint(
   machine: Machine,
   variant: Variant = "full",
 ): Promise<Uint8Array> {
-  return renderToBuffer(
+  return renderToBytes(
     PrintDocument({
       items,
       machine,

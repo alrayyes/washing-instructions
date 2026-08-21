@@ -16,7 +16,7 @@ import {
   type ResolvedInstruction,
   type Variant,
   washGroups,
-} from "@washy-washy/core";
+} from "@washy-washy/core/browser";
 import { ApplianceContext, useMachine } from "./appliances";
 import {
   ControlPanel,
