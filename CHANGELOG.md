@@ -1,3 +1,9 @@
+## [2.11.0](https://github.com/alrayyes/washy-washy/compare/v2.10.0...v2.11.0) (2026-08-21)
+
+### Features
+
+* **web:** use typed inputs on the editable chart, not text everywhere ([#89](https://github.com/alrayyes/washy-washy/issues/89)) ([020fc6b](https://github.com/alrayyes/washy-washy/commit/020fc6bd8b7ceba338162d7a94c27acc3c87beb1))
+
 ## [2.10.0](https://github.com/alrayyes/washy-washy/compare/v2.9.0...v2.10.0) (2026-08-21)
 
 ### Features
