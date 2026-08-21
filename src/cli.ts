@@ -10,8 +10,8 @@ import {
   resolve,
   type Variant,
 } from "@washy-washy/core";
+import { renderPhone, renderPrint } from "@washy-washy/pdf";
 import { loadMachine } from "./machine";
-import { renderPhone, renderPrint } from "./render";
 
 const DEFAULT_CSV = "data/washing-instructions.csv";
 const DEFAULT_OUT = "out";

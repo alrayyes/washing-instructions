@@ -5,11 +5,10 @@
     "": {
       "name": "washy-washy",
       "dependencies": {
-        "@react-pdf/renderer": "4.6.1",
         "@washy-washy/core": "workspace:*",
+        "@washy-washy/pdf": "workspace:*",
         "csv-parse": "7.0.2",
         "pdf-lib": "1.17.1",
-        "react": "19.2.8",
       },
       "devDependencies": {
         "@biomejs/biome": "2.5.9",
@@ -45,6 +44,16 @@
       "version": "0.0.0",
       "dependencies": {
         "csv-parse": "7.0.2",
+      },
+    },
+    "packages/pdf": {
+      "name": "@washy-washy/pdf",
+      "version": "0.0.0",
+      "dependencies": {
+        "@react-pdf/renderer": "4.6.1",
+        "@washy-washy/core": "workspace:*",
+        "pdf-lib": "1.17.1",
+        "react": "19.2.8",
       },
     },
   },
@@ -553,6 +562,8 @@
     "@vscode/l10n": ["@vscode/l10n@0.0.18", "", {}, "sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ=="],
 
     "@washy-washy/core": ["@washy-washy/core@workspace:packages/core"],
+
+    "@washy-washy/pdf": ["@washy-washy/pdf@workspace:packages/pdf"],
 
     "@washy-washy/web": ["@washy-washy/web@workspace:apps/web"],
 
