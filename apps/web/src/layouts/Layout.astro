@@ -7,6 +7,10 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+const path = Astro.url.pathname;
+const NAV_LINK = "rounded-md px-2 py-1 -mx-2 hover:bg-panel hover:text-accent";
+const NAV_LINK_ACTIVE = "text-accent";
+const NAV_LINK_INACTIVE = "text-body";
 ---
 
 <!doctype html>
@@ -24,6 +28,25 @@ const { title, description } = Astro.props;
         Fork me on GitHub
       </a>
     </div>
+    <nav
+      class="mx-auto flex max-w-3xl items-center gap-4 px-4 pt-6 text-sm font-semibold sm:px-6"
+      aria-label="Site"
+    >
+      <a
+        href="/"
+        aria-current={path === "/" ? "page" : undefined}
+        class={`${NAV_LINK} ${path === "/" ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`}
+      >
+        Home
+      </a>
+      <a
+        href="/config"
+        aria-current={path.startsWith("/config") ? "page" : undefined}
+        class={`${NAV_LINK} ${path.startsWith("/config") ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`}
+      >
+        Config
+      </a>
+    </nav>
     <main class="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
       <slot />
     </main>
@@ -32,11 +55,6 @@ const { title, description } = Astro.props;
     >
       <p>
         <a
-          href="/config"
-          class="underline decoration-hairline underline-offset-2 hover:text-accent hover:decoration-accent"
-        >
-          View the full config
-        </a>{" · "}<a
           href="https://github.com/alrayyes/washy-washy"
           class="underline decoration-hairline underline-offset-2 hover:text-accent hover:decoration-accent"
         >
