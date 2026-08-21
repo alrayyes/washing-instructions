@@ -1,3 +1,9 @@
+## [2.10.0](https://github.com/alrayyes/washy-washy/compare/v2.9.0...v2.10.0) (2026-08-21)
+
+### Features
+
+* **web:** make the chart editable on the config page ([#86](https://github.com/alrayyes/washy-washy/issues/86)) ([8b50086](https://github.com/alrayyes/washy-washy/commit/8b500867540e2ae5be9368322d11738e44b902af)), closes [#83](https://github.com/alrayyes/washy-washy/issues/83) [#72](https://github.com/alrayyes/washy-washy/issues/72)
+
 ## [2.9.0](https://github.com/alrayyes/washy-washy/compare/v2.8.0...v2.9.0) (2026-08-21)
 
 ### Features
