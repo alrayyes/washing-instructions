@@ -1,3 +1,9 @@
+## [2.8.0](https://github.com/alrayyes/washy-washy/compare/v2.7.0...v2.8.0) (2026-08-21)
+
+### Features
+
+* **web:** shareable URL for the current filter state ([#82](https://github.com/alrayyes/washy-washy/issues/82)) ([2f1cec0](https://github.com/alrayyes/washy-washy/commit/2f1cec0a7ab1723174a7342aeb52a7c257b38f12))
+
 ## [2.7.0](https://github.com/alrayyes/washy-washy/compare/v2.6.0...v2.7.0) (2026-08-21)
 
 ### Features
