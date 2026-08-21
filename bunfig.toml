@@ -1,0 +1,7 @@
+# apps/web/e2e/**/*.spec.ts are Playwright specs, run only via `bunx
+# playwright test` inside apps/web. bun's own test runner otherwise
+# auto-discovers them too — they use Playwright's test(), not bun:test's,
+# so bun running them fails with "did not expect test() to be called here"
+# rather than skipping them.
+[test]
+pathIgnorePatterns = ["apps/web/e2e/**"]

@@ -38,6 +38,11 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # wrangler's local state — auth, deploy history (apps/web)
 .wrangler
 
+# Playwright's own run output (apps/web)
+test-results
+playwright-report
+blob-report
+
 # downloaded by bun run prose:sync — the Vale binary, and the style packages it
 # lints against. styles/config is ours and stays committed, so the package
 # directories are ignored by name rather than the whole styles/ tree
