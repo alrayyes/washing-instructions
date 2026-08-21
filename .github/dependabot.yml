@@ -40,6 +40,30 @@ updates:
           - markdownlint-cli2
           - lefthook
 
+  # Dependabot is opt-in per directory, not just per ecosystem - it doesn't
+  # walk a bun workspace on its own. apps/web has its own production deps
+  # (astro) the root entry above never sees.
+  - package-ecosystem: bun
+    directory: /apps/web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: fix
+      prefix-development: chore
+      include: scope
+
+  # Same gap, packages/core's own deps (csv-parse).
+  - package-ecosystem: bun
+    directory: /packages/core
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: fix
+      prefix-development: chore
+      include: scope
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
