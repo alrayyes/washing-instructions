@@ -96,17 +96,64 @@ test("editing a chart field and saving applies it across the site", async ({ pag
 test("an invalid edit names the row and column, and isn't applied", async ({ page }) => {
   await goto(page);
 
-  const temperatureInput = page
+  // Every constrained field (temperature, programme, …) is a select now —
+  // the UI can't produce an invalid value for those at all. Emptying the
+  // one genuinely free-text required field is the remaining way to reach
+  // instructionsFromRows's validation from this page.
+  const pileInput = page
     .locator('[data-testid="chart-cards"] > div')
     .first()
-    .locator('input[name="temperature"]');
-  await temperatureInput.fill("99");
+    .locator('input[name="clothing_type"]');
+  await pileInput.fill("");
   await page.getByRole("button", { name: /Save changes/ }).click();
 
-  await expect(page.getByRole("alert")).toContainText(/row \d+, column "temperature"/);
-  await expect(page.getByRole("alert")).toContainText("99");
+  await expect(page.getByRole("alert")).toContainText(/row \d+, column "clothing_type"/);
+  await expect(page.getByRole("alert")).toContainText("must not be empty");
   // The bad edit never took: still the bundled chart, not a half-applied one.
   await expect(page.getByText("Showing the bundled example chart.")).toBeVisible();
+});
+
+test("select, checkbox and checklist fields all apply and download correctly", async ({ page }) => {
+  await goto(page);
+
+  const card = page.locator('[data-testid="chart-cards"] > div').first();
+  await card.locator('select[name="temperature"]').selectOption("30");
+  await card.locator('input[name="fabric_softener"]').check();
+  await card.locator('input[name="options"][value="Speed"]').check();
+  await page.getByRole("button", { name: /Save changes/ }).click();
+
+  await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
+
+  const href = await page.locator('a[download="washing-instructions.json"]').getAttribute("href");
+  const rows = JSON.parse(
+    decodeURIComponent(href?.replace("data:application/json;charset=utf-8,", "") ?? ""),
+  );
+  expect(rows[0].temperature).toBe("30");
+  expect(rows[0].fabric_softener).toBe("yes");
+  expect(rows[0].options.split("|")).toContain("Speed");
+});
+
+test("unchecking ironing clears and disables the iron setting", async ({ page }) => {
+  await goto(page);
+
+  // The first pile in the bundled chart is ironed — see data/washing-
+  // instructions.csv.dist — so its "Iron setting" select starts enabled.
+  const card = page.locator('[data-testid="chart-cards"] > div').first();
+  const ironSetting = card.locator('select[name="iron_setting"]');
+  await expect(ironSetting).toBeEnabled();
+
+  await card.locator('input[name="ironing"]').uncheck();
+
+  await expect(ironSetting).toBeDisabled();
+  await page.getByRole("button", { name: /Save changes/ }).click();
+  await expect(page.getByText("Showing your uploaded chart.")).toBeVisible();
+
+  const href = await page.locator('a[download="washing-instructions.json"]').getAttribute("href");
+  const rows = JSON.parse(
+    decodeURIComponent(href?.replace("data:application/json;charset=utf-8,", "") ?? ""),
+  );
+  expect(rows[0].ironing).toBe("no");
+  expect(rows[0].iron_setting).toBe("");
 });
 
 test("an edit survives a reload", async ({ page }) => {
