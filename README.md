@@ -466,6 +466,15 @@ filters and it saves itself. Where storage isn't available at all (private
 browsing, a full quota), the page still works; it just starts back at the
 default view every time.
 
+The same filters are also in the URL — `?cut=iron&pile=towels` — so copying
+the address bar and sending it to someone opens straight to that view, no
+description of which dropdown and search term needed. A URL carrying filter
+state always wins over whatever `localStorage` remembers from a previous
+visit, and the URL updates as you filter without adding to your browser's
+back-button history. The uploaded chart itself isn't part of the URL — its
+JSON is too large for that — so sharing your own chart still means sending
+the downloaded file, not a link.
+
 You can also upload your own chart instead of the bundled example: a JSON
 array of rows in the exact shape `data/washing-instructions.schema.json`
 describes — the same shape `packages/core`'s `chartToJson` writes and
