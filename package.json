@@ -36,7 +36,6 @@
     "@react-pdf/renderer": "4.6.1",
     "@washy-washy/core": "workspace:*",
     "csv-parse": "7.0.2",
-    "generate": "^0.14.0",
     "pdf-lib": "1.17.1",
     "react": "19.2.8"
   },
