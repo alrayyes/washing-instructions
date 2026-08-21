@@ -48,10 +48,20 @@ test("reflects an uploaded chart, not the bundled example", async ({ page }) => 
   await expect(page.getByText("Config Page E2E Pile")).toBeVisible();
 });
 
-test("is reachable from the main page without knowing the URL by hand", async ({ page }) => {
+test("the nav reaches both pages, in both directions", async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector('[data-hydrated="true"]');
+  const nav = page.getByRole("navigation", { name: "Site" });
 
-  await page.getByRole("link", { name: /config/i }).click();
+  await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
+  await expect(nav.getByRole("link", { name: "Config" })).not.toHaveAttribute("aria-current");
+
+  await nav.getByRole("link", { name: "Config" }).click();
   await expect(page).toHaveURL(/\/config\/?$/);
+  await page.waitForSelector('[data-hydrated="true"]');
+  await expect(nav.getByRole("link", { name: "Config" })).toHaveAttribute("aria-current", "page");
+  await expect(nav.getByRole("link", { name: "Home" })).not.toHaveAttribute("aria-current");
+
+  await nav.getByRole("link", { name: "Home" }).click();
+  await expect(page).toHaveURL(/\/$/);
 });
