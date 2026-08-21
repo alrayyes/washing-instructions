@@ -1,3 +1,9 @@
+## [2.9.0](https://github.com/alrayyes/washy-washy/compare/v2.8.0...v2.9.0) (2026-08-21)
+
+### Features
+
+* **web:** add a site nav for Home and Config ([#85](https://github.com/alrayyes/washy-washy/issues/85)) ([61137a3](https://github.com/alrayyes/washy-washy/commit/61137a37a8e730c4e52336281f4206a8a2d10b5f))
+
 ## [2.8.0](https://github.com/alrayyes/washy-washy/compare/v2.7.0...v2.8.0) (2026-08-21)
 
 ### Features
