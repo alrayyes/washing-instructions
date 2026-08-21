@@ -1,3 +1,9 @@
+## [2.4.1](https://github.com/alrayyes/washy-washy/compare/v2.4.0...v2.4.1) (2026-08-21)
+
+### Performance Improvements
+
+* **web:** code-split the PDF renderer out of the main chunk ([#65](https://github.com/alrayyes/washy-washy/issues/65)) ([f3e2bde](https://github.com/alrayyes/washy-washy/commit/f3e2bde75edf9c56a8d5707b826ffdaec2f3db9c)), closes [#60](https://github.com/alrayyes/washy-washy/issues/60)
+
 ## [2.4.0](https://github.com/alrayyes/washy-washy/compare/v2.3.0...v2.4.0) (2026-08-21)
 
 ### Features
