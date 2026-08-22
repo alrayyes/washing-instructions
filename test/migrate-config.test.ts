@@ -2,9 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DIST_MACHINE } from "@washy-washy/core";
 import { migrateConfig } from "../scripts/migrate-config";
-import { loadMachine } from "../src/machine";
+import { DIST_MACHINE, loadMachine } from "../src/machine";
 
 const HEADER =
   "clothing_type,detergent,fabric_softener,temperature,spin,duration,program,options," +

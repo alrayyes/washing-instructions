@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { chartFromJson, chartToJson, DIST_MACHINE, parseInstructions } from "@washy-washy/core";
-import { loadMachine } from "../src/machine";
+import { chartFromJson, chartToJson, parseInstructions } from "@washy-washy/core";
+import { DIST_MACHINE, loadMachine } from "../src/machine";
 
 const machine = await loadMachine(DIST_MACHINE);
 

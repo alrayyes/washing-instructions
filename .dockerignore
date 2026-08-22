@@ -1,10 +1,9 @@
-# The build needs the manifest, the lockfile, src/, the packages/ workspace
-# and the dummy config. Keeping everything else out means a docs edit does not
-# invalidate the dependency layer.
+# The build needs the manifest, the lockfile, src/ and the dummy config.
+# Keeping everything else out means a docs edit does not invalidate the
+# dependency layer.
 *
 
 !package.json
 !bun.lock
 !src
-!packages
 !data/washy-washy.json.dist
