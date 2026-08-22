@@ -134,6 +134,18 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bunx --bun commitlint --from "${{ github.event.pull_request.base.sha }}" --to HEAD --verbose
 
+  # Public repo, so this actually catches something Dependabot's own schedule
+  # doesn't: a PR introducing a *new* dependency that's already known-bad,
+  # checked at merge time rather than waiting for the next scan. Skipped on a
+  # private repo needing paid GHAS for it — see rules/releases.md — which
+  # doesn't apply here.
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+
   # Prose gets its own two jobs rather than a line in the one above, so that
   # when the run goes red the job name says which tier failed: a grammar error
   # is a mistake and a style alert is an opinion, answered differently.
