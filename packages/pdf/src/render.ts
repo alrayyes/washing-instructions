@@ -19,7 +19,7 @@ async function pageCount(bytes: Uint8Array): Promise<number> {
  * `renderToBuffer` is Node-only — it throws in a browser even from the
  * browser build, since a `Buffer` is a Node type. `pdf(…).toBlob()` is the
  * one render entry point react-pdf exposes on both platforms, so this is
- * what makes `renderPhone`/`renderPrint` usable from `apps/web`'s island as
+ * what makes `renderPhone`/`renderPrint` usable from a browser island as
  * well as the CLI. Every caller here actually passes a <Document> wrapped in
  * <ApplianceContext.Provider>, not a bare Document, which is looser than
  * what react-pdf's own types ask for.

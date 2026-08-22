@@ -154,9 +154,9 @@ export function rowsFromInstructions(instructions: Instruction[]): Row[] {
 }
 
 /**
- * The JSON interchange format for a chart — the same row shape
- * `data/washing-instructions.schema.json` describes, so a file written here
- * validates against it exactly as a CSV does.
+ * The JSON interchange format for a chart — the same row shape a CSV parses
+ * into, so a file written here validates against a machine exactly as a CSV
+ * does.
  */
 export function chartToJson(instructions: Instruction[]): string {
   return `${JSON.stringify(rowsFromInstructions(instructions), null, 2)}\n`;

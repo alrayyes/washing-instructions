@@ -26,9 +26,5 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  },
-  // apps/web is an Astro project with its own tsconfig and its own checker
-  // (`astro check`, run by its own `bun run check`) — .astro files need
-  // Astro's TS plugin to type-check at all, which plain tsc doesn't have.
-  "exclude": ["apps/web"]
+  }
 }

@@ -25,19 +25,10 @@ the `.dist`; never point them at the other one.
 - `docker build -t washy-washy . && docker run --rm -v "$PWD/out:/out" washy-washy`
   — the same thing without Bun on the host. CI builds and runs it too, so a
   `Dockerfile` that lints and does not work fails there; releases push it to GHCR
-- `bun run schema` — regenerate `data/washing-instructions.schema.json`; run it after
-  touching `packages/core/src/machine.ts` or a test fails on the stale copy.
-  Still about the old standalone files, not `washy-washy.json` — see the
-  gotcha below
 - `bun run check` — every linter, `tsc --noEmit` and the tests, in that order
-- `bun run lint:data` — check the dummy chart against the generated schema
-- `bun run lint:machine` — check the dummy machine against `data/machine.schema.json`
 - `bun run format` — Prettier over the Markdown and YAML; it owns those and nothing else
 - `bun run prose:sync` — fetch Vale's style packages; needed once before `check` works
 - `bun test test/csv.test.ts` — one file, when iterating
-- `bun run lighthouse` (from `apps/web`) — build, serve, and run Lighthouse 3
-  times against the real static site, gated on category scores
-  (`apps/web/lighthouserc.cjs`)
 
 ## Gotchas
 
@@ -54,14 +45,13 @@ the `.dist`; never point them at the other one.
   never translated — `parseMachine`/`parseConfig` in
   `packages/core/src/machine.ts`/`config.ts` only validate; `loadConfig` in
   `src/config.ts` is the Bun-only file-reading adapter around them.
-- **The old two-file setup — `data/machine.json.dist`/`data/machine.schema.json`
-  and `data/washing-instructions.csv.dist`/`.schema.json` — still exists, on
-  purpose.** `apps/web` still reads those two `.dist` files directly via Vite
-  `?raw` imports, unrelated to the CLI's own `data/washy-washy.json`. Their
-  `bun run schema`/`lint:data`/`lint:machine` commands keep validating them.
-  They go away together once `apps/web` leaves this repo, not before —
-  `bun run migrate-config` is the bridge between the two, not a replacement
-  for the old files while `apps/web` is still here.
+- **`data/machine.json.dist` outlived the old two-file config setup on
+  purpose.** It's the shared `DIST_MACHINE` fixture several tests load for a
+  realistic `Machine` — unrelated to the CLI's own input, which is
+  `data/washy-washy.json`. Don't delete it as a leftover; check what imports
+  `DIST_MACHINE` first. There's no schema or validator for it any more (that
+  job now belongs to the combined config's own schema, tracked in #107) —
+  it's a fixture, not a file anything else generates or checks.
 - **Anything that writes a file for the repo must load `DIST_MACHINE`, not
   `DEFAULT_MACHINE`.** The latter prefers your own appliances, so the schema
   generator and the tests would otherwise bake in whatever machine the person
@@ -74,42 +64,27 @@ the `.dist`; never point them at the other one.
   else kept.
 - **`packages/core` is a Bun workspace with no Bun/Node-only APIs in its public
   surface** — chart parsing, mixing rules, machine/schema/config validation.
-  Both the CLI (`src/`) and, eventually, `apps/web` import it as
-  `@washy-washy/core`. File I/O (`loadConfig`, `loadMachine`, reading the CSV)
-  stays in each consumer; core only ever takes file contents as a string or a
-  parsed value.
+  This CLI imports it as `@washy-washy/core`, workspace-linked for now;
+  [washy-washy-web](https://github.com/alrayyes/washy-washy-web) imports the
+  published npm package of the same name. File I/O (`loadConfig`,
+  `loadMachine`, reading the CSV) stays in each consumer; core only ever
+  takes file contents as a string or a parsed value.
 - **A sheet is defined by what it leaves out**, so `test/generate.test.ts`
   inflates the content streams and reads the words back. Adding an iron word to
   the washing sheet fails there, not in review.
-- **`apps/web` pins TypeScript 6.x, not the 7.x the rest of the repo uses.**
-  `astro check` (via `@astrojs/check`) needs the classic Language Service API,
-  which TypeScript's native 7.x compiler doesn't expose yet. Bumping
-  `apps/web`'s `typescript` to match root breaks `bun run check` there with an
-  opaque "does not expose the programmatic API" error.
 - **`biome.json` is strict JSON, not JSONC** — despite `tsconfig.json` and
   `.releaserc.json` tolerating comments elsewhere in this repo, a `//` in
   `biome.json` fails to parse and silently falls back to defaults, which then
   reformats every file in the repo (tabs instead of the configured spaces).
-  Explain a rule choice in this file instead of inline there. One example:
-  `overrides` turns `a11y/noSvgWithoutTitle` off for `apps/web/public/*.svg`,
-  since a favicon is browser chrome, not accessible page content — a `<title>`
-  in it would do nothing a real page `<svg>` needs one for.
-- **The CLI's `Dockerfile` still needs `apps/web/package.json` copied in**,
-  even though the image never runs the web app — `bun install
---frozen-lockfile` checks every workspace manifest against the lockfile
-  before it will honour the flag. Adding `--filter='!@washy-washy/web'` to
-  that same command is what actually keeps Astro and its language server out
-  of the image; dropping either half reintroduces the problem it fixes (a
-  failed build, or a CLI image carrying a whole second tool chain it never
-  uses).
+  Explain a rule choice in this file instead of inline there.
 
 ## Conventions
 
 - The config is data, not code: adding a pile should never need a code change.
 - Care advice is sourced. When you change a wash setting, say in the commit body
   why — the manufacturer, a care label, a test — not just that it seemed better.
-- `out/` is generated. Never commit a PDF from it. The two under `docs/` are
+- `out/` is generated. Never commit a PDF from it. The six under `docs/` are
   the exception — the README links them — and they are written by
-  `bun run examples`, which names both `.dist` files, so your own appliances
+  `bun run examples`, which names the `.dist` config, so your own appliances
   cannot get into them. A test in `test/generate.test.ts` fails while they are
   stale.

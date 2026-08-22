@@ -7,11 +7,7 @@
       "!out",
       "!**/dist",
       "!styles/Google",
-      "!styles/proselint",
-      "!**/.astro",
-      "!**/test-results",
-      "!**/playwright-report",
-      "!**/.lighthouseci"
+      "!styles/proselint"
     ]
   },
   "formatter": {
@@ -33,39 +29,11 @@
       "semicolons": "always"
     }
   },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    }
-  },
   "assist": {
     "actions": {
       "source": {
         "organizeImports": "on"
       }
     }
-  },
-  "overrides": [
-    {
-      "includes": ["**/*.astro"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUnusedVariables": "off",
-            "noUnusedImports": "off"
-          }
-        }
-      }
-    },
-    {
-      "includes": ["apps/web/public/**/*.svg"],
-      "linter": {
-        "rules": {
-          "a11y": {
-            "noSvgWithoutTitle": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }

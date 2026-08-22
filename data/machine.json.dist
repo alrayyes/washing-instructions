@@ -1,5 +1,4 @@
 {
-  "$schema": "./machine.schema.json",
   "washer": {
     "name": "Generic front loader",
     "capacity": "1–8 kg",

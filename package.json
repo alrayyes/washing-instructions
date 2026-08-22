@@ -6,18 +6,15 @@
   "license": "GPL-3.0-or-later",
   "type": "module",
   "workspaces": [
-    "packages/*",
-    "apps/*"
+    "packages/*"
   ],
   "scripts": {
-    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run lint:machine && bun run typecheck && bun test",
+    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run typecheck && bun test",
     "examples": "bun run src/cli.ts data/washy-washy.json.dist --out docs",
     "format": "prettier --write .",
     "generate": "bun run src/cli.ts",
     "lint": "biome check .",
-    "lint:data": "bun run scripts/validate-csv.ts",
     "lint:fix": "biome check --write .",
-    "lint:machine": "bun run scripts/validate-machine.ts",
     "lint:md": "prettier --check \"**/*.md\" && markdownlint-cli2 \"**/*.md\"",
     "lint:prose": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' --minAlertLevel=error .",
     "lint:prose:advice": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' .",
@@ -25,7 +22,6 @@
     "migrate-config": "bun run scripts/migrate-config.ts",
     "prepare": "lefthook install",
     "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
-    "schema": "bun run scripts/csv-schema.ts",
     "screenshots": "bun run scripts/screenshots.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
@@ -46,12 +42,10 @@
     "@semantic-release/release-notes-generator": "14.1.1",
     "@types/bun": "1.3.14",
     "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.4",
     "conventional-changelog-conventionalcommits": "9.3.1",
     "lefthook": "2.1.10",
     "markdownlint-cli2": "0.23.2",
     "prettier": "3.9.6",
-    "react-dom": "19.2.8",
     "semantic-release": "25.0.9",
     "typescript": "7.0.2"
   },
