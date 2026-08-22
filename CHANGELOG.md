@@ -1,3 +1,9 @@
+## [2.13.0](https://github.com/alrayyes/washy-washy-cli/compare/v2.12.0...v2.13.0) (2026-08-22)
+
+### Features
+
+* **core:** mirror washy-washy-core's combined config module locally ([#104](https://github.com/alrayyes/washy-washy-cli/issues/104)) ([a688ade](https://github.com/alrayyes/washy-washy-cli/commit/a688ade41a3b6733094a6c208d51b83a7b6d33a7)), closes [washy-washy-core#14](https://github.com/alrayyes/washy-washy-core/issues/14) [94/#102](https://github.com/94/washy-washy-cli/issues/102) [#103](https://github.com/alrayyes/washy-washy-cli/issues/103)
+
 ## [2.12.0](https://github.com/alrayyes/washy-washy/compare/v2.11.0...v2.12.0) (2026-08-21)
 
 ### Features
