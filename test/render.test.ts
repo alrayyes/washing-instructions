@@ -47,8 +47,7 @@ describe("renderPrint", () => {
     const machine = await loadMachine(DIST_MACHINE);
     const items = resolve(Array.from({ length: 24 }, (_, index) => pile(index + 1)));
 
-    expect(
-      (await inkPerPage(await renderPrint(items, machine))).filter((ink) => ink < 1000),
-    ).toEqual([]);
+    const { pdf } = await renderPrint(items, machine);
+    expect((await inkPerPage(pdf)).filter((ink) => ink < 1000)).toEqual([]);
   }, 60_000);
 });
