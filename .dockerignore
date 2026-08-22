@@ -1,5 +1,5 @@
 # The build needs the manifest, the lockfile, src/, the packages/ workspace
-# and the dummy chart. Keeping everything else out means a docs edit does not
+# and the dummy config. Keeping everything else out means a docs edit does not
 # invalidate the dependency layer.
 *
 
@@ -10,5 +10,4 @@
 # Just the manifest — bun's frozen-lockfile check needs every workspace to be
 # present, but this image never runs apps/web, so nothing else from it goes in.
 !apps/web/package.json
-!data/washing-instructions.csv.dist
-!data/machine.json.dist
+!data/washy-washy.json.dist

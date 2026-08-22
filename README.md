@@ -18,9 +18,9 @@ black t-shirts coming out streaky, or where on the dial "Fijn/Zijde" actually
 is. This turns a CSV of laundry piles into PDFs that answer all of it, in two
 shapes:
 
-- **`out/washing-instructions-phone.pdf`** — one tall, narrow page you scroll
+- **`out/washy-washy-phone.pdf`** — one tall, narrow page you scroll
   through on your phone while standing in front of the machine.
-- **`out/washing-instructions-print.pdf`** — an A4 reference sheet to pin next
+- **`out/washy-washy-print.pdf`** — an A4 reference sheet to pin next
   to the machine, followed by a full-page card for each pile.
 
 Each of those also comes cut in half, because the two jobs happen in different
@@ -29,11 +29,12 @@ rooms hours apart and neither wants to read past the other to find its own:
 Six files out of one run — see [the split sheets](#the-split-sheets).
 
 Both are drawn for _your_ appliances. You describe the washing machine and the
-iron once, in a JSON file, and every card then shows the programme dial with the
-pointer where you need to turn it, the temperature and spin values picked out of
-the row the display steps through, which option buttons to press, and the iron's
-thermostat ring with its steam zone marked. You are not translating generic
-advice onto your machine; the drawing _is_ your machine.
+iron once, alongside your chart, in one JSON file, and every card then shows
+the programme dial with the pointer where you need to turn it, the
+temperature and spin values picked out of the row the display steps through,
+which option buttons to press, and the iron's thermostat ring with its steam
+zone marked. You are not translating generic advice onto your machine; the
+drawing _is_ your machine.
 
 Nothing here translates a fascia label, ever. If the dial says `Fijn/Zijde`, the
 card says `Fijn/Zijde` — a chart you have to translate back while standing in
@@ -51,23 +52,23 @@ printed sheet carries a full compatibility matrix with the reason for every no.
 
 That is the committed example chart, not anyone's real laundry. Every sheet it
 draws is here to open, so you can read the whole thing rather than a picture of
-the top of it. All six come from the generic appliances in
-`data/machine.json.dist`.
+the top of it. All six come from the generic appliances and chart in
+`data/washy-washy.json.dist`.
 
 **On the phone**, top of each sheet:
 
 <p>
-  <a href="docs/washing-instructions-phone.pdf"><img src="docs/phone.png" alt="The phone sheet: loads, the dial legend and the first card" width="150"></a>
-  <a href="docs/washing-instructions-phone-washing.pdf"><img src="docs/phone-washing.png" alt="The washing-only phone sheet, with no iron on the cards" width="150"></a>
-  <a href="docs/washing-instructions-phone-ironing.pdf"><img src="docs/phone-ironing.png" alt="The ironing-only phone sheet, one card per thermostat position" width="150"></a>
+  <a href="docs/washy-washy-phone.pdf"><img src="docs/phone.png" alt="The phone sheet: loads, the dial legend and the first card" width="150"></a>
+  <a href="docs/washy-washy-phone-washing.pdf"><img src="docs/phone-washing.png" alt="The washing-only phone sheet, with no iron on the cards" width="150"></a>
+  <a href="docs/washy-washy-phone-ironing.pdf"><img src="docs/phone-ironing.png" alt="The ironing-only phone sheet, one card per thermostat position" width="150"></a>
 </p>
 
 **Printable**, the reference sheet each one opens with:
 
 <p>
-  <a href="docs/washing-instructions-print.pdf"><img src="docs/print.png" alt="The reference sheet: loads, an at-a-glance table and the compatibility matrix" width="200"></a>
-  <a href="docs/washing-instructions-print-washing.pdf"><img src="docs/print-washing.png" alt="The washing-only reference sheet, with no iron column" width="200"></a>
-  <a href="docs/washing-instructions-print-ironing.pdf"><img src="docs/print-ironing.png" alt="The ironing-only reference sheet, every pile against its thermostat position" width="200"></a>
+  <a href="docs/washy-washy-print.pdf"><img src="docs/print.png" alt="The reference sheet: loads, an at-a-glance table and the compatibility matrix" width="200"></a>
+  <a href="docs/washy-washy-print-washing.pdf"><img src="docs/print-washing.png" alt="The washing-only reference sheet, with no iron column" width="200"></a>
+  <a href="docs/washy-washy-print-ironing.pdf"><img src="docs/print-ironing.png" alt="The ironing-only reference sheet, every pile against its thermostat position" width="200"></a>
 </p>
 
 Every picture is a link to the PDF it came out of. The printable ones open on
@@ -90,12 +91,11 @@ use the Helvetica that every PDF reader already has.
 
 ```sh
 bun install --frozen-lockfile
-cp data/machine.json.dist data/machine.json             # then describe your appliances
-cp data/washing-instructions.csv.dist data/washing-instructions.csv
+cp data/washy-washy.json.dist data/washy-washy.json     # then describe your laundry
 ```
 
-Neither copy is required. With no files of your own the tool reads the two
-committed `.dist` examples, so `bun run generate` works on a fresh clone and
+The copy is not required. With no file of your own the tool reads the
+committed `.dist` example, so `bun run generate` works on a fresh clone and
 produces a chart for a machine that is not yours — useful for seeing the shape
 of the thing, useless for actually doing laundry.
 
@@ -108,14 +108,14 @@ bun run generate
 ```
 
 ```text
-Read 16 piles from /home/you/washy-washy/data/washing-instructions.csv.dist
+Read 16 piles from /home/you/washy-washy/data/washy-washy.json.dist
   drawn for Generic front loader · Generic steam iron
-  out/washing-instructions-phone.pdf  one page, 6225 pt tall (11 layout passes)
-  out/washing-instructions-print.pdf
-  out/washing-instructions-phone-washing.pdf  one page, 4272 pt tall (10 layout passes)
-  out/washing-instructions-print-washing.pdf
-  out/washing-instructions-phone-ironing.pdf  one page, 900 pt tall (9 layout passes)
-  out/washing-instructions-print-ironing.pdf
+  out/washy-washy-phone.pdf  one page, 6225 pt tall (11 layout passes)
+  out/washy-washy-print.pdf
+  out/washy-washy-phone-washing.pdf  one page, 4272 pt tall (10 layout passes)
+  out/washy-washy-print-washing.pdf
+  out/washy-washy-phone-ironing.pdf  one page, 900 pt tall (9 layout passes)
+  out/washy-washy-print-ironing.pdf
 
 Piles that can share a drum:
   White + White Socks           ~2:30
@@ -127,14 +127,13 @@ Set up identically on both appliances, so sharing one card:
   Merino Wool + Cashmere Blend
 ```
 
-Point it at your own file, at different appliances, or somewhere else for the
-output:
+Point it at your own file, or somewhere else for the output:
 
 ```sh
-bun run generate my-laundry.csv --machine my-machine.json --out ~/Documents
+bun run generate my-laundry.json --out ~/Documents
 ```
 
-The output filenames follow the input, so `my-laundry.csv` gives you
+The output filenames follow the input, so `my-laundry.json` gives you
 `my-laundry-phone.pdf`, `my-laundry-print.pdf` and the four split sheets
 beside them.
 
@@ -200,25 +199,14 @@ docker build -t washy-washy .
 docker run --rm -v "$PWD/out:/out" washy-washy
 ```
 
-That uses the dummy chart baked into the image. To chart your own laundry,
-mount it over the top and name it — everything after the image name goes
-straight to the CLI:
+That uses the dummy config baked into the image. To chart your own laundry
+and appliances, mount your own config over the top — everything after the
+image name goes straight to the CLI:
 
 ```sh
 docker run --rm \
   -v "$PWD/out:/out" \
-  -v "$PWD/data/washing-instructions.csv:/app/data/mine.csv:ro" \
-  ghcr.io/alrayyes/washy-washy-cli data/mine.csv
-```
-
-Your appliances go in the same way, since the image carries only the example
-pair:
-
-```sh
-docker run --rm \
-  -v "$PWD/out:/out" \
-  -v "$PWD/data/machine.json:/app/data/machine.json:ro" \
-  -v "$PWD/data/washing-instructions.csv:/app/data/washing-instructions.csv:ro" \
+  -v "$PWD/data/washy-washy.json:/app/data/washy-washy.json:ro" \
   ghcr.io/alrayyes/washy-washy-cli
 ```
 
@@ -226,24 +214,30 @@ The container runs as an unprivileged user, so the PDFs come out owned by
 `1000:1000` rather than by root. If that is not your own ID, `--user "$(id
 -u):$(id -g)"` fixes the ownership on the way out.
 
-## The CSV
+## Your config
 
-One row per pile. Adding a pile never needs a code change.
+One file, `data/washy-washy.json`, describes both your appliances (the
+`machine` key) and your chart (the `chart` key) — one row per pile, and
+adding a pile never needs a code change.
 
-The chart that ships with the repo is
-[`data/washing-instructions.csv.dist`](data/washing-instructions.csv.dist), and
-it is a made-up one — nobody's actual wardrobe. Yours goes in
-`data/washing-instructions.csv` beside it, which is gitignored, so your laundry
-never lands in a commit. Copy the dist across and edit it:
+The one that ships with the repo is
+[`data/washy-washy.json.dist`](data/washy-washy.json.dist), and it is made
+up — nobody's actual wardrobe or actual washing machine. Yours goes in
+`data/washy-washy.json` beside it, which is gitignored, so your laundry never
+lands in a commit. Copy the dist across and edit it:
 
 ```sh
-cp data/washing-instructions.csv.dist data/washing-instructions.csv
+cp data/washy-washy.json.dist data/washy-washy.json
 ```
 
 There is no need to hurry: with no file of your own, `bun run generate` reads
 the dist and says so.
 
-| Column            | What goes in it                                                         |
+### The chart
+
+Each entry under `chart` is one pile:
+
+| Field             | What goes in it                                                         |
 | ----------------- | ----------------------------------------------------------------------- |
 | `clothing_type`   | What you call the pile — this is the card heading                       |
 | `detergent`       | Which detergent and how much                                            |
@@ -261,54 +255,51 @@ the dist and says so.
 | `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo`    |
 | `notes`           | Anything else worth knowing                                             |
 
-Every machine-facing value is checked against what the appliances can actually
-be set to, so a typo fails the run rather than producing a PDF that tells you
-to turn the dial somewhere it does not go:
+Every machine-facing value is checked against what the appliances in the same
+file can actually be set to, so a typo fails the run rather than producing a
+PDF that tells you to turn the dial somewhere it does not go:
 
 ```text
 row 8, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
 ```
 
-[`data/washing-instructions.schema.json`](data/washing-instructions.schema.json)
-says the same thing in a form other
-tools understand: a [Frictionless Table
-Schema](https://datapackage.org/standard/table-schema/) naming every column, its
-type, and the values it accepts. Point a validator at the pair and it tells you
-which row is wrong; point an editor at it and you get the programme names in an
-autocomplete rather than in another window.
+### Migrating from the old two-file setup
 
-It is generated, never edited — `packages/core/src/machine.ts` stays the one
-authority on the appliances, and a second copy of those lists would drift the
-first time a programme is renamed:
+Earlier versions kept the appliances in `data/machine.json` and the chart in
+`data/washing-instructions.csv`. If you still have those,
+`bun run migrate-config` reads them (falling back to their own `.dist`
+examples the same way) and writes the combined
+`data/washy-washy.json`:
 
 ```sh
-bun run schema   # after changing packages/core/src/machine.ts
+bun run migrate-config [machine.json] [chart.csv] [out.json]
 ```
 
-A test compares the committed file against what the generator produces, so
-forgetting that command fails CI rather than leaving a schema that quietly
-disagrees with the parser.
+All three arguments default to the old paths and the new one, so
+`bun run migrate-config` alone does the right thing for a setup that has not
+moved yet.
 
 ### Let a chatbot write the first draft
 
 Filling in fifteen rows of care advice from scratch is the tedious part, and it
-is the part a language model is genuinely good at. Paste it the dist file as the
-format, your `data/machine.json` as the only values it may use, and a
-description of what you actually own — a flat share with two sets of bed linen
-and a lot of running kit is a different chart from a household with school
-uniforms.
+is the part a language model is genuinely good at. Paste it your config file
+as the format, so it can see both the `chart` array's shape and the exact
+appliance values it is allowed to write, and a description of what you
+actually own — a flat share with two sets of bed linen and a lot of running
+kit is a different chart from a household with school uniforms.
 
-Give it the machine file whole rather than retyping the lists out of it. Every
-value it is allowed to write is in there, and it is the same file the validator
-will judge the answer against.
+Give it the file whole rather than retyping the lists out of it. Every value
+it is allowed to write is in there, and it is the same file the validator will
+judge the answer against.
 
 Something like this works:
 
 ```text
-Here is a CSV format with an example row, and the JSON file describing my
-appliances. Write me one row per pile for the laundry I describe.
+Here is my washy-washy.json, describing my appliances under "machine" and
+an example pile under "chart". Write me a "chart" array, one entry per pile,
+for the laundry I describe.
 
-Every machine-facing value has to come out of that file: program from
+Every machine-facing value has to come out of the "machine" key: program from
 washer.programs, temperature from washer.temperatures, spin from washer.spins,
 options from washer.options, and iron_setting from an iron.settings key. Spell
 them exactly as they appear there.
@@ -321,14 +312,14 @@ My laundry: <describe it — fabrics, colours, what you own a lot of, what you
 line dry, anything with a care label you actually follow>.
 ```
 
-Two things to do with the answer. Run it: the CSV validator checks every
-machine-facing value against the machine file you load, so an invented
-programme name fails the run rather than reaching a PDF. Then read it: a model
-will state a wash temperature with total confidence and be wrong, so check
-anything that would ruin a garment — wool, silk, anything with elastane —
-against the care label or the maker's own guidance before you trust the chart
-taped to your machine. The durations are guesses too, and yours are on the
-display.
+Two things to do with the answer. Run it: paste the array over the `chart`
+key and run the tool — the validator checks every machine-facing value
+against the `machine` key in the same file, so an invented programme name
+fails the run rather than reaching a PDF. Then read it: a model will state a
+wash temperature with total confidence and be wrong, so check anything that
+would ruin a garment — wool, silk, anything with elastane — against the care
+label or the maker's own guidance before you trust the chart taped to your
+machine. The durations are guesses too, and yours are on the display.
 
 ### How "can these wash together" is decided
 
@@ -367,13 +358,10 @@ of cards on each. See [the split sheets](#the-split-sheets).
 
 ## Your appliances
 
-The machine is data, not code. `data/machine.json.dist` describes a generic
-front loader and a generic steam iron; yours goes in `data/machine.json` beside
-it, which is gitignored like the chart:
-
-```sh
-cp data/machine.json.dist data/machine.json
-```
+The machine is data, not code, and it is the `machine` key of the same
+`data/washy-washy.json` your chart lives in — see [Your config](#your-config)
+for how to get a copy started. The committed example describes a generic
+front loader and a generic steam iron.
 
 Inside are the dial labels in physical order, the temperatures and spin speeds
 the display offers, the option buttons, and the iron's thermostat positions.
@@ -387,14 +375,11 @@ missing: it moves all the others. `temperatures` are printed as they stand,
 except that a plain number gets a degree sign, which is why a machine whose
 display says `cold` or `koud` needs no special case anywhere in the code.
 
-[`data/machine.schema.json`](data/machine.schema.json) describes the file, and
-the `$schema` line at the top of the `.dist` points at it, so an editor will
-complete the fields and complain before the tool does. `bun run lint:machine`
-checks the committed `.dist` against it too, so a schema that drifts from the
-file it documents fails the pipeline rather than only misleading an editor. The
-CSV validator takes its allowed values from whichever machine you load, so a
-chart written for one machine is refused by another rather than silently drawn
-wrong:
+[`data/machine.schema.json`](data/machine.schema.json) documents this same
+shape (it is also still what the standalone `data/machine.json.dist` used by
+`apps/web` is checked against). The chart validator takes its allowed values
+from whichever machine is embedded in the config you load, so a chart written
+for one machine is refused by another rather than silently drawn wrong:
 
 ```text
 row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
@@ -405,8 +390,9 @@ row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, 
 Typing out sixteen dial labels in a language you may not read is the tedious
 part, and you do not have to. Take a photo of the fascia and a photo of the
 iron's thermostat ring, paste them to a chatbot along with
-[`data/machine.schema.json`](data/machine.schema.json) and the `.dist` file as
-the format, and ask for the same file for your appliances.
+[`data/machine.schema.json`](data/machine.schema.json) and the `machine` key
+of the `.dist` file as the format, and ask for the same shape for your
+appliances.
 
 A photo beats describing it here, and for a reason specific to this tool. The
 order of `programs` is load-bearing — every tick's angle comes from where it
@@ -437,7 +423,7 @@ to guess, and if it guesses wrong every dial in every PDF is rotated. Start at
 the off position and go clockwise yourself.
 
 After that, run it. `parseMachine` refuses a file that is missing a field or
-repeats a programme, and the CSV validator then refuses a chart written for
+repeats a programme, and the chart validator then refuses a chart written for
 your old machine, naming the first row that no longer fits. That second one is
 the useful failure when you replace an appliance: the chart does not silently
 draw the wrong dial, it stops and tells you which rows need new programme
@@ -483,7 +469,7 @@ CSV's `|`-joined lists as real JSON arrays. "Download this chart as JSON" writes
 shape out for whatever chart is currently active, bundled or your own, so
 editing a downloaded file and re-uploading it round-trips cleanly. A file
 that fails validation is rejected with the same row/column error the CLI's
-CSV validator gives, and the upload itself never leaves the browser —
+chart validator gives, and the upload itself never leaves the browser —
 there's no server or account behind it, storage-permitting; clearing it (or
 using a private/storage-restricted browser) falls back to the bundled chart
 rather than showing nothing.
@@ -544,6 +530,6 @@ on synthetic activewear.
 on — but anything you distribute that is built on it comes with the same freedom
 attached, source included.
 
-The care advice in `data/washing-instructions.csv.dist` is assembled from the
+The care advice in `data/washy-washy.json.dist` is assembled from the
 manufacturer and trade sources listed above, and is offered in the same spirit
 as the code: no warranty. Your care labels outrank it.

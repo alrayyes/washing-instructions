@@ -37,11 +37,10 @@ COPY packages ./packages
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=dependencies /app/packages/core/node_modules ./packages/core/node_modules
 COPY --from=dependencies /app/packages/pdf/node_modules ./packages/pdf/node_modules
-# The committed dummy chart and the committed example appliances, so
-# `docker run` with nothing mounted still produces something to look at. Your
-# own versions of both are gitignored and never in the image; mount them over
-# the top.
-COPY data/washing-instructions.csv.dist data/machine.json.dist ./data/
+# The committed dummy config, so `docker run` with nothing mounted still
+# produces something to look at. Your own version is gitignored and never in
+# the image; mount it over the top.
+COPY data/washy-washy.json.dist ./data/
 
 # /out is the mount point, and it is created here rather than by the first run
 # so that it belongs to the unprivileged user. The oven/bun images ship a `bun`
@@ -54,8 +53,8 @@ RUN mkdir -p /out && chown 1000:1000 /out
 USER 1000:1000
 VOLUME /out
 
-# Split so that `docker run <image>` generates from the bundled chart, and
+# Split so that `docker run <image>` generates from the bundled config, and
 # arguments after the image name are passed straight to the CLI:
-#   docker run -v "$PWD/out:/out" <image> data/my-laundry.csv
+#   docker run -v "$PWD/out:/out" <image> data/my-laundry.json
 ENTRYPOINT ["bun", "run", "src/cli.ts", "--out", "/out"]
 CMD []
