@@ -121,7 +121,7 @@
       "drying": "Tumble dry normal.",
       "colour_group": "white",
       "mix_tags": "",
-      "notes": "Same settings as White — throw them in that load.",
+      "notes": "",
       "reference_name": "",
       "reference_link": ""
     },
@@ -178,7 +178,7 @@
       "drying": "Tumble dry low or line dry.",
       "colour_group": "colour",
       "mix_tags": "",
-      "notes": "Same settings as Coloured — throw them in that load.",
+      "notes": "",
       "reference_name": "",
       "reference_link": ""
     },
@@ -254,7 +254,7 @@
       "drying": "Line dry, or tumble on low.",
       "colour_group": "dark",
       "mix_tags": "",
-      "notes": "Same settings as Dark — throw them in that load.",
+      "notes": "",
       "reference_name": "",
       "reference_link": ""
     },
