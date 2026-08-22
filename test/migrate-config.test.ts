@@ -41,3 +41,24 @@ describe("migrateConfig", () => {
     );
   });
 });
+
+describe("bun run migrate-config", () => {
+  test("writes a file that already passes bun run lint", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "migrate-"));
+    const csvPath = join(dir, "washing-instructions.csv");
+    const outPath = join(dir, "washy-washy.json");
+    await writeFile(csvPath, `${HEADER}\n${ROW}\n`);
+
+    Bun.spawnSync({
+      cmd: ["bun", "run", "scripts/migrate-config.ts", DIST_MACHINE, csvPath, outPath],
+    });
+
+    const check = Bun.spawnSync({
+      cmd: ["node_modules/.bin/biome", "check", outPath],
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+
+    expect(check.exitCode).toBe(0);
+  });
+});

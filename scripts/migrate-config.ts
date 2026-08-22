@@ -4,8 +4,9 @@
  * Reads the same fallback-to-`.dist` rule as everything else here, so it
  * works unmodified against either your own files or the committed examples.
  */
-import { type Config, configToJson, parseInstructions } from "@washy-washy/core";
+import { type Config, parseInstructions } from "@washy-washy/core";
 import { loadMachine } from "../src/machine";
+import { writeConfig } from "./write-config";
 
 export const DEFAULT_MACHINE_PATH = "data/machine.json";
 export const DEFAULT_CSV_PATH = "data/washing-instructions.csv";
@@ -32,6 +33,6 @@ if (import.meta.main) {
   ] = Bun.argv.slice(2);
 
   const config = await migrateConfig(machinePath, csvPath);
-  await Bun.write(outPath, configToJson(config));
+  await writeConfig(outPath, config);
   console.log(`wrote ${outPath}`);
 }

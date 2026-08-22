@@ -35,6 +35,20 @@ describe("bun run new-config", () => {
     expect(written.chart).toHaveLength(1);
   });
 
+  test("writes a file that already passes bun run lint", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "new-config-"));
+    const path = join(dir, "washy-washy.json");
+    Bun.spawnSync({ cmd: ["bun", "run", "scripts/new-config.ts", path] });
+
+    const check = Bun.spawnSync({
+      cmd: ["node_modules/.bin/biome", "check", path],
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+
+    expect(check.exitCode).toBe(0);
+  });
+
   test("refuses to overwrite an existing file", async () => {
     const dir = await mkdtemp(join(tmpdir(), "new-config-"));
     const path = join(dir, "washy-washy.json");

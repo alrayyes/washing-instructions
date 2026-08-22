@@ -4,9 +4,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 describe("bun run validate-config", () => {
-  test("accepts the committed .dist by default", () => {
+  // Named explicitly rather than relying on default resolution: a real
+  // clone can have its own data/washy-washy.json, and this has to mean the
+  // same thing on every machine regardless of whether one exists locally.
+  test("accepts the committed .dist", () => {
     const result = Bun.spawnSync({
-      cmd: ["bun", "run", "scripts/validate-config.ts"],
+      cmd: ["bun", "run", "scripts/validate-config.ts", "data/washy-washy.json.dist"],
       stdout: "pipe",
       stderr: "pipe",
     });

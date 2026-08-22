@@ -8,12 +8,11 @@
  * anything at all (a dial needs an off position and one more to be a dial;
  * a thermostat ring needs two positions to have a ring), and the chart
  * parser refuses zero rows outright. Built from the real `Machine`/
- * `Config`/`Instruction` types and piped through `configToJson` rather
- * than hand-written JSON, so it's guaranteed to load — `bun run generate`
- * works on it immediately — and to carry the same `$schema` line every
- * other config does.
+ * `Config`/`Instruction` types rather than hand-written JSON, so it's
+ * guaranteed to load — `bun run generate` works on it immediately.
  */
-import { type Config, configToJson, type Instruction, type Machine } from "@washy-washy/core";
+import type { Config, Instruction, Machine } from "@washy-washy/core";
+import { writeConfig } from "./write-config";
 
 export const DEFAULT_OUT_PATH = "data/washy-washy.json";
 
@@ -63,6 +62,6 @@ if (import.meta.main) {
     process.exit(1);
   }
 
-  await Bun.write(path, configToJson(skeletonConfig()));
+  await writeConfig(path, skeletonConfig());
   console.log(`wrote ${path}`);
 }
