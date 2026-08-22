@@ -22,6 +22,7 @@
     "lint:prose": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' --minAlertLevel=error .",
     "lint:prose:advice": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' .",
     "lint:yaml": "prettier --check \"**/*.{yml,yaml}\"",
+    "migrate-config": "bun run scripts/migrate-config.ts",
     "prepare": "lefthook install",
     "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
     "schema": "bun run scripts/csv-schema.ts",
