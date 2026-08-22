@@ -226,8 +226,8 @@ jobs:
         run: |
           mkdir -p out
           docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/out:/out" washy-washy:ci
-          test -s out/washing-instructions-phone.pdf
-          test -s out/washing-instructions-print.pdf
+          test -s out/washy-washy-phone.pdf
+          test -s out/washy-washy-print.pdf
 
   # The PDFs themselves, kept as an artifact so a reviewer can read the thing
   # rather than a description of it.
