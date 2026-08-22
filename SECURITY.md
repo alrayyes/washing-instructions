@@ -12,7 +12,8 @@ find something that matters — a crafted chart or machine file that escapes the
 renderer, a problem in the way `scripts/install-vale.ts` fetches and
 verifies its binary — report it privately through
 [GitHub's security advisories](https://github.com/alrayyes/washy-washy-cli/security/advisories/new)
-rather than in a public issue, and I will look at it.
+rather than in a public issue. Expect an initial response within 5 business
+days.
 
 Only the latest commit on `main` is supported. There is no release old enough to
 need a backport.
