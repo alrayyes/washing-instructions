@@ -9,6 +9,7 @@
  * `chartToJson`) has no such dependency and is what the web app's
  * upload/download uses instead.
  */
+export * from "./config";
 export * from "./machine";
 export * from "./mixing";
 export * from "./rows";
