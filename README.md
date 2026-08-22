@@ -375,11 +375,9 @@ missing: it moves all the others. `temperatures` are printed as they stand,
 except that a plain number gets a degree sign, which is why a machine whose
 display says `cold` or `koud` needs no special case anywhere in the code.
 
-[`data/machine.schema.json`](data/machine.schema.json) documents this same
-shape (it is also still what the standalone `data/machine.json.dist` used by
-`apps/web` is checked against). The chart validator takes its allowed values
-from whichever machine is embedded in the config you load, so a chart written
-for one machine is refused by another rather than silently drawn wrong:
+The chart validator takes its allowed values from whichever machine is
+embedded in the config you load, so a chart written for one machine is
+refused by another rather than silently drawn wrong:
 
 ```text
 row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, ...
@@ -389,8 +387,7 @@ row 2, column "program": "Cottons" is not one of Uit, Katoen, Katoen + Voorwas, 
 
 Typing out sixteen dial labels in a language you may not read is the tedious
 part, and you do not have to. Take a photo of the fascia and a photo of the
-iron's thermostat ring, paste them to a chatbot along with
-[`data/machine.schema.json`](data/machine.schema.json) and the `machine` key
+iron's thermostat ring, paste them to a chatbot along with the `machine` key
 of the `.dist` file as the format, and ask for the same shape for your
 appliances.
 
@@ -404,8 +401,8 @@ Something like this works:
 
 ```text
 Attached is a photo of my washing machine's fascia and one of my iron's
-thermostat, plus a JSON schema and an example file. Write me the same file for
-these appliances.
+thermostat, plus an example file. Write me the same shape for these
+appliances.
 
 Copy every label exactly as printed, in whatever language it is in. Do not
 translate any of them into English, and do not tidy up the spelling or the
@@ -431,75 +428,12 @@ names.
 
 ## The web app
 
-Live at [washy-washy.ryankes.eu](https://washy-washy.ryankes.eu).
-
-`apps/web` is a static [Astro](https://astro.build) site — a bookmarkable,
-Android-installable page reading the same `.dist` chart. It shows the phone
-sheet as a real page — the same cards, dial illustrations and colours the
-PDF draws, as HTML/CSS/SVG rather than an embedded PDF viewer — filtered by
-cut (everything, washing only, ironing only) and by pile (a search over the
-clothing type). The PDF itself, drawn through the same `@react-pdf/renderer`
-components and height-bisection pass the CLI's phone PDF uses, is only
-generated when you click "Download this sheet as a PDF" — not on every
-filter change.
-
-Your last cut and pile filter are saved in the browser's `localStorage`, under
-the key `washy-washy:filters`, so reopening the page (or the installed
-home-screen icon) picks up where you left off. That's the only thing the site
-stores, it never leaves the device, and there's no account or server it could
-sync to — clear it the way you'd clear any site's data, or just use the
-filters and it saves itself. Where storage isn't available at all (private
-browsing, a full quota), the page still works; it just starts back at the
-default view every time.
-
-The same filters are also in the URL — `?cut=iron&pile=towels` — so copying
-the address bar and sending it to someone opens straight to that view, no
-description of which dropdown and search term needed. A URL carrying filter
-state always wins over whatever `localStorage` remembers from a previous
-visit, and the URL updates as you filter without adding to your browser's
-back-button history. The uploaded chart itself isn't part of the URL — its
-JSON is too large for that — so sharing your own chart still means sending
-the downloaded file, not a link.
-
-You can also upload your own chart instead of the bundled example: a JSON
-array of rows in the exact shape `data/washing-instructions.schema.json`
-describes — the same shape `packages/core`'s `chartToJson` writes and
-`chartFromJson` reads, and the same one a CSV parses into, just with the
-CSV's `|`-joined lists as real JSON arrays. "Download this chart as JSON" writes that
-shape out for whatever chart is currently active, bundled or your own, so
-editing a downloaded file and re-uploading it round-trips cleanly. A file
-that fails validation is rejected with the same row/column error the CLI's
-chart validator gives, and the upload itself never leaves the browser —
-there's no server or account behind it, storage-permitting; clearing it (or
-using a private/storage-restricted browser) falls back to the bundled chart
-rather than showing nothing.
-
-The [`/config`](https://washy-washy.ryankes.eu/config) page shows the whole
-loaded config in one place — every washer programme, temperature, spin and
-button, the iron's thermostat positions, and every pile in the chart — for
-checking or troubleshooting what the site is actually working from. It's
-read-only and reflects whichever chart is active, bundled or uploaded, the
-same way the main page does.
-
-```sh
-cd apps/web
-bun run dev              # local dev server
-bun run build            # static output in apps/web/dist
-bun run check            # astro check — this app's own typecheck, separate
-                          # from the CLI's, since .astro files need Astro's
-                          # own TS plugin
-bun run test:e2e         # Playwright, against a real build — see apps/web/
-                          # e2e/ and playwright.config.ts. First run needs
-                          # `bunx playwright install --with-deps chromium`.
-bun run deploy           # ship apps/web/dist to production
-bun run deploy:version   # upload a preview version without promoting it
-```
-
-It shares `packages/core` — the chart parsing, mixing rules and machine
-validation — with the CLI, so a rule change lands in both at once. Deploys as
-a Cloudflare Worker serving static assets (`apps/web/wrangler.jsonc`), built
-and shipped by Cloudflare's own Git integration — a build on `main` deploys
-straight to production, a pull request uploads a preview version instead.
+Live at [washy-washy.ryankes.eu](https://washy-washy.ryankes.eu), source at
+[alrayyes/washy-washy-web](https://github.com/alrayyes/washy-washy-web) — a
+separate repo since the four-way split of what used to be this monorepo. It
+shares `@washy-washy/core`'s chart parsing, mixing rules and machine
+validation with this CLI as a published dependency, so a rule change in
+core lands in both once each picks up the new version.
 
 ## Contributing
 

@@ -1,8 +1,0 @@
-{
-  "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  // scripts/ is Bun-runtime tooling (the E2E static file server), not
-  // Astro/browser code — this config has no Bun global types configured,
-  // and adding them risks conflicting with astro's own strict type setup.
-  "exclude": ["dist", "scripts"]
-}
