@@ -1,3 +1,9 @@
+## [2.15.0](https://github.com/alrayyes/washy-washy-cli/compare/v2.14.0...v2.15.0) (2026-08-22)
+
+### Features
+
+* cut the CLI over to the combined machine+chart config ([#106](https://github.com/alrayyes/washy-washy-cli/issues/106)) ([c79b802](https://github.com/alrayyes/washy-washy-cli/commit/c79b8023ec921c32e9061ee853d9d29961e2868f)), closes [#102](https://github.com/alrayyes/washy-washy-cli/issues/102)
+
 ## [2.14.0](https://github.com/alrayyes/washy-washy-cli/compare/v2.13.0...v2.14.0) (2026-08-22)
 
 ### Features
