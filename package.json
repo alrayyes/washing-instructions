@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:prose:ltex && bun run typecheck && bun test",
+    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:prose:ltex && bun run validate-config && bun run typecheck && bun test",
     "examples": "bun run src/cli.ts data/washy-washy.json.dist --out docs",
     "format": "prettier --write .",
     "generate": "bun run src/cli.ts",
@@ -21,11 +21,13 @@
     "lint:prose:ltex": "bun run scripts/lint-prose-ltex.ts",
     "lint:yaml": "prettier --check \"**/*.{yml,yaml}\"",
     "migrate-config": "bun run scripts/migrate-config.ts",
+    "new-config": "bun run scripts/new-config.ts",
     "prepare": "lefthook install",
     "prose:sync": "bun run scripts/install-vale.ts && .tools/vale sync",
     "screenshots": "bun run scripts/screenshots.ts",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate-config": "bun run scripts/validate-config.ts"
   },
   "dependencies": {
     "@washy-washy/core": "workspace:*",

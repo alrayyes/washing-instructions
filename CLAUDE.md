@@ -17,6 +17,12 @@ the `.dist`; never point them at the other one.
 ## Commands
 
 - `bun run generate` — write all six PDFs to `out/`
+- `bun run new-config [path]` — scaffold a fresh config (placeholder machine,
+  one placeholder pile); default path `data/washy-washy.json`. Refuses to
+  overwrite an existing file
+- `bun run validate-config [path]` — same validation `generate` does, without
+  drawing anything; default path `data/washy-washy.json` (so a fresh clone
+  with no file of your own validates the `.dist`)
 - `bun run migrate-config` — one-off conversion from the old
   `data/machine.json` + `data/washing-instructions.csv` pair to
   `data/washy-washy.json`
@@ -49,9 +55,16 @@ the `.dist`; never point them at the other one.
   purpose.** It's the shared `DIST_MACHINE` fixture several tests load for a
   realistic `Machine` — unrelated to the CLI's own input, which is
   `data/washy-washy.json`. Don't delete it as a leftover; check what imports
-  `DIST_MACHINE` first. There's no schema or validator for it any more (that
-  job now belongs to the combined config's own schema, tracked in #107) —
+  `DIST_MACHINE` first. There's no schema or validator for it any more —
   it's a fixture, not a file anything else generates or checks.
+- **This repo doesn't generate its own JSON Schema for the combined config.**
+  `@washy-washy/core` does — `configToJson` leads its output with a
+  `$schema` key pointing at the published package's schema on jsDelivr
+  (`CONFIG_SCHEMA_URL` in `packages/core/src/config.ts`, mirrored from
+  core's own repo). Duplicating schema generation here would split logic
+  core already owns across two repos. `bun run validate-config` uses
+  `parseConfig` for real semantic validation instead of walking that schema
+  — the schema is for editor autocomplete, not a second source of truth.
 - **Anything that writes a file for the repo must load `DIST_MACHINE`, not
   `DEFAULT_MACHINE`.** The latter prefers your own appliances, so the schema
   generator and the tests would otherwise bake in whatever machine the person
