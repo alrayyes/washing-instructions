@@ -358,6 +358,23 @@
       "colour_group": "any",
       "mix_tags": "solo",
       "notes": "Pull the insoles and laces out first and wash those by hand. The shoes go in a mesh delicates bag or a pillowcase, on their own — a loose trainer batters the drum and everything in it."
+    },
+    {
+      "clothing_type": "Linen",
+      "detergent": "Mild liquid detergent, no bleach — bleach yellows linen and breaks the fibre down over time",
+      "fabric_softener": "no",
+      "temperature": "40",
+      "spin": "800",
+      "duration": "~1:30",
+      "program": "Easy Care",
+      "options": "Easy Iron",
+      "ironing": "yes",
+      "ironing_notes": "While still damp, hottest setting, steam first.",
+      "iron_setting": "max",
+      "drying": "Line dry, or tumble low and pull out a little damp — bone dry locks creases in.",
+      "colour_group": "any",
+      "mix_tags": "",
+      "notes": "New linen sheds a little dye/lint for the first few washes — wash alone until it rinses clear, then fine with other 40 °C loads."
     }
   ]
 }
