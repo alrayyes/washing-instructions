@@ -1,5 +1,14 @@
+# Drops the 23 rules Prettier decides for itself, so the two can't disagree
+# about the same character. markdownlint ships and maintains this list beside
+# the rules, which is why it isn't hand-picked here.
+extends: "markdownlint/style/prettier"
+
 config:
-  # Prose wraps where it reads best; a hard column limit fights that.
+  # Prose wraps where it reads best; a hard column limit fights that. The
+  # style above already turns this off too (Prettier reflows prose, on the
+  # grounds that it always does — which on `proseWrap: preserve` it never
+  # does), so it stays off on purpose, said here rather than inherited by
+  # accident.
   MD013: false
   # The README opens with a badge row, not a heading.
   MD041: false
@@ -17,19 +26,6 @@ config:
       - img
       - a
       - p
-
-  # Below here: layout Prettier already decides. Prettier runs first and
-  # markdownlint judges what it produced, so leaving these on would only give us
-  # a hook that fails twice and fixes nothing.
-  # List markers.
-  MD004: false
-  # List indentation.
-  MD007: false
-  # Consecutive blank lines.
-  MD012: false
-  # Emphasis characters.
-  MD049: false
-  MD050: false
 
 globs:
   - "**/*.md"
