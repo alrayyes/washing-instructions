@@ -81,18 +81,22 @@ async function main(argv: string[]): Promise<void> {
 
   await mkdir(out, { recursive: true });
   const stem = outputStem(file);
+  const dropped = new Set<string>();
 
   const written = await Promise.all(
     SHEETS.flatMap(({ variant, suffix }) => [
       (async () => {
         const path = join(out, `${stem}-phone${suffix}.pdf`);
         const phone = await renderPhone(items, machine, variant);
+        for (const character of phone.dropped) dropped.add(character);
         await writeFile(path, phone.pdf);
         return `${path}  one page, ${Math.round(phone.height)} pt tall (${phone.attempts} layout passes)`;
       })(),
       (async () => {
         const path = join(out, `${stem}-print${suffix}.pdf`);
-        await writeFile(path, await renderPrint(items, machine, variant));
+        const print = await renderPrint(items, machine, variant);
+        for (const character of print.dropped) dropped.add(character);
+        await writeFile(path, print.pdf);
         return path;
       })(),
     ]),
@@ -117,6 +121,11 @@ async function main(argv: string[]): Promise<void> {
   if (merged.length > 0) {
     console.log("\nSet up identically on both appliances, so sharing one card:");
     for (const group of merged) console.log(`  ${names(group)}`);
+  }
+  if (dropped.size > 0) {
+    console.log(
+      `\nCharacters the font can't render (transliterated or stripped): ${[...dropped].join(" ")}`,
+    );
   }
 }
 
