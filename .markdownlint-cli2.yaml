@@ -31,8 +31,8 @@ globs:
   - "**/*.md"
 
 ignores:
-  # Not just node_modules/** — that only matches the root's, and each
-  # workspace member (packages/core, packages/pdf) gets its own nested copy.
+  # Not just node_modules/** — that only matches the root's, and a dependency
+  # can still get its own nested copy when versions conflict.
   - "**/node_modules/**"
   - "out/**"
   # Vendored by `vale sync`. Generated text belongs to nobody.

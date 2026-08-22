@@ -48,9 +48,9 @@ the `.dist`; never point them at the other one.
   and every programme, temperature, spin speed and button in the `chart` key
   is checked against them. The dial angles come from the order of
   `washer.programs`, so a reordered list redraws every card. Fascia labels are
-  never translated — `parseMachine`/`parseConfig` in
-  `packages/core/src/machine.ts`/`config.ts` only validate; `loadConfig` in
-  `src/config.ts` is the Bun-only file-reading adapter around them.
+  never translated — `parseMachine`/`parseConfig` in `@washy-washy/core`
+  only validate; `loadConfig` in `src/config.ts` is the Bun-only
+  file-reading adapter around them.
 - **`data/machine.json.dist` outlived the old two-file config setup on
   purpose.** It's the shared `DIST_MACHINE` fixture several tests load for a
   realistic `Machine` — unrelated to the CLI's own input, which is
@@ -59,9 +59,8 @@ the `.dist`; never point them at the other one.
   it's a fixture, not a file anything else generates or checks.
 - **This repo doesn't generate its own JSON Schema for the combined config.**
   `@washy-washy/core` does — `configToJson` leads its output with a
-  `$schema` key pointing at the published package's schema on jsDelivr
-  (`CONFIG_SCHEMA_URL` in `packages/core/src/config.ts`, mirrored from
-  core's own repo). Duplicating schema generation here would split logic
+  `$schema` key (`CONFIG_SCHEMA_URL`) pointing at the published package's
+  schema on jsDelivr. Duplicating schema generation here would split logic
   core already owns across two repos. `bun run validate-config` uses
   `parseConfig` for real semantic validation instead of walking that schema
   — the schema is for editor autocomplete, not a second source of truth.
@@ -69,19 +68,20 @@ the `.dist`; never point them at the other one.
   `DEFAULT_MACHINE`.** The latter prefers your own appliances, so the schema
   generator and the tests would otherwise bake in whatever machine the person
   running them happens to own.
-- **`packages/core/src/mixing.ts` is the only place that decides what can share
-  a drum.** The per-card "wash together with" line, the compatibility matrix and
-  the CLI summary all read from it, so a rule change lands in all three at once.
-  It also owns how each sheet cuts the chart into cards: `cardGroups` for the
-  full one, `washGroups` with the thermostat dropped, `ironGroups` with nothing
-  else kept.
-- **`packages/core` is a Bun workspace with no Bun/Node-only APIs in its public
-  surface** — chart parsing, mixing rules, machine/schema/config validation.
-  This CLI imports it as `@washy-washy/core`, workspace-linked for now;
-  [washy-washy-web](https://github.com/alrayyes/washy-washy-web) imports the
-  published npm package of the same name. File I/O (`loadConfig`,
-  `loadMachine`, reading the CSV) stays in each consumer; core only ever
-  takes file contents as a string or a parsed value.
+- **`mixing.ts`, in `@washy-washy/core`, is the only place that decides what
+  can share a drum.** The per-card "wash together with" line, the
+  compatibility matrix and the CLI summary all read from it, so a rule
+  change there lands in all three here at once next time the dependency
+  bumps. It also owns how each sheet cuts the chart into cards: `cardGroups`
+  for the full one, `washGroups` with the thermostat dropped, `ironGroups`
+  with nothing else kept.
+- **`@washy-washy/core` and `@washy-washy/pdf` are real npm dependencies,
+  not a local workspace.** This repo, [washy-washy-web](https://github.com/alrayyes/washy-washy-web)
+  and both packages' own repos are four separate repos, split out of what
+  used to be one monorepo. Bumping either is an ordinary dependency update,
+  pinned to an exact version like everything else. File I/O (`loadConfig`,
+  `loadMachine`, reading the CSV) stays in this repo; the packages only
+  ever take file contents as a string or a parsed value.
 - **A sheet is defined by what it leaves out**, so `test/generate.test.ts`
   inflates the content streams and reads the words back. Adding an iron word to
   the washing sheet fails there, not in review.

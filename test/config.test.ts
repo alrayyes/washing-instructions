@@ -7,12 +7,11 @@ import {
   chartToJson,
   configFromJson,
   configToJson,
-  DIST_MACHINE,
   parseConfig,
   parseInstructions,
 } from "@washy-washy/core";
 import { loadConfig, resolveConfig } from "../src/config";
-import { loadMachine } from "../src/machine";
+import { DIST_MACHINE, loadMachine } from "../src/machine";
 
 const machine = await loadMachine(DIST_MACHINE);
 
