@@ -45,41 +45,41 @@ export interface Shot {
 export const SHOTS: Shot[] = [
   {
     png: "phone.png",
-    pdf: "washing-instructions-phone.pdf",
+    pdf: "washy-washy-phone.pdf",
     page: 1,
     dpi: 150,
     crop: { width: 509, height: 1500 },
   },
   {
     png: "phone-washing.png",
-    pdf: "washing-instructions-phone-washing.pdf",
+    pdf: "washy-washy-phone-washing.pdf",
     page: 1,
     dpi: 150,
     crop: { width: 509, height: 1500 },
   },
   {
     png: "phone-ironing.png",
-    pdf: "washing-instructions-phone-ironing.pdf",
+    pdf: "washy-washy-phone-ironing.pdf",
     page: 1,
     dpi: 150,
     crop: { width: 509, height: 1500 },
   },
-  { png: "print.png", pdf: "washing-instructions-print.pdf", page: 1, dpi: 110 },
+  { png: "print.png", pdf: "washy-washy-print.pdf", page: 1, dpi: 110 },
   {
     png: "print-washing.png",
-    pdf: "washing-instructions-print-washing.pdf",
+    pdf: "washy-washy-print-washing.pdf",
     page: 1,
     dpi: 110,
   },
   {
     png: "print-ironing.png",
-    pdf: "washing-instructions-print-ironing.pdf",
+    pdf: "washy-washy-print-ironing.pdf",
     page: 1,
     dpi: 110,
   },
   // The second page of the printable set, where the cards are. The reference
   // sheet on page 1 says what the chart holds; this says what it looks like.
-  { png: "print-card.png", pdf: "washing-instructions-print.pdf", page: 2, dpi: 110 },
+  { png: "print-card.png", pdf: "washy-washy-print.pdf", page: 2, dpi: 110 },
 ];
 
 /**

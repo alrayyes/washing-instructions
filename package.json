@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:data && bun run lint:machine && bun run typecheck && bun test",
-    "examples": "bun run src/cli.ts data/washing-instructions.csv.dist --machine data/machine.json.dist --out docs",
+    "examples": "bun run src/cli.ts data/washy-washy.json.dist --out docs",
     "format": "prettier --write .",
     "generate": "bun run src/cli.ts",
     "lint": "biome check .",

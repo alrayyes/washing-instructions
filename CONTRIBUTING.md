@@ -33,9 +33,9 @@ bun run screenshots        # re-shoot the PNGs of them (needs poppler)
 
 `out/` is generated and nothing in it is ever committed. The set under `docs/` is
 the exception, because a README that links a PDF has to have one to link. Change
-the chart, the machine file or anything that draws, and `bun test` fails until
-`bun run examples` has run. That command names both `.dist` files rather than
-letting the CLI pick, because the defaults prefer your own appliances and an
+the chart, the machine key or anything that draws, and `bun test` fails until
+`bun run examples` has run. That command names the `.dist` config rather than
+letting the CLI pick, because the default prefers your own appliances and an
 example in the repository is the last place they should turn up.
 
 ### The screenshots
@@ -149,7 +149,7 @@ they are worth a gate rather than only a reminder.
 
 - Only Helvetica is embedded, so the PDFs can only render WinAnsi characters.
   `•`, `°`, `—`, `–` are fine; `≈`, `✓` and curly quotes vanish silently. Watch
-  this when editing prose in the CSV.
+  this when editing prose in the chart.
 - The phone page's height is _measured_, not chosen: `renderPhone` renders the
   document repeatedly and bisects until it fits on one page with under 8 pt to
   spare. That is why the run reports a number of layout passes.

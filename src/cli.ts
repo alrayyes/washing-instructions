@@ -2,18 +2,16 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { basename, join, resolve as resolvePath } from "node:path";
 import {
   cardGroups,
-  DEFAULT_MACHINE,
   durationsOf,
   loadGroups,
-  parseInstructions,
   type ResolvedInstruction,
   resolve,
   type Variant,
 } from "@washy-washy/core";
 import { renderPhone, renderPrint } from "@washy-washy/pdf";
-import { loadMachine } from "./machine";
+import { loadConfig } from "./config";
 
-const DEFAULT_CSV = "data/washing-instructions.csv";
+const DEFAULT_CONFIG = "data/washy-washy.json";
 const DEFAULT_OUT = "out";
 
 /**
@@ -31,47 +29,29 @@ const SHEETS: { variant: Variant; suffix: string }[] = [
 
 function usage(): string {
   return [
-    "Usage: bun run generate [csv] [--out <dir>] [--machine <file>]",
+    "Usage: bun run generate [config] [--out <dir>]",
     "",
-    `  csv               instruction CSV to read (default: ${DEFAULT_CSV},`,
+    `  config            machine+chart config to read (default: ${DEFAULT_CONFIG},`,
     "                    falling back to the committed .dist)",
     `  --out <dir>       where the six PDFs go (default: ${DEFAULT_OUT})`,
-    `  --machine <file>  the appliances to draw (default: ${DEFAULT_MACHINE},`,
-    "                    falling back to the committed .dist)",
   ].join("\n");
 }
 
-/**
- * Which file to actually read. `data/washing-instructions.csv` describes one
- * household's laundry and is gitignored, so a fresh clone has only the .dist
- * beside it — fall back to that rather than failing on a checkout that is
- * perfectly fine. Falling back needs a .dist to exist, so naming a file that
- * simply is not there still fails, which is what you want when you meant your
- * own chart and mistyped it.
- */
-export async function resolveCsv(csv: string): Promise<string> {
-  if (await Bun.file(csv).exists()) return csv;
-  if (await Bun.file(`${csv}.dist`).exists()) return `${csv}.dist`;
-  throw new Error(`no such file: ${csv}`);
-}
-
 /** What the PDFs are named after. The .dist suffix is not part of the name. */
-export function outputStem(csv: string): string {
-  return basename(csv)
+export function outputStem(path: string): string {
+  return basename(path)
     .replace(/\.dist$/i, "")
-    .replace(/\.csv$/i, "");
+    .replace(/\.json$/i, "");
 }
 
 interface Args {
-  csv: string;
+  config: string;
   out: string;
-  machine: string;
 }
 
 export function parseArgs(argv: string[]): Args {
-  let csv = DEFAULT_CSV;
+  let config = DEFAULT_CONFIG;
   let out = DEFAULT_OUT;
-  let machine = DEFAULT_MACHINE;
   const positional: string[] = [];
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -81,11 +61,6 @@ export function parseArgs(argv: string[]): Args {
       if (value === undefined) throw new Error("--out needs a directory");
       out = value;
       index += 1;
-    } else if (argument === "--machine" || argument === "-m") {
-      const value = argv[index + 1];
-      if (value === undefined) throw new Error("--machine needs a file");
-      machine = value;
-      index += 1;
     } else if (argument === "--help" || argument === "-h") {
       throw new Error(usage());
     } else {
@@ -94,20 +69,18 @@ export function parseArgs(argv: string[]): Args {
   }
 
   if (positional.length > 1) throw new Error(`unexpected argument: ${positional[1]}`);
-  if (positional[0] !== undefined) csv = positional[0];
-  return { csv, out, machine };
+  if (positional[0] !== undefined) config = positional[0];
+  return { config, out };
 }
 
 async function main(argv: string[]): Promise<void> {
-  const { csv: requested, out, machine: machinePath } = parseArgs(argv);
-  const csv = await resolveCsv(requested);
-  const machine = await loadMachine(machinePath);
-
-  const source = await Bun.file(csv).text();
-  const items = resolve(parseInstructions(source, machine));
+  const { config: requested, out } = parseArgs(argv);
+  const { file, config } = await loadConfig(requested);
+  const { machine, chart } = config;
+  const items = resolve(chart);
 
   await mkdir(out, { recursive: true });
-  const stem = outputStem(csv);
+  const stem = outputStem(file);
 
   const written = await Promise.all(
     SHEETS.flatMap(({ variant, suffix }) => [
@@ -130,7 +103,7 @@ async function main(argv: string[]): Promise<void> {
   const names = (group: ResolvedInstruction[]) =>
     group.map((item) => item.clothingType).join(" + ");
 
-  console.log(`Read ${items.length} piles from ${resolvePath(csv)}`);
+  console.log(`Read ${items.length} piles from ${resolvePath(file)}`);
   console.log(`  drawn for ${machine.washer.name} · ${machine.iron.name}`);
   for (const line of written) console.log(`  ${line}`);
   if (groups.length > 0) {
