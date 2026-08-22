@@ -233,6 +233,30 @@ cp data/washy-washy.json.dist data/washy-washy.json
 There is no need to hurry: with no file of your own, `bun run generate` reads
 the dist and says so.
 
+Starting from a blank slate instead of the worked example:
+
+```sh
+bun run new-config             # writes data/washy-washy.json
+```
+
+That writes a placeholder machine and one placeholder pile — enough to
+load and generate immediately, so you can see the shape before you fill in
+your own — rather than the sixteen-pile dummy chart. It refuses to
+overwrite a file that is already there.
+
+Every config also opens with a `$schema` line pointing at
+[`@washy-washy/core`'s published JSON Schema](https://cdn.jsdelivr.net/npm/@washy-washy/core/schema/config.schema.json),
+so an editor that reads `$schema` (VS Code among them) autocompletes field
+names and flags an obviously wrong shape as you type, before you even run
+the tool. Check your work at any point, or as a CI-style check on its own:
+
+```sh
+bun run validate-config         # your file, falling back to the .dist
+```
+
+It reports the same specific field/row error `bun run generate` would if
+something is wrong.
+
 ### The chart
 
 Each entry under `chart` is one pile:

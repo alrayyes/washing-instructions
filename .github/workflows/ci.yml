@@ -33,6 +33,7 @@ jobs:
       - run: bun run lint
       - run: bun run lint:md
       - run: bun run lint:yaml
+      - run: bun run validate-config
       - run: bun run typecheck
       # Coverage instrumentation slows the suite down, which is why the
       # pre-push hook runs plain `bun test` and only CI pays for this.

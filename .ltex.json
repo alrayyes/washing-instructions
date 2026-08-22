@@ -29,6 +29,7 @@
       "commitlint",
       "filesystem",
       "gitignored",
+      "jsDelivr",
       "lefthook",
       "linted",
       "lockfile",

@@ -3,6 +3,7 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  CONFIG_SCHEMA_URL,
   chartToJson,
   configFromJson,
   configToJson,
@@ -74,6 +75,14 @@ describe("configToJson / configFromJson", () => {
 
   test("rejects invalid JSON", () => {
     expect(() => configFromJson("not json")).toThrow(/not valid JSON/);
+  });
+
+  test("leads the JSON with a $schema key an editor can use", () => {
+    const chart = parseInstructions(csv(), machine);
+    const written = JSON.parse(configToJson({ machine, chart }));
+
+    expect(Object.keys(written)[0]).toBe("$schema");
+    expect(written.$schema).toBe(CONFIG_SCHEMA_URL);
   });
 });
 

@@ -66,6 +66,8 @@ pre-push:
       run: bun run lint:prose
     - name: ltex
       run: bun run lint:prose:ltex
+    - name: config
+      run: bun run validate-config
     - name: typecheck
       run: bun run typecheck
     - name: test
