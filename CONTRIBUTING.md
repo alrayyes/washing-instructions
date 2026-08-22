@@ -88,10 +88,11 @@ it, which is the point:
   LanguageTool: grammar, spelling, punctuation, the phonetic article. These have
   a right answer, so the `ltex` job blocks the run. It reports findings with exit
   code **3**, not 1, which is worth knowing before you write anything that tests
-  for a number. It stays out of the git hooks because it is a 300 MB download
-  carrying its own Java runtime; cache the archive under `$XDG_CACHE_HOME` and
-  run it yourself before pushing, since it's the one check here that no hook
-  covers.
+  for a number. `bun run lint:prose:ltex` (`scripts/lint-prose-ltex.ts`) is what
+  both `pre-push` and CI actually call, so the two can't drift — it stays out of
+  `pre-commit` specifically, since it's a 300 MB download carrying its own Java
+  runtime, cached under `$XDG_CACHE_HOME` and still more than a _commit_ should
+  wait on even once cached.
 - **Style** — [Vale](https://vale.sh) with the Google and proselint packages:
   house voice, wordiness, clichés. This is advice, and Vale exits non-zero only
   on error-severity alerts, so its warnings are reported without blocking. It is
