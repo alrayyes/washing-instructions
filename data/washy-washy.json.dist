@@ -102,7 +102,9 @@
       "drying": "Tumble dry normal, or line dry in the sun — sunlight bleaches whites for free.",
       "colour_group": "white",
       "mix_tags": "",
-      "notes": "Wash whites on their own. One stray coloured sock is all it takes."
+      "notes": "Wash whites on their own. One stray coloured sock is all it takes.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "White Socks",
@@ -119,7 +121,9 @@
       "drying": "Tumble dry normal.",
       "colour_group": "white",
       "mix_tags": "",
-      "notes": "Same settings as White — throw them in that load."
+      "notes": "Same settings as White — throw them in that load.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "White Towels",
@@ -136,7 +140,9 @@
       "drying": "Tumble dry medium — the tumbling is what fluffs the pile back up.",
       "colour_group": "white",
       "mix_tags": "lint-shedder",
-      "notes": "Never fabric softener: it coats the loops in silicone and the towel stops absorbing. White vinegar in the softener drawer once a month softens instead."
+      "notes": "Never fabric softener: it coats the loops in silicone and the towel stops absorbing. White vinegar in the softener drawer once a month softens instead.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Coloured",
@@ -153,7 +159,9 @@
       "drying": "Line dry inside out, or tumble on low.",
       "colour_group": "colour",
       "mix_tags": "",
-      "notes": "Wash new or strongly dyed items separately for the first two or three washes."
+      "notes": "Wash new or strongly dyed items separately for the first two or three washes.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Coloured Socks",
@@ -170,7 +178,9 @@
       "drying": "Tumble dry low or line dry.",
       "colour_group": "colour",
       "mix_tags": "",
-      "notes": "Same settings as Coloured — throw them in that load."
+      "notes": "Same settings as Coloured — throw them in that load.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Coloured Towels",
@@ -187,7 +197,9 @@
       "drying": "Tumble dry medium — the tumbling is what fluffs the pile back up.",
       "colour_group": "colour",
       "mix_tags": "lint-shedder",
-      "notes": "Never fabric softener — it kills absorbency. Run them at 60 °C every month or so if they start to smell."
+      "notes": "Never fabric softener — it kills absorbency. Run them at 60 °C every month or so if they start to smell.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Microfibre Towels",
@@ -204,7 +216,9 @@
       "drying": "Air dry, or tumble on low. High heat fuses the split ends shut and the towel never absorbs again.",
       "colour_group": "colour",
       "mix_tags": "lint-magnet",
-      "notes": "Never fabric softener — it fills the split fibres with silicone and the towel is finished. Wash with microfibre only: the same split ends that make it absorbent grab cotton lint and never let go."
+      "notes": "Never fabric softener — it fills the split fibres with silicone and the towel is finished. Wash with microfibre only: the same split ends that make it absorbent grab cotton lint and never let go.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Dark",
@@ -221,7 +235,9 @@
       "drying": "Line dry inside out, out of direct sun. Skip the dryer: heat fades black fastest.",
       "colour_group": "dark",
       "mix_tags": "dye-bleeder",
-      "notes": "Turn everything inside out. The extra rinse matters here — detergent residue dries as grey streaks on black."
+      "notes": "Turn everything inside out. The extra rinse matters here — detergent residue dries as grey streaks on black.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Black Socks",
@@ -238,7 +254,9 @@
       "drying": "Line dry, or tumble on low.",
       "colour_group": "dark",
       "mix_tags": "",
-      "notes": "Same settings as Dark — throw them in that load."
+      "notes": "Same settings as Dark — throw them in that load.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Denim",
@@ -255,7 +273,9 @@
       "drying": "Hang by the waistband and air dry. A hot dryer shrinks them and destroys the elastane in stretch denim.",
       "colour_group": "dark",
       "mix_tags": "dye-bleeder",
-      "notes": "Inside out, zips and buttons closed. Wash them far less often than you think."
+      "notes": "Inside out, zips and buttons closed. Wash them far less often than you think.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Raw Denim",
@@ -272,7 +292,9 @@
       "drying": "Hang inside out indoors, away from sun and radiators. Never tumble.",
       "colour_group": "dark",
       "mix_tags": "solo|dye-bleeder",
-      "notes": "Unwashed denim is meant to go months before its first wash. Gentler than the machine: a 45-minute cold soak in the bath, inside out, no agitation, no wringing — then roll in a towel to press the water out."
+      "notes": "Unwashed denim is meant to go months before its first wash. Gentler than the machine: a 45-minute cold soak in the bath, inside out, no agitation, no wringing — then roll in a towel to press the water out.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Merino Wool",
@@ -289,7 +311,9 @@
       "drying": "Never tumble dry. Dry flat on a towel, away from radiators and sun — hung up it stretches and never comes back.",
       "colour_group": "any",
       "mix_tags": "",
-      "notes": "Turn inside out, wash with wool only, nothing with zips. Merino barely needs washing — air it overnight and wear it again."
+      "notes": "Turn inside out, wash with wool only, nothing with zips. Merino barely needs washing — air it overnight and wear it again.",
+      "reference_name": "Icebreaker on merino",
+      "reference_link": "https://eu.icebreaker.com/en-gb/blogs/journal/how-to-wash-merino-wool-jumper"
     },
     {
       "clothing_type": "Synthetic Activewear",
@@ -306,7 +330,9 @@
       "drying": "Air dry on a hanger — dry within the hour. Tumble heat kills the stretch.",
       "colour_group": "sport",
       "mix_tags": "lint-magnet",
-      "notes": "Inside out. Never softener: it films over the fibres these rely on for wicking and stretch. A cup of white vinegar in the rinse resets a load that already smells. Covers tops, shorts and base layers — one fabric family, one wash. Mixed colours are fine in one run: at 30 °C the dyes on polyester barely move. The exception is a brand-new black or strong red piece, which can crock for a wash or two — give that its own run first."
+      "notes": "Inside out. Never softener: it films over the fibres these rely on for wicking and stretch. A cup of white vinegar in the rinse resets a load that already smells. Covers tops, shorts and base layers — one fabric family, one wash. Mixed colours are fine in one run: at 30 °C the dyes on polyester barely move. The exception is a brand-new black or strong red piece, which can crock for a wash or two — give that its own run first.",
+      "reference_name": "Dirty Labs on synthetic activewear",
+      "reference_link": "https://dirtylabs.com/blogs/the-dirt/how-to-wash-your-activewear"
     },
     {
       "clothing_type": "Gym Socks",
@@ -323,7 +349,9 @@
       "drying": "Tumble dry low or line dry.",
       "colour_group": "sport",
       "mix_tags": "lint-shedder",
-      "notes": "Give them a 60 °C cotton run every few weeks — 40 °C keeps them clean but doesn't reset the smell."
+      "notes": "Give them a 60 °C cotton run every few weeks — 40 °C keeps them clean but doesn't reset the smell.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Cashmere Blend",
@@ -340,7 +368,9 @@
       "drying": "Never tumble dry. Squeeze the water out, never wring, then dry flat on a towel away from any heat.",
       "colour_group": "any",
       "mix_tags": "",
-      "notes": "Inside out, and only ever with other wool. Cashmere pills where it rubs — that is the fibre behaving normally, not a fault; a cashmere comb takes it off. Check the blend first: a little nylon makes it tougher, silk makes it more delicate."
+      "notes": "Inside out, and only ever with other wool. Cashmere pills where it rubs — that is the fibre behaving normally, not a fault; a cashmere comb takes it off. Check the blend first: a little nylon makes it tougher, silk makes it more delicate.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Wool Trainers",
@@ -357,7 +387,9 @@
       "drying": "Air dry only, somewhere with moving air: outside, by a window, or in front of a fan. Never the dryer and never a radiator — heat warps the sole and shrinks the wool upper.",
       "colour_group": "any",
       "mix_tags": "solo",
-      "notes": "Pull the insoles and laces out first and wash those by hand. The shoes go in a mesh delicates bag or a pillowcase, on their own — a loose trainer batters the drum and everything in it."
+      "notes": "Pull the insoles and laces out first and wash those by hand. The shoes go in a mesh delicates bag or a pillowcase, on their own — a loose trainer batters the drum and everything in it.",
+      "reference_name": "",
+      "reference_link": ""
     },
     {
       "clothing_type": "Linen",
@@ -374,7 +406,9 @@
       "drying": "Line dry, or tumble low and pull out a little damp — bone dry locks creases in.",
       "colour_group": "any",
       "mix_tags": "",
-      "notes": "New linen sheds a little dye/lint for the first few washes — wash alone until it rinses clear, then fine with other 40 °C loads."
+      "notes": "New linen sheds a little dye/lint for the first few washes — wash alone until it rinses clear, then fine with other 40 °C loads.",
+      "reference_name": "",
+      "reference_link": ""
     }
   ]
 }

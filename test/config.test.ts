@@ -17,10 +17,10 @@ const machine = await loadMachine(DIST_MACHINE);
 
 const HEADER =
   "clothing_type,detergent,fabric_softener,temperature,spin,duration,program,options," +
-  "ironing,ironing_notes,iron_setting,drying,colour_group,mix_tags,notes";
+  "ironing,ironing_notes,iron_setting,drying,colour_group,mix_tags,notes,reference_name,reference_link";
 
 const ROW =
-  "Dark,Dark liquid,no,30,800,~2:00,Cottons,Extra Rinse,yes,Inside out,2,Line dry,dark,dye-bleeder,";
+  "Dark,Dark liquid,no,30,800,~2:00,Cottons,Extra Rinse,yes,Inside out,2,Line dry,dark,dye-bleeder,,,";
 
 function csv(row = ROW): string {
   return `${HEADER}\n${row}\n`;

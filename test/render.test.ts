@@ -21,6 +21,8 @@ function pile(index: number): Instruction {
     colourGroup: "colour",
     mixTags: [],
     notes: "",
+    referenceName: "",
+    referenceLink: "",
   };
 }
 

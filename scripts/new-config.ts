@@ -50,6 +50,8 @@ export function skeletonConfig(): Config {
     colourGroup: "any",
     mixTags: [],
     notes: "",
+    referenceName: "",
+    referenceLink: "",
   };
   return { machine, chart: [pile] };
 }

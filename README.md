@@ -261,23 +261,25 @@ something is wrong.
 
 Each entry under `chart` is one pile:
 
-| Field             | What goes in it                                                         |
-| ----------------- | ----------------------------------------------------------------------- |
-| `clothing_type`   | What you call the pile — this is the card heading                       |
-| `detergent`       | Which detergent and how much                                            |
-| `fabric_softener` | `yes` or `no`                                                           |
-| `temperature`     | A temperature your machine offers                                       |
-| `spin`            | A spin speed your machine offers                                        |
-| `duration`        | Roughly how long it runs — on the loads table, the summary and the card |
-| `program`         | A dial position, spelled exactly as on the fascia                       |
-| `options`         | Option buttons, pipe-separated; empty for none                          |
-| `ironing`         | `yes` or `no` — whether you iron it at all                              |
-| `ironing_notes`   | Prose: how to iron it, or why you don't. Often empty                    |
-| `iron_setting`    | A thermostat position. Empty when `ironing` is `no`                     |
-| `drying`          | Prose: how to dry it                                                    |
-| `colour_group`    | `white`, `colour`, `dark`, `sport` or `any`                             |
-| `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo`    |
-| `notes`           | Anything else worth knowing                                             |
+| Field             | What goes in it                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------- |
+| `clothing_type`   | What you call the pile — this is the card heading                                                       |
+| `detergent`       | Which detergent and how much                                                                            |
+| `fabric_softener` | `yes` or `no`                                                                                           |
+| `temperature`     | A temperature your machine offers                                                                       |
+| `spin`            | A spin speed your machine offers                                                                        |
+| `duration`        | Roughly how long it runs — on the loads table, the summary and the card                                 |
+| `program`         | A dial position, spelled exactly as on the fascia                                                       |
+| `options`         | Option buttons, pipe-separated; empty for none                                                          |
+| `ironing`         | `yes` or `no` — whether you iron it at all                                                              |
+| `ironing_notes`   | Prose: how to iron it, or why you don't. Often empty                                                    |
+| `iron_setting`    | A thermostat position. Empty when `ironing` is `no`                                                     |
+| `drying`          | Prose: how to dry it                                                                                    |
+| `colour_group`    | `white`, `colour`, `dark`, `sport` or `any`                                                             |
+| `mix_tags`        | Pipe-separated: `lint-shedder`, `lint-magnet`, `dye-bleeder`, `solo`                                    |
+| `notes`           | Anything else worth knowing                                                                             |
+| `reference_name`  | Who to credit for advice that isn't obvious from the garment itself. Empty when there's nothing to cite |
+| `reference_link`  | A link backing up `reference_name`. Empty when there's nothing to cite                                  |
 
 Every machine-facing value is checked against what the appliances in the same
 file can actually be set to, so a typo fails the run rather than producing a

@@ -318,9 +318,9 @@ describe("bun run generate, a different machine", () => {
     };
     const csv =
       "clothing_type,detergent,fabric_softener,temperature,spin,duration,program,options," +
-      "ironing,ironing_notes,iron_setting,drying,colour_group,mix_tags,notes\n" +
-      "Linge blanc,Lessive,no,40,1000,~2:00,Coton,Prélavage,yes,Fer chaud,2,Étendre,white,,\n" +
-      "Pulls,Lessive laine,no,30,0,~0:40,Laine,,no,,,À plat,any,,\n";
+      "ironing,ironing_notes,iron_setting,drying,colour_group,mix_tags,notes,reference_name,reference_link\n" +
+      "Linge blanc,Lessive,no,40,1000,~2:00,Coton,Prélavage,yes,Fer chaud,2,Étendre,white,,,,\n" +
+      "Pulls,Lessive laine,no,30,0,~0:40,Laine,,no,,,À plat,any,,,,\n";
     const chart = parseInstructions(csv, machine);
     await writeFile(config, configToJson({ machine, chart }));
 
