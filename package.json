@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run typecheck && bun test",
+    "check": "bun run lint && bun run lint:md && bun run lint:yaml && bun run lint:prose && bun run lint:prose:ltex && bun run typecheck && bun test",
     "examples": "bun run src/cli.ts data/washy-washy.json.dist --out docs",
     "format": "prettier --write .",
     "generate": "bun run src/cli.ts",
@@ -18,6 +18,7 @@
     "lint:md": "prettier --check \"**/*.md\" && markdownlint-cli2 \"**/*.md\"",
     "lint:prose": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' --minAlertLevel=error .",
     "lint:prose:advice": ".tools/vale --glob='!{styles/**,CHANGELOG.md}' .",
+    "lint:prose:ltex": "bun run scripts/lint-prose-ltex.ts",
     "lint:yaml": "prettier --check \"**/*.{yml,yaml}\"",
     "migrate-config": "bun run scripts/migrate-config.ts",
     "prepare": "lefthook install",
